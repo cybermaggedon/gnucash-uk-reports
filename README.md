@@ -44,6 +44,12 @@ file so that you can check the code works 'out of the box'.
 
 ## Installing
 
+There is a dependency on the `gnucash` Python module, which cannot be installed
+from PyPI.  See <https://wiki.gnucash.org/wiki/Python_Bindings> for
+installation.  On Linux (Debian, Ubuntu, Fedora), the Python modules are
+available on package repositories.  MacOS and Windows builds of GnuCash are
+reportedly not shipping with Python APIs at the moment.
+
 ```
 pip3 install git+https://github.com/cybermaggedon/gnucash-uk-reports
 ```
