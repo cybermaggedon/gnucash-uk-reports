@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-from gnucash_uk_accounts.config import Config
-from gnucash_uk_accounts.worksheet import get_worksheet
-import gnucash_uk_accounts.accounts as accounts
+from gnucash_uk_reports.config import Config
+from gnucash_uk_reports.worksheet import get_worksheet
+import gnucash_uk_reports.accounts as accounts
 import sys
 
-from gnucash_uk_accounts.element import get_element
+from gnucash_uk_reports.element import get_element
 
 if len(sys.argv) < 4:
     sys.stderr.write("Usage:\n    report <config> <report> <format>\n")
