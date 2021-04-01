@@ -94,7 +94,7 @@ In Arelle, you can invoke a validation and check the output matches the
 schema.
 
 Once Arelle is installed, you can install the Workiva
-[xbrl-viewer](https://github.com/Workiva/ixbrl-viewer).  When an iXBRL
+[ixbrl-viewer](https://github.com/Workiva/ixbrl-viewer).  When an iXBRL
 document is loaded into Arelle, the document is automatically loaded into
 a browser with markup so that you can navigate the tags and discover tagged
 information.  With the iXBRL viewer when you hover over tagged information,

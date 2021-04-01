@@ -7,7 +7,7 @@
 Example Biz Ltd.
 Registered number: 012345678
 Unaudited Micro-Entity Accounts
-For the period: 2020-03-01 - 2021-02-28
+For the period: 2020-09-01 - 2021-08-31
 Approved for publication 2021-06-13
 
 *** Balance Sheet ***
@@ -26,13 +26,13 @@ Total                                   :   9752.40    8455.40
 Prepayments and Accrued Income          :         -          -  
 
 Creditors: falling due within one year:
-  Trade Creditors                       :  (1482.40)   (682.40) 
-  Other Creditors                       :   (190.00)         -  
-Total                                   :  (1672.40)   (682.40) 
+  Trade Creditors                       :         -          -  
+  Other Creditors                       :  (1482.40)   (682.40) 
+Total                                   :  (1482.40)   (682.40) 
 
-Net Current Assets                      :   8080.00    7773.00  
+Net Current Assets                      :   8270.00    7773.00  
 
-Total Assets Less Liabilities           :   8592.00    8413.00  
+Total Assets Less Liabilities           :   8782.00    8413.00  
 
 Creditors: falling due after one year   :         -          -  
 
@@ -42,7 +42,7 @@ Total                                   :   (190.00)         -
 
 Accrued liabilities and deferred income :         -          -  
 
-Net Assets                              :   8402.00    8413.00  
+Net Assets                              :   8592.00    8413.00  
 
 Capital and Reserves:
   Share Capital                         :   8000.00    8000.00  
@@ -71,9 +71,38 @@ Administrative Expenses:
 Total                                   :  (1086.00)  (1072.00) 
 
 Profit (Loss)                           :    494.00     413.00  
-
 ```
 
 ## iXBRL output (in a browser)
 
-![alt text](report.png)
+### Title page
+
+![alt text](report1.png)
+
+### Balance sheet
+
+![alt text](report2.png)
+
+### Income statement
+
+![alt text](report3.png)
+
+### Notes
+
+![alt text](report4.png)
+
+## iXBRL in Arelle
+
+The iXBRL can be loaded into Arelle to allow facts to be viewed.
+
+![alt text](arelle.png)
+
+## iXBRL in ixbrl-viewer
+
+The iXBRL can be loaded into ixbrlviewer.  Easiest way is to do follow the
+installation instructions for
+[ixbrl-viewer](https://github.com/Workiva/ixbrl-viewer) so that it is
+an Arelle plugin.
+
+![alt text](ixbrlviewer.png)
+

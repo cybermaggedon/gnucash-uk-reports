@@ -58,18 +58,18 @@
 	    "date": "2021-06-13",
 	    "currency": "GBP",
 	    "signing-director": "B Smith",
-	    "periods": [
-		{
-		    "name": "2020",
-		    "start": "2020-03-01",
-		    "end": "2021-02-28"
-		},
-		{
-		    "name": "2019",
-		    "start": "2019-03-01",
-		    "end": "2020-02-29"
-		}
-	    ]
+ 	    "periods": [
+ 		{
+ 		    "name": "2021",
+ 		    "start": "2020-09-01",
+ 		    "end": "2021-08-31"
+ 		},
+ 		{
+ 		    "name": "2020",
+ 		    "start": "2019-09-01",
+ 		    "end": "2020-08-31"
+ 		}
+ 	    ]
 	}
 
     },
@@ -276,8 +276,7 @@
 			"sign": "reversed"
 		    },
 		    "accounts": [
-			"Accounts Payable",
-			"VAT:Output"
+			"Accounts Payable"
 		    ]
 		},
 		{
@@ -291,7 +290,7 @@
 			"sign": "reversed"
 		    },
 		    "accounts": [
-			"Liabilities"
+			"VAT:Output"
 		    ]
 		}
 	    ]
