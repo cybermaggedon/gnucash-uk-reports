@@ -87,7 +87,7 @@
 		    "accounts": [
 			"Income"
 		    ],
-		    "in-year": true
+		    "period": "in-year"
 		}
 	    ],
 	    "tags": {
@@ -106,7 +106,7 @@
 		    "id": "staffing",
 		    "kind": "line",
 		    "description": "Staffing Costs",
-		    "in-year": true,
+		    "period": "in-year",
 		    "accounts": [
 			"Expenses:Emoluments"
 		    ]
@@ -143,7 +143,7 @@
 		    "accounts": [
 			"Expenses:Depreciation"
 		    ],
-		    "in-year": true
+		    "period": "in-year"
 		},
 		{
 		    "id": "other-charges",
@@ -153,7 +153,7 @@
 			"Expenses:VAT Purchases",
 			"Expenses:Other non-VAT expenses"
 		    ],
-		    "in-year": true
+		    "period": "in-year"
 		}
 	    ],
 	    "tags": {
@@ -187,7 +187,7 @@
 		    "tags": {
 			"tag": "uk-core:PropertyPlantEquipmentIncludingRight-of-useAssets"
 		    },
-		    "in-year": false,
+		    "period": "to-end",
 		    "accounts": [
 			"Assets:Capital Equipment"
 		    ]
@@ -209,7 +209,7 @@
 		    "id": "debtors",
 		    "kind": "line",
 		    "description": "Debtors",
-		    "in-year": false,
+		    "period": "to-end",
 		    "tags": {
 			"tag": "uk-core:TradeDebtorsTradeReceivables"
 		    },
@@ -222,7 +222,7 @@
 		    "id": "vat-refund-owed",
 		    "kind": "line",
 		    "description": "VAT Refund Due",
-		    "in-year": false,
+		    "period": "to-end",
 		    "tags": {
 			"tag": "uk-core:DeferredTaxAssetDebtors"
 		    },
@@ -234,7 +234,7 @@
 		    "id": "bank",
 		    "kind": "line",
 		    "description": "Bank",
-		    "in-year": false,
+		    "period": "to-end",
 		    "tags": {
 			"tag": "uk-core:CashBankOnHand"
 		    },
@@ -269,7 +269,7 @@
 		    "id": "trade-creditors",
 		    "kind": "line",
 		    "description": "Trade Creditors",
-		    "in-year": false,
+		    "period": "to-end",
 		    "tags": {
 			"tag": "uk-core:TradeCreditorsTradePayables",
 			"context": "within-year-{0}",
@@ -283,7 +283,7 @@
 		    "id": "other-creditors",
 		    "kind": "line",
 		    "description": "Other Creditors",
-		    "in-year": false,
+		    "period": "to-end",
 		    "tags": {
 			"tag": "uk-core:OtherCreditorsIncludingTaxationSocialSecurityBalanceSheetSubtotal",
 			"context": "within-year-{0}",
@@ -347,7 +347,7 @@
 		    "id": "corporation-tax-owed",
 		    "kind": "line",
 		    "description": "Corporation Tax",
-		    "in-year": false,
+		    "period": "to-end",
 		    "tags": {
 			"tag": "uk-core:TaxationIncludingDeferredTaxationBalanceSheetSubtotal",
 			"sign": "reversed"
@@ -395,7 +395,7 @@
 		    "accounts": [
 			"Equity:Shareholdings"
 		    ],
-		    "in-year": false
+		    "period": "to-end"
 		},
 		{
 		    "id": "profit-loss",
@@ -405,7 +405,7 @@
 			"Income",
 			"Expenses"
 		    ],
-		    "in-year": false
+		    "period": "to-end"
 		},
 		{
 		    "id": "dividends",
@@ -414,7 +414,7 @@
 		    "accounts": [
 			"Equity:Dividends"
 		    ],
-		    "in-year": false
+		    "period": "to-end"
 		},
 		{
 		    "kind": "line",
@@ -422,7 +422,7 @@
 		    "accounts": [
 			"Equity:Corporation Tax"
 		    ],
-		    "in-year": true
+		    "period": "to-end"
 		}
 	    ]
 	},
@@ -436,7 +436,107 @@
 	    "inputs": [
 		"capital-and-reserves"
 	    ]
+	},
+
+
+
+	
+	{
+	    "id": "fixed-assets-analysis",
+	    "kind": "group",
+	    "description": "Fixed Assets",
+	    "lines": [
+		{
+		    "kind": "line",
+		    "description": "At start of period",
+		    "period": "to-start",
+		    "accounts": [
+			"Assets:Capital Equipment:Computer Equipment"
+		    ]
+		},
+		{
+		    "kind": "line",
+		    "description": "Additions",
+		    "period": "in-year",
+		    "accounts": [
+			"Assets:Capital Equipment:Computer Equipment"
+		    ],
+		    "tags": {
+			"tag": "uk-core:IncreaseDecreaseInPropertyPlantEquipment",
+			"context": "period-{0}"
+		    }
+		}
+	    ],
+	    "tags": {
+		"tag": "uk-core:PropertyPlantEquipmentGrossCost"
+	    }
+	},
+
+
+	{
+	    "id": "depreciation-analysis",
+	    "kind": "group",
+	    "description": "Depreciation",
+	    "lines": [
+		{
+		    "kind": "line",
+		    "description": "At start of period",
+		    "period": "to-start",
+		    "accounts": [
+			"Assets:Capital Equipment:Depreciation"
+		    ]
+		},
+		{
+		    "kind": "line",
+		    "description": "Charge",
+		    "period": "in-year",
+		    "accounts": [
+			"Assets:Capital Equipment:Depreciation"
+		    ],
+		    "tags": {
+			"tag": "uk-core:IncreaseFromDepreciationChargeForYearPropertyPlantEquipment",
+			"context": "period-{0}"
+		    }
+		}
+	    ],
+	    "tags": {
+		"tag": "uk-core:AccumulatedDepreciationImpairmentPropertyPlantEquipment"
+	    }
+	},
+
+	{
+	    "id": "carrying-final",
+	    "kind": "computation",
+	    "description": "Carrying at end of period",
+	    "inputs": [
+		"fixed-assets-analysis",
+		"depreciation-analysis"
+	    ],
+	    "tags": {
+		"tag": "uk-core:PropertyPlantEquipmentIncludingRight-of-useAssets"
+	    }
+	},
+
+
+	
+	{
+	    "id": "carrying-initial",
+	    "kind": "group",
+	    "description": "Carrying at start of period",
+	    "hide-breakdown": true,
+	    "lines": [
+		{
+		    "kind": "line",
+		    "description": "At start of period",
+		    "period": "to-start",
+		    "accounts": [
+			"Assets:Capital Equipment:Computer Equipment",
+			"Assets:Capital Equipment:Depreciation"
+		    ]
+		}
+	    ]
 	}
+
     ],
 
 
@@ -466,23 +566,7 @@
 	    ]
 
 	},
-	{
-	    "id": "profit-and-loss-current",
-	    "kind": "single-period",
-	    "description": "Profit and Loss",
-
-	    "tags": {
-	    },
-
-	    "items": [
-		"turnover",
-		"cost-of-sales",
-		"gross-profit",
-		"administrative-expenses",
-		"profit"
-	    ]
-
-	},
+	
 	{
 	    "id": "profit-and-loss",
 	    "kind": "multi-period",
@@ -499,7 +583,25 @@
 		"profit"
 	    ]
 
+	},
+	
+	{
+	    "id": "fixed-assets",
+	    "kind": "multi-period",
+	    "description": "Fixed Assets",
+
+	    "tags": {
+	    },
+
+	    "items": [
+		"fixed-assets-analysis",
+		"depreciation-analysis",
+		"carrying-final",
+		"carrying-initial"
+	    ]
+
 	}
+	
     ],
 
     "elements": [
@@ -511,6 +613,7 @@
 		"title",
 		"balance-sheet",
 		"profit-and-loss",
+		"fixed-assets",
 		"notes"
 	    ]
 	},
@@ -534,6 +637,13 @@
 	    "kind": "worksheet",
 	    "title": "Income Statement",
 	    "worksheet": "profit-and-loss"
+	},
+
+	{
+	    "id": "fixed-assets",
+	    "kind": "worksheet",
+	    "title": "Fixed Assets",
+	    "worksheet": "fixed-assets"
 	},
 
 	{

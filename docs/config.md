@@ -146,7 +146,7 @@ shown with its total, and then there's a total for all the lines.
 		    "tags": {
 			"tag": "uk-core:PropertyPlantEquipmentIncludingRight-of-useAssets"
 		    },
-		    "in-year": false,
+		    "period": "in-year",
 		    "accounts": [
 			"Assets:Capital Equipment"
 		    ]
@@ -179,13 +179,15 @@ In iXBRL they are normally positive, so you can set the `sign` field to
 `reversed` to turn something which is normally a Gnucash negative into an
 iXBRL positive.
 
-When examining Gnucash accounts the `group` usually looks at transactions
-which are within the current period (usually an accounting year).  This is
-correct for income/expense information where you are only accounting
-within a period, but incorrect for balance sheet where you are accumulating
-information from the origins of a company.  This is controlled with the
-`in-year` attribute.  Set to `false` to examine transactions from the beginning
-from time immemorial.
+When examining Gnucash accounts the `group` normally looks at transactions
+from time immemorial up until the end of the account period.
+This is correct for balance sheets where you are analysing accumulation,
+but incorrect for income/expenses where you only want to account in-year.
+This is controlled with the
+`period` attribute.  Set to `to-end` to examine transactions from the beginning
+from time immemorial to the end of the period, `to-start` to examine
+transactions prior to the accounting period, and `in-year` to examine
+transactions only within the accounting period.
 
 If the `line` list is empty i.e. there are no line items, the group
 will evaluate to zero.

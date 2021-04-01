@@ -72,6 +72,10 @@ class Line(Computable):
         return  Line(id, cfg.get("description"), cfg.get("accounts"),
                      cfg.get("tags"))
 
+IN_YEAR = 1
+TO_START = 2
+TO_END = 3
+
 class Group(Computable):
     def __init__(self, id, description, tags):
         self.id = id
@@ -91,9 +95,15 @@ class Group(Computable):
         for l in cfg.get("lines"):
 
             line = Line.load(l)
-            in_year = l.get("in-year")
+            pspec = l.get("period")
 
-            g.add(line, in_year)
+            pid = {
+                "in-year": IN_YEAR,
+                "to-start": TO_START,
+                "to-end": TO_END
+            }.get(pspec, TO_END)
+
+            g.add(line, pid)
 
         def set_hide(x):
             g.hide_breakdown = x
@@ -102,16 +112,17 @@ class Group(Computable):
         
         return g
 
-    def add(self, line, in_year=True):
-        self.lines.append((line, in_year))
+    def add(self, line, period=TO_END):
+        self.lines.append((line, period))
     def compute(self, accounts, start, end, result):
         total = 0
-        for line, in_year in self.lines:
-            if in_year:
+        for line, period in self.lines:
+            if period == IN_YEAR:
                 total += line.compute(accounts, start, end, result)
+            elif period == TO_START:
+                history = datetime.date(1970, 1, 1)
+                total += line.compute(accounts, history, start, result)
             else:
-                # Some date which is before the start of all account
-                # transactions
                 history = datetime.date(1970, 1, 1)
                 total += line.compute(accounts, history, end, result)
         result.set(self.id, total)

@@ -14,14 +14,14 @@ Approved for publication 2021-06-13
                                                2021       2020  
 
 Fixed Assets:
-  Tangible Assets                       :    512.00     640.00  
-Total                                   :    512.00     640.00  
+  Tangible Assets                       :    912.00     672.00  
+Total                                   :    912.00     672.00  
 
 Current Assets:
   Debtors                               :   1056.00          -  
-  VAT Refund Due                        :    160.00     160.00  
-  Bank                                  :   8536.40    8295.40  
-Total                                   :   9752.40    8455.40  
+  VAT Refund Due                        :    240.00     160.00  
+  Bank                                  :   8056.40    8295.40  
+Total                                   :   9352.40    8455.40  
 
 Prepayments and Accrued Income          :         -          -  
 
@@ -30,9 +30,9 @@ Creditors: falling due within one year:
   Other Creditors                       :  (1482.40)   (682.40) 
 Total                                   :  (1482.40)   (682.40) 
 
-Net Current Assets                      :   8270.00    7773.00  
+Net Current Assets                      :   7870.00    7773.00  
 
-Total Assets Less Liabilities           :   8782.00    8413.00  
+Total Assets Less Liabilities           :   8782.00    8445.00  
 
 Creditors: falling due after one year   :         -          -  
 
@@ -42,54 +42,66 @@ Total                                   :   (190.00)         -
 
 Accrued liabilities and deferred income :         -          -  
 
-Net Assets                              :   8592.00    8413.00  
+Net Assets                              :   8592.00    8445.00  
 
 Capital and Reserves:
   Share Capital                         :   8000.00    8000.00  
-  Retained Profit                       :    907.00     413.00  
+  Retained Profit                       :    907.00     445.00  
   Dividends                             :   (125.00)         -  
   Corporation Tax                       :   (190.00)         -  
-Total                                   :   8592.00    8413.00  
+Total                                   :   8592.00    8445.00  
 
-Total Capital and Reserves              :   8592.00    8413.00  
+Total Capital and Reserves              :   8592.00    8445.00  
 
 
 *** Income Statement ***
                                                2021       2020  
 
 Turnover / revenue:
-  Consultancy                           :   4000.00    3412.00  
-Total                                   :   4000.00    3412.00  
+  Consultancy                           :   7412.00    3412.00  
+Total                                   :   7412.00    3412.00  
 
-Cost of Sales                           :  (2420.00)  (1927.00) 
+Cost of Sales                           :  (4347.00)  (1927.00) 
 
-Gross Profit                            :   1580.00    1485.00  
+Gross Profit                            :   3065.00    1485.00  
 
 Administrative Expenses:
-  Depreciation                          :   (128.00)   (160.00) 
-  Other                                 :   (958.00)   (912.00) 
-Total                                   :  (1086.00)  (1072.00) 
+  Depreciation                          :   (288.00)   (128.00) 
+  Other                                 :  (1870.00)   (912.00) 
+Total                                   :  (2158.00)  (1040.00) 
 
-Profit (Loss)                           :    494.00     413.00  
+Profit (Loss)                           :    907.00     445.00  
+
+
+*** Fixed Assets ***
+                                               2021       2020  
+
+Fixed Assets:
+  At start of period                    :    800.00          -  
+  Additions                             :    400.00     800.00  
+Total                                   :   1200.00     800.00  
+
+Depreciation:
+  At start of period                    :   (128.00)         -  
+  Charge                                :   (160.00)   (128.00) 
+Total                                   :   (288.00)   (128.00) 
+
+Carrying at end of period               :    912.00     672.00  
+
+Carrying at start of period             :    672.00          -  
 ```
 
 ## iXBRL output (in a browser)
 
-### Title page
+![alt text](report-title.png)
 
-![alt text](report1.png)
+![alt text](report-bs.png)
 
-### Balance sheet
+![alt text](report-income.png)
 
-![alt text](report2.png)
+![alt text](report-assets.png)
 
-### Income statement
-
-![alt text](report3.png)
-
-### Notes
-
-![alt text](report4.png)
+![alt text](report-notes.png)
 
 ## iXBRL in Arelle
 

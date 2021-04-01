@@ -186,12 +186,19 @@ h2 {
   }
 
   DIV.title.page h1 {
-    padding-top: 4rem;
-    padding-left: 4rem;
+    margin: 4rem 4rem 0.5rem 4rem;
+    padding: 0;
   }
 
   DIV.title.page DIV.subheading {
-    padding-left: 4rem;
+    font-weight: bold;
+    margin: 0.5rem 4em 2rem 4em;
+    padding: 0;
+  }
+
+  DIV.title.page DIV.information {
+    margin: 0.2em 4em 0.2em 4em;
+    padding: 0;
   }
 
   DIV.title.page DIV.signature {
@@ -1029,15 +1036,6 @@ class Title(Element):
                        "period-0", val)
             div.appendChild(div2)
 
-        def company_number(val):
-            div2 = par.doc.createElement("div")
-            div2.setAttribute("class", "subheading")
-            div2.appendChild(par.doc.createTextNode("Registered number: "))
-            par.add_nn(div2,
-                       "uk-bus:UKCompaniesHouseRegisteredNumber",
-                       "period-0", val)
-            div.appendChild(div2)
-
         def report_title(val):
             div2 = doc.createElement("div")
             div2.setAttribute("class", "subheading")
@@ -1046,9 +1044,18 @@ class Title(Element):
                        "period-0", val)
             div.appendChild(div2)
 
+        def company_number(val):
+            div2 = par.doc.createElement("div")
+            div2.setAttribute("class", "information")
+            div2.appendChild(par.doc.createTextNode("Registered number: "))
+            par.add_nn(div2,
+                       "uk-bus:UKCompaniesHouseRegisteredNumber",
+                       "period-0", val)
+            div.appendChild(div2)
+
         def report_date(val):
             div2 = doc.createElement("div")
-            div2.setAttribute("class", "subheading")
+            div2.setAttribute("class", "information")
             div2.appendChild(par.doc.createTextNode("Approved for publication "))
             par.add_date(div2,
                        "uk-bus:BusinessReportPublicationDate",
@@ -1057,7 +1064,7 @@ class Title(Element):
 
         def report_period(p):
             div2 = doc.createElement("div")
-            div2.setAttribute("class", "subheading")
+            div2.setAttribute("class", "information")
             div2.appendChild(par.doc.createTextNode("For the period: "))
             par.add_date(div2,
                        "uk-bus:StartDateForPeriodCoveredByReport",
@@ -1069,15 +1076,24 @@ class Title(Element):
             div.appendChild(div2)
 
         self.metadata.get("business").get("company-name").use(company_name)
-        self.metadata.get("business").get("company-number").use(company_number)
         self.metadata.get("report").get("title").use(report_title)
+        self.metadata.get("business").get("company-number").use(company_number)
         self.metadata.get("report").get("periods")[0].use(report_period)
         self.metadata.get("report").get_date("date").use(report_date)
 
-
-
-
+        directors = self.metadata.get("business.directors")
         company_name = self.metadata.get("business").get("company-name")
+
+        div2 = doc.createElement("div")
+        div.appendChild(div2)
+        div2.setAttribute("class", "information")
+        div2.appendChild(par.doc.createTextNode("Directors: "))
+        for i in range(0, len(directors)):
+            if i > 0:
+                div2.appendChild(par.doc.createTextNode(", "))
+            par.add_nn(div2, "uk-bus:NameEntityOfficer",
+                       "officer-{0}".format(i + 1),
+                       directors[i])
 
         sig = par.doc.createElement("div")
         sig.setAttribute("class", "signature")
@@ -1087,7 +1103,6 @@ class Title(Element):
 
         p.appendChild(par.doc.createTextNode("Approved by the board of directors and authorised for publication on "))
 
-        directors = self.metadata.get("business.directors")
 
         def report_date(val):
             par.add_date(p, "uk-bus:BusinessReportPublicationDate",
@@ -1100,7 +1115,7 @@ class Title(Element):
         p = par.doc.createElement("p")
         sig.appendChild(p)
 
-        p.appendChild(par.doc.createTextNode("Signed by "))
+        p.appendChild(par.doc.createTextNode("Signed on behalf of the directors by "))
 
         def signer(val):
             for i in range(0, len(directors)):
