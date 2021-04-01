@@ -512,14 +512,15 @@
 		"title",
 		"balance-sheet",
 		"profit-and-loss",
-		"notes",
-		"signature"
+		"notes"
 	    ]
 	},
 
 	{
 	    "id": "title",
-	    "kind": "title"
+	    "kind": "title",
+	    "signature-image": "signature.png",
+	    "signature-type": "image/png"
 	},
 
 	{
@@ -548,11 +549,6 @@
 		"software-version",
 		"note:These are fictional accounts, references to real-world entities or persons is unintentional."
 	    ]
-	},
-
-	{
-	    "id": "signature",
-	    "kind": "signature"
 	}
 
     ]

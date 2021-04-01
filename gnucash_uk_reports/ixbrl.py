@@ -22,6 +22,7 @@ class IxbrlReporter:
 
             # Blank header cell
             blank = doc.createElement("div")
+            blank.setAttribute("class", "label")
             grid.appendChild(blank)
             blank.appendChild(doc.createTextNode(" "))
 
@@ -35,6 +36,7 @@ class IxbrlReporter:
 
             # Blank header cell
             blank = doc.createElement("div")
+            blank.setAttribute("class", "label")
             grid.appendChild(blank)
             blank.appendChild(doc.createTextNode(" "))
 
@@ -222,7 +224,7 @@ class IxbrlReporter:
 
             grid = doc.createElement("div")
             grid.setAttribute("id", worksheet.id)
-            grid.setAttribute("class", "worksheet")
+            grid.setAttribute("class", "sheet")
 
             add_header(grid, periods)
 

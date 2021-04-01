@@ -7,7 +7,7 @@ from . period import Period
 from datetime import datetime
 from xml.dom.minidom import getDOMImplementation
 from xml.dom import XHTML_NAMESPACE
-
+import base64
 import json
 
 software = "gnucash-uk-reports"
@@ -148,9 +148,6 @@ class Element:
         if kind == "notes":
             return NotesElement.load(elt_def, cfg)
 
-        if kind == "signature":
-            return SignatureElement.load(elt_def, cfg)
-
         raise RuntimeError("Don't know element kind '%s'" % kind)
 
     def add_style(self, elt):
@@ -159,31 +156,70 @@ class Element:
         
         style = doc.createElement("style")
         elt.appendChild(style)
-
-        num_periods = len(self.periods)
-
-        template_columns = ["20em"]
-        template_columns.extend(["10em"] * num_periods)
-        template_columns = " ".join(template_columns)
             
         style_text = """
 
-.worksheet {
-    display: grid;
-    grid-template-columns: %s;
-    grid-template-rows: auto;
-    column-gap: 1rem;
-    row-gap: 0.2rem;
-    padding: 1em;
+h2 {
+  page-break-before: always;
 }
 
-.breakdown.header {
-  grid-column: 1 / span %d;
+@media screen, projection, tv {
+
+  body {
+    margin: 2% 4% 2% 4%;
+    background-color: gray;
+  }
+
+  DIV.page {
+
+    background-color: white;
+    padding: 2em;
+
+    /* CSS hack for cross browser minimum height */
+    min-height: 29.7cm;
+
+    height: 29.7cm;
+    width: 21cm;
+
+    margin: 2em 0;
+
+  }
+
+  DIV.title.page h1 {
+    padding-top: 4rem;
+    padding-left: 4rem;
+  }
+
+  DIV.title.page DIV.subheading {
+    padding-left: 4rem;
+  }
+
+  DIV.title.page DIV.signature {
+    padding: 4rem;
+  }
+
+}
+
+.sheet {
+  display: grid;
+  grid-template-columns: 20rem repeat(10, 10rem);
+  grid-template-rows: auto;
+  column-gap: 1rem;
+  row-gap: 0.2rem;
+  padding: 1rem;
 }
 
 .header {
   font-weight: bold;
   margin-top: 1em;
+}
+
+.label {
+  grid-column: 1;
+}
+
+.label.breakdown.header {
+  grid-column: 1 / span 10;
 }
 
 .label.item {
@@ -193,6 +229,19 @@ class Element:
 .value {
   font-family: Source Code Pro, monospace;
   font-size: 10pt;
+}
+
+@media print {
+  .value {
+    font-family: Source Code Pro, monospace;
+    font-size: 1rem;
+  }
+  * {
+    font-size: 1rem;
+  }
+  .sheet {
+    grid-template-columns: 40% repeat(10, 20%);
+  }
 }
 
 .total.value {
@@ -241,7 +290,7 @@ class Element:
   display: none;
 }
 
-        """ % (template_columns, (num_periods + 1))
+        """
 
         style.appendChild(doc.createTextNode(style_text))
 
@@ -918,15 +967,19 @@ class Composite(Element):
         return elt
 
 class Title(Element):
-    def __init__(self, metadata):
+    def __init__(self, metadata, img, type):
         super().__init__(metadata)
         self.title = metadata.get("report").get("title")
         self.date = metadata.get("report").get("date")
+        self.img = img
+        self.type = type
     @staticmethod
     def load(elt_def, cfg):
 
         e = Title(
-            cfg.get("metadata")
+            cfg.get("metadata"),
+            elt_def.get("signature-image"),
+            elt_def.get("signature-type")
         )
 
         return e
@@ -966,11 +1019,11 @@ class Title(Element):
         doc = par.doc
 
         div = doc.createElement("div")
-        div.setAttribute("class", "title")
+        div.setAttribute("class", "title page")
 
         def company_name(val):
             div2 = doc.createElement("h1")
-            div2.setAttribute("class", "title")
+            div2.setAttribute("class", "heading")
             par.add_nn(div2,
                        "uk-bus:EntityCurrentLegalOrRegisteredName",
                        "period-0", val)
@@ -1021,6 +1074,57 @@ class Title(Element):
         self.metadata.get("report").get("periods")[0].use(report_period)
         self.metadata.get("report").get_date("date").use(report_date)
 
+
+
+
+        company_name = self.metadata.get("business").get("company-name")
+
+        sig = par.doc.createElement("div")
+        sig.setAttribute("class", "signature")
+
+        p = par.doc.createElement("p")
+        sig.appendChild(p)
+
+        p.appendChild(par.doc.createTextNode("Approved by the board of directors and authorised for publication on "))
+
+        directors = self.metadata.get("business.directors")
+
+        def report_date(val):
+            par.add_date(p, "uk-bus:BusinessReportPublicationDate",
+                       "report-date", val)
+
+        self.metadata.get("report").get_date("date").use(report_date)
+
+        p.appendChild(par.doc.createTextNode("."))
+
+        p = par.doc.createElement("p")
+        sig.appendChild(p)
+
+        p.appendChild(par.doc.createTextNode("Signed by "))
+
+        def signer(val):
+            for i in range(0, len(directors)):
+                if val == directors[i]:
+                    par.add_nn(p, "uk-core:DirectorSigningFinancialStatements",
+                               "officer-" + str(i + 1), "")
+                    p.appendChild(par.doc.createTextNode(val))
+
+
+        self.metadata.get("report").get("signing-director").use(signer)
+
+        p.appendChild(par.doc.createTextNode("."))
+
+
+        if self.img and self.type:
+            img = par.doc.createElement("img")
+            data = base64.b64encode(open(self.img, "rb").read()).decode("utf-8")
+            img.setAttribute("src",
+                             "data:{0};base64,{1}".format(self.type, data)
+                             )
+            sig.appendChild(img)
+
+        div.appendChild(sig)
+        
         return div
 
 class WorksheetElement(Element):
@@ -1056,6 +1160,7 @@ class WorksheetElement(Element):
         elt = rep.get_elt(self.worksheet)
 
         div = par.doc.createElement("div")
+        div.setAttribute("class", "worksheet page")
 
         title = par.doc.createElement("h2")
         title.appendChild(par.doc.createTextNode(self.title))
@@ -1210,7 +1315,7 @@ class NotesElement(Element):
     def to_ixbrl_elt(self, par):
 
         div = par.doc.createElement("div")
-        div.setAttribute("class", "notes")
+        div.setAttribute("class", "notes page")
 
         title = par.doc.createElement("h2")
         title.appendChild(par.doc.createTextNode("Notes"))
@@ -1230,55 +1335,6 @@ class NotesElement(Element):
             p.appendChild(self.get_note_elts(note, par))
 
         return div
-
-class SignatureElement(Element):
-    def __init__(self, metadata):
-        super().__init__(metadata)
-
-    @staticmethod
-    def load(elt_def, cfg):
-
-        e = SignatureElement(
-            cfg.get("metadata")
-        )
-
-        return e
-
-    def to_text(self, out):
-        pass
-
-    def to_ixbrl_elt(self, par):
-
-        company_name = self.metadata.get("business").get("company-name")
-
-        elt = par.doc.createElement("div")
-
-        elt.appendChild(par.doc.createTextNode("Approved by the board of directors and authorised for publication on "))
-
-        directors = self.metadata.get("business.directors")
-
-        def report_date(val):
-            par.add_date(elt, "uk-bus:BusinessReportPublicationDate",
-                       "report-date", val)
-
-        self.metadata.get("report").get_date("date").use(report_date)
-
-        elt.appendChild(par.doc.createTextNode(", signed by "))
-
-        def signer(val):
-            for i in range(0, len(directors)):
-                if val == directors[i]:
-                    par.add_nn(elt, "uk-core:DirectorSigningFinancialStatements",
-                               "officer-" + str(i + 1), "")
-                    elt.appendChild(par.doc.createTextNode(val))
-
-
-        # FIXME: Can go in hidden header?
-        self.metadata.get("report").get("signing-director").use(signer)
-
-        elt.appendChild(par.doc.createTextNode("."))
-
-        return elt
 
 def get_element(id, cfg, session):
 
