@@ -1186,8 +1186,9 @@ class WorksheetElement(Element):
         return div
 
 class NotesElement(Element):
-    def __init__(self, metadata, notes):
+    def __init__(self, metadata, title, notes):
         super().__init__(metadata)
+        self.title = title
         self.notes = notes
 
     @staticmethod
@@ -1195,6 +1196,7 @@ class NotesElement(Element):
 
         e = NotesElement(
             cfg.get("metadata"),
+            elt_def.get("title"),
             elt_def.get("notes")
         )
 
@@ -1333,7 +1335,10 @@ class NotesElement(Element):
         div.setAttribute("class", "notes page")
 
         title = par.doc.createElement("h2")
-        title.appendChild(par.doc.createTextNode("Notes"))
+        if self.title:
+            title.appendChild(par.doc.createTextNode(self.title))
+        else:
+            title.appendChild(par.doc.createTextNode("Notes"))
         div.appendChild(title)
 
         ol = par.doc.createElement("ol")

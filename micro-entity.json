@@ -79,6 +79,7 @@
 	    "id": "turnover",
 	    "kind": "group",
 	    "description": "Turnover / revenue",
+	    "hide-breakdown": true,
 	    "lines": [
 		{
 		    "kind": "line",
@@ -135,6 +136,7 @@
 	    "id": "administrative-expenses",
 	    "kind": "group",
 	    "description": "Administrative Expenses",
+	    "hide-breakdown": true,
 	    "lines": [
 		{
 		    "id": "depreciation",
@@ -179,6 +181,7 @@
 	    "id": "fixed-assets",
 	    "kind": "group",
 	    "description": "Fixed Assets",
+	    "hide-breakdown": true,
 	    "lines": [
 		{
 		    "id": "tangible-assets",
@@ -201,6 +204,7 @@
 	    "id": "current-assets",
 	    "kind": "group",
 	    "description": "Current Assets",
+	    "hide-breakdown": true,
 	    "tags": {
 		"tag": "uk-core:CurrentAssets"
 	    },
@@ -259,6 +263,7 @@
 	    "id": "creditors-within-1-year",
 	    "kind": "group",
 	    "description": "Creditors: falling due within one year",
+	    "hide-breakdown": true,
 	    "tags": {
 		"tag": "uk-core:Creditors",
 		"context": "within-year-{0}",
@@ -338,6 +343,7 @@
 	    "id": "provisions-for-liabilities",
 	    "kind": "group",
 	    "description": "Provisions For Liabilities",
+	    "hide-breakdown": true,
 	    "tags": {
 		"tag": 	"uk-core:ProvisionsForLiabilitiesBalanceSheetSubtotal",
 		"sign": "reversed"
@@ -386,6 +392,7 @@
 	{
 	    "id": "capital-and-reserves",
 	    "kind": "group",
+	    "hide-breakdown": true,
 	    "description": "Capital and Reserves",
 	    "lines": [
 		{
@@ -445,6 +452,7 @@
 	    "id": "fixed-assets-analysis",
 	    "kind": "group",
 	    "description": "Fixed Assets",
+	    "hide-breakdown": true,
 	    "lines": [
 		{
 		    "kind": "line",
@@ -477,6 +485,7 @@
 	    "id": "depreciation-analysis",
 	    "kind": "group",
 	    "description": "Depreciation",
+	    "hide-breakdown": true,
 	    "lines": [
 		{
 		    "kind": "line",
@@ -515,39 +524,8 @@
 	    "tags": {
 		"tag": "uk-core:PropertyPlantEquipmentIncludingRight-of-useAssets"
 	    }
-	},
-	
-	{
-	    "id": "share-capital",
-	    "kind": "group",
-	    "description": "Share Capital",
-	    "lines": [
-		{
-		    "kind": "line",
-		    "description": "Ordinary Shares",
-		    "period": "to-start",
-		    "accounts": [
-			"Equity:Shareholdings:Ordinary Shares"
-		    ]
-		},
-		{
-		    "kind": "line",
-		    "description": "Preference Shares",
-		    "period": "to-start",
-		    "accounts": [
-			"Equity:Shareholdings:Preference Shares"
-		    ]
-		},
-		{
-		    "kind": "line",
-		    "description": "Shares Issued",
-		    "period": "in-year",
-		    "accounts": [
-			"Equity:Shareholdings"
-		    ]
-		}
-	    ]
 	}
+
 
     ],
 
@@ -611,20 +589,6 @@
 		"carrying-final"
 	    ]
 
-	},
-	
-	{
-	    "id": "share-capital",
-	    "kind": "multi-period",
-	    "description": "Share Capital",
-
-	    "tags": {
-	    },
-
-	    "items": [
-		"share-capital"
-	    ]
-
 	}
 	
     ],
@@ -638,8 +602,6 @@
 		"title",
 		"balance-sheet",
 		"profit-and-loss",
-		"fixed-assets",
-		"share-capital",
 		"notes"
 	    ]
 	},
@@ -670,13 +632,6 @@
 	    "kind": "worksheet",
 	    "title": "Fixed Assets",
 	    "worksheet": "fixed-assets"
-	},
-
-	{
-	    "id": "share-capital",
-	    "kind": "worksheet",
-	    "title": "Share Capital",
-	    "worksheet": "share-capital"
 	},
 
 	{
