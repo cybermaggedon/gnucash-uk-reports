@@ -155,6 +155,7 @@ class Element:
         doc = self.doc
         
         style = doc.createElement("style")
+        style.setAttribute("type", "text/css")
         elt.appendChild(style)
             
         style_text = """
@@ -398,6 +399,13 @@ h2 {
         head = doc.createElement("head")
         html.appendChild(head)
 
+        def add_title(val):
+            t = doc.createElement("title");
+            t.appendChild(doc.createTextNode(val));
+            head.appendChild(t)
+
+        self.metadata.get("report").get("title").use(add_title)
+
         self.add_style(head)
 
         body = doc.createElement("body")
@@ -426,10 +434,18 @@ h2 {
         self.create_metadata()
 
         currency = self.metadata.get("report").get("currency")
+
         unit = doc.createElement("xbrli:unit")
         unit.setAttribute("id", currency)
         measure = doc.createElement("xbrli:measure")
         measure.appendChild(doc.createTextNode("iso4217:" + currency))
+        unit.appendChild(measure)
+        resources.appendChild(unit)
+
+        unit = doc.createElement("xbrli:unit")
+        unit.setAttribute("id", "pure")
+        measure = doc.createElement("xbrli:measure")
+        measure.appendChild(doc.createTextNode("xbrli:pure"))
         unit.appendChild(measure)
         resources.appendChild(unit)
        
@@ -463,9 +479,16 @@ h2 {
             self.create_instant_period(report_date)
         ]))
 
-        # report periods, period<n>
+        # period-<n> (report periods)
         for i in range(0, len(self.periods)):
             self.resources.appendChild(self.create_context("period-" + str(i), [
+                self.create_entity(company_number),
+                self.create_period(self.periods[i])
+            ]))
+
+        # entity-trading-<n> (report periods)
+        for i in range(0, len(self.periods)):
+            self.resources.appendChild(self.create_context("entity-trading-" + str(i), [
                 self.create_entity(company_number),
                 self.create_period(self.periods[i])
             ]))
@@ -729,6 +752,12 @@ h2 {
                                     "period-0", val)
         )
 
+        report.get_date("statement-date").use(
+            lambda val:
+            self.add_date(self.hidden, "uk-bus:BalanceSheetDate",
+                          "report-date", val)
+        )
+
         business.get("activities").use(
             lambda val: self.add_nn(self.hidden,
                                "uk-bus:DescriptionPrincipalActivities",
@@ -756,6 +785,9 @@ h2 {
                                     "uk-bus:EntityDormantTruefalse",
                                     "period-0", json.dumps(val))
         )
+
+        self.add_nn(self.hidden, "uk-bus:EntityTradingStatus",
+                    "entity-trading-0", "")
 
         report.get("accounting-standards").use(
             lambda x:
@@ -792,6 +824,21 @@ h2 {
         self.add_nn(self.hidden,
                     "uk-bus:DateFormationOrIncorporation",
                     "formation-date", date)
+
+        def add_avg_employee_counts(val):
+            for i in range(0, len(val)):
+
+                elt = self.doc.createElement("ix:nonFraction")
+                elt.setAttribute("name", "uk-core:AverageNumberEmployeesDuringPeriod")
+                elt.setAttribute("contextRef", "period-" + str(i))
+                elt.setAttribute("format", "ixt2:numdotdecimal")
+                elt.setAttribute("decimals", "0")
+                elt.setAttribute("unitRef", "pure")
+                elt.appendChild(self.doc.createTextNode(str(val[i])))
+
+                self.hidden.appendChild(elt)
+
+        report.get("average-employees").use(add_avg_employee_counts)
 
         directors = business.get("directors")
         if directors:
@@ -1056,7 +1103,7 @@ class Title(Element):
         def report_date(val):
             div2 = doc.createElement("div")
             div2.setAttribute("class", "information")
-            div2.appendChild(par.doc.createTextNode("Approved for publication "))
+            div2.appendChild(par.doc.createTextNode("Date: "))
             par.add_date(div2,
                        "uk-bus:BusinessReportPublicationDate",
                        "report-date", val)
@@ -1105,8 +1152,8 @@ class Title(Element):
 
 
         def report_date(val):
-            par.add_date(p, "uk-bus:BusinessReportPublicationDate",
-                       "report-date", val)
+            par.add_date(p, "uk-core:DateAuthorisationFinancialStatementsForIssue",
+                        "report-date", val)
 
         self.metadata.get("report").get_date("date").use(report_date)
 
@@ -1132,6 +1179,7 @@ class Title(Element):
 
         if self.img and self.type:
             img = par.doc.createElement("img")
+            img.setAttribute("alt", "Director's signature")
             data = base64.b64encode(open(self.img, "rb").read()).decode("utf-8")
             img.setAttribute("src",
                              "data:{0};base64,{1}".format(self.type, data)
@@ -1216,15 +1264,10 @@ class NotesElement(Element):
 
             elt = par.doc.createElement("span")
 
+            text = "For the accounting period ending {0} the company was entitled to exemption from audit under section 477 of the Companies Act 2006 relating to small companies.".format(year_end.strftime("%d %B %Y"))
+
             par.add_nn(elt, "uk-direp:StatementThatCompanyEntitledToExemptionFromAuditUnderSection477CompaniesAct2006RelatingToSmallCompanies",
-                       "period-0", "")
-            
-            elt.appendChild(par.doc.createTextNode("For the accounting period ending "))
-
-            par.add_date(elt, "uk-bus:EndDateForPeriodCoveredByReport",
-                         "report-date", year_end)
-
-            elt.appendChild(par.doc.createTextNode(" the company was entitled to exemption from audit under section 477 of the Companies Act 2006 relating to small companies."))
+                       "period-0", text)
 
             return elt
 
@@ -1232,22 +1275,19 @@ class NotesElement(Element):
 
             elt = par.doc.createElement("span")
 
-            par.add_nn(elt, "uk-direp:StatementThatMembersHaveNotRequiredCompanyToObtainAnAudit",
-                       "period-0", "")
-            
+            par.add_nn(elt,
+                       "uk-direp:StatementThatMembersHaveNotRequiredCompanyToObtainAnAudit",
+                       "period-0",
+                       "The members have not required the company to obtain an audit of its financial statements for the accounting period in accordance with section 476.")
 
-            text = "The members have not required the company to obtain an audit of its financial statements for the accounting period in accordance with section 476."
-            elt.appendChild(par.doc.createTextNode(text))
             return elt
 
         if n == "micro-entity-provisions":
 
             elt = par.doc.createElement("span")
             par.add_nn(elt, "uk-direp:StatementThatAccountsHaveBeenPreparedInAccordanceWithProvisionsSmallCompaniesRegime",
-                       "period-0", "")
+                       "period-0", "These financial statements have been prepared in accordance with the micro-entity provisions.")
 
-            text = "These financial statements have been prepared in accordance with the micro-entity provisions."
-            elt.appendChild(par.doc.createTextNode(text))
             return elt
 
         if n == "company":
