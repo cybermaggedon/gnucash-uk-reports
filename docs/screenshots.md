@@ -88,7 +88,15 @@ Total                                   :   (288.00)   (128.00)
 
 Carrying at end of period               :    912.00     672.00  
 
-Carrying at start of period             :    672.00          -  
+
+*** Share Capital ***
+                                               2021       2020  
+
+Share Capital:
+  Ordinary Shares                       :   3750.00    3750.00  
+  Preference Shares                     :   4250.00    1250.00  
+  Shares Issued                         :         -    3000.00  
+Total                                   :   8000.00    8000.00  
 ```
 
 ## iXBRL output (in a browser)
@@ -100,6 +108,8 @@ Carrying at start of period             :    672.00          -
 ![alt text](report-income.png)
 
 ![alt text](report-assets.png)
+
+![alt text](report-shares.png)
 
 ![alt text](report-notes.png)
 
