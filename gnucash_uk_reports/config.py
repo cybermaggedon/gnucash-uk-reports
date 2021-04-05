@@ -53,6 +53,9 @@ class Config(dict):
     def get_date(self, key, dflt=None):
         val = self.get(key, dflt)
         return DateValue.fromisoformat(val)
+    def get_bool(self, key, dflt=None):
+        val = self.get(key, dflt)
+        return val == True
     def use(self, fn):
         return fn(self)
 

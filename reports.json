@@ -74,6 +74,23 @@
  		    "end": "2020-08-31"
  		}
  	    ]
+	},
+
+	"tax": {
+	    "date": "2021-08-31",
+	    "period": {
+		"name": "2021",
+		"start": "2020-09-01",
+ 		"end": "2021-08-31"
+	    },
+	    "utr": "0123456789",
+	    "business-type": "company",
+	    "ni": {
+		"trading": false,
+		"sme": false,
+		"employer": false
+	    },
+	    "partner-in-a-firm": false
 	}
 
     },
@@ -694,6 +711,13 @@
 		"directors-acknowledge",
 		"software-version",
 		"note:These are fictional accounts, references to real-world entities or persons is unintentional."
+	    ]
+	},
+
+	{
+	    "id": "ct600",
+	    "kind": "ct600",
+	    "elements": [
 	    ]
 	}
 
