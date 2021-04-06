@@ -10,8 +10,8 @@ def create_uuid():
     return str(uuid.uuid4())
 
 IN_YEAR = 1
-TO_START = 2
-TO_END = 3
+AT_START = 2
+AT_END = 3
 
 class Computable:
     def compute(self, accounts, start, end, result):
@@ -38,7 +38,7 @@ class Computable:
 
 class Line(Computable):
 
-    def __init__(self, id, description, accounts, taxonomy, period=TO_END):
+    def __init__(self, id, description, accounts, taxonomy, period=AT_END):
         self.id = id
         self.description = description
         self.accounts = accounts
@@ -49,14 +49,20 @@ class Line(Computable):
 
         total = 0
 
+        cdef = ContextDefinition()
+
         # FIXME: If there are transactions preceding 1970, this won't work.
-        if self.period == TO_START:
+        if self.period == AT_START:
+            cdef.set_instant(start)
             history = datetime.date(1970, 1, 1)
             start, end = history, start
-        elif self.period == TO_END:
+        elif self.period == AT_END:
+            cdef.set_instant(end)
             history = datetime.date(1970, 1, 1)
             start, end = history, end
-
+        else:
+            cdef.set_period(start, end)
+            
         for acct_name in self.accounts:
             acct = session.get_account(session.root, acct_name)
 
@@ -69,7 +75,10 @@ class Line(Computable):
 
             total += acct_total
 
-        result.set(self.id, self.taxonomy.create_money_fact(self.id, total))
+        cdef.add_segments(self.id, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
+
+        result.set(self.id, context.create_money_fact(self.id, total))
 
         return total
 
@@ -89,9 +98,9 @@ class Line(Computable):
 
         pid = {
             "in-year": IN_YEAR,
-            "to-start": TO_START,
-            "to-end": TO_END
-        }.get(pspec, TO_END)
+            "to-start": AT_START,
+            "to-end": AT_END
+        }.get(pspec, AT_END)
 
         return Line(id, cfg.get("description"), cfg.get("accounts"),
                     taxonomy, pid)
@@ -105,8 +114,13 @@ class Constant(Computable):
 
     def compute(self, session, start, end, result):
 
+        cdef = ContextDefinition()
+        cdef.set_period(start, end)
+        cdef.add_segments(self.id, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
+
         val = self.values[str(end)]
-        result.set(self.id, self.taxonomy.create_money_fact(self.id, val))
+        result.set(self.id, context.create_money_fact(self.id, val))
         return val
 
     def get_output(self, result):
@@ -154,17 +168,22 @@ class Group(Computable):
         self.lines.append(line)
 
     def compute(self, accounts, start, end, result):
+
+        cdef = ContextDefinition()
+        cdef.set_period(start, end)
+        cdef.add_segments(self.id, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
+
         total = 0
         for line in self.lines:
             total += line.compute(accounts, start, end, result)
-        result.set(self.id, self.taxonomy.create_money_fact(self.id, total))
+        result.set(self.id, context.create_money_fact(self.id, total))
         return total
 
     def get_output(self, result):
 
         if len(self.lines) == 0:
-            output = NilValue(self, self.description,
-                              self.taxonomy.create_money_fact(self.id, 0))
+            output = NilValue(self, self.description, result.get(self.id))
             return output
 
         if self.hide_breakdown:
@@ -231,7 +250,12 @@ class Computation(Computable):
         for v in self.steps:
             total += v.compute(accounts, start, end, result)
 
-        result.set(self.id, self.taxonomy.create_money_fact(self.id, total))
+        cdef = ContextDefinition()
+        cdef.set_period(start, end)
+        cdef.add_segments(self.id, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
+
+        result.set(self.id, context.create_money_fact(self.id, total))
 
         return total
 
@@ -239,8 +263,7 @@ class Computation(Computable):
 
         if len(self.steps) == 0:
             
-            output = NilValue(self, self.description,
-                              self.taxonomy.create_money_fact(self.id, 0))
+            output = NilValue(self, self.description, result.get(self.id))
             return output
 
         # Assume item contains AddOperations x.item provides value.

@@ -3,7 +3,7 @@ from . multi_period import MultiPeriodWorksheet
 from . computation import Computable
 from . fact import FRS101
 
-def get_worksheet(id, cfg, session, taxonomy=FRS101()):
+def get_worksheet(id, cfg, session, taxonomy):
 
     comp_defs = cfg.get("computations")
 

@@ -95,6 +95,59 @@
 
     },
     
+    "taxonomy": {
+	"frs-101": {
+	    "tags": {
+		"turnover": "uk-core:TurnoverRevenue",
+		"cost-of-sales": "uk-core:CostSales",
+		"gross-profit": "uk-core:GrossProfitLoss",
+		"administrative-expenses": "uk-core:AdministrativeExpenses",
+		"fixed-assets": "uk-core:FixedAssets",
+		"profit": "uk-core:ProfitLoss",
+		"tangible-assets": "uk-core:PropertyPlantEquipmentIncludingRight-of-useAssets",
+		"current-assets": "uk-core:CurrentAssets",
+		"debtors": "uk-core:TradeDebtorsTradeReceivables",
+		"vat-refund-owed": "uk-core:DeferredTaxAssetDebtors",
+		"bank": "uk-core:CashBankOnHand",
+		"prepayments-and-accrued-income": "uk-core:PrepaymentsAccruedIncomeNotExpressedWithinCurrentAssetSubtotal",
+		"creditors-within-1-year": "uk-core:Creditors",
+		"trade-creditors": "uk-core:TradeCreditorsTradePayables",
+		"other-creditors": "uk-core:OtherCreditorsIncludingTaxationSocialSecurityBalanceSheetSubtotal",
+		"net-current-assets": "uk-core:NetCurrentAssetsLiabilities",
+		"total-assets-less-liabilities": "uk-core:TotalAssetsLessCurrentLiabilities",
+		"creditors-after-1-year": "uk-core:Creditors",
+		"provisions-for-liabilities": "uk-core:ProvisionsForLiabilitiesBalanceSheetSubtotal",
+		"corporation-tax-owed": "uk-core:TaxationIncludingDeferredTaxationBalanceSheetSubtotal",
+		"accruals-and-deferred-income": "uk-core:AccruedLiabilitiesDeferredIncome",
+		"net-assets": "uk-core:NetAssetsLiabilities",
+		"total-capital-and-reserves": "uk-core:Equity"
+	    },
+	    "sign-reversed": {
+		"cost-of-sales": true,
+		"administrative-expenses": true,
+		"prepayments-and-accrued-income": true,
+		"creditors-within-1-year": true,
+		"trade-creditors": true,
+		"other-creditors": true,
+		"creditors-after-1-year": true,
+		"provisions-for-liabilities": true,
+		"corporation-tax-owed": true,
+		"accruals-and-deferred-income": true
+	    },
+	    "segments": {
+		"creditors-within-1-year": {
+		    "uk-core:MaturitiesOrExpirationPeriodsDimension":
+		    "uk-core:WithinOneYear"
+		},
+		"creditors-after-1-year": {
+		    "uk-core:MaturitiesOrExpirationPeriodsDimension":
+		    "uk-core:AfterOneYear"
+		}
+	    }
+	}
+    },
+	    
+    
     "computations": [
 	{
 	    "id": "turnover",
@@ -110,11 +163,7 @@
 		    ],
 		    "period": "in-year"
 		}
-	    ],
-	    "tags": {
-		"tag": "uk-core:TurnoverRevenue",
-		"context": "period-{0}"
-	    }
+	    ]
 	},
 	{
 	    "id": "cost-of-sales",
@@ -131,12 +180,7 @@
 			"Expenses:Emoluments"
 		    ]
 		}
-	    ],
-	    "tags": {
-		"tag": "uk-core:CostSales",
-		"context": "period-{0}",
-		"sign": "reversed"
-	    }
+	    ]
 	},	
 	{
 	    "id": "gross-profit",
@@ -145,11 +189,7 @@
 	    "inputs": [
 		"turnover",
 		"cost-of-sales"
-	    ],
-	    "tags": {
-		"tag": "uk-core:GrossProfitLoss",
-		"context": "period-{0}"
-	    }
+	    ]
 	},
 	{
 	    "id": "administrative-expenses",
@@ -175,12 +215,7 @@
 		    ],
 		    "period": "in-year"
 		}
-	    ],
-	    "tags": {
-		"tag": "uk-core:AdministrativeExpenses",
-		"context": "period-{0}",
-		"sign": "reversed"
-	    }
+	    ]
 	},
 	{
 	    "id": "profit",
@@ -189,11 +224,7 @@
 	    "inputs": [
 		"gross-profit",
 		"administrative-expenses"
-	    ],
-	    "tags": {
-		"tag": "uk-core:ProfitLoss",
-		"context": "period-{0}"
-	    }
+	    ]
 	},
 	{
 	    "id": "fixed-assets",
@@ -204,35 +235,23 @@
 		    "id": "tangible-assets",
 		    "kind": "line",
 		    "description": "Tangible Assets",
-		    "tags": {
-			"tag": "uk-core:PropertyPlantEquipmentIncludingRight-of-useAssets"
-		    },
-		    "period": "to-end",
+		    "period": "at-end",
 		    "accounts": [
 			"Assets:Capital Equipment"
 		    ]
 		}
-	    ],
-	    "tags": {
-		"tag": "uk-core:FixedAssets"
-	    }
+	    ]
 	},
 	{
 	    "id": "current-assets",
 	    "kind": "group",
 	    "description": "Current Assets",
-	    "tags": {
-		"tag": "uk-core:CurrentAssets"
-	    },
 	    "lines": [
 		{
 		    "id": "debtors",
 		    "kind": "line",
 		    "description": "Debtors",
-		    "period": "to-end",
-		    "tags": {
-			"tag": "uk-core:TradeDebtorsTradeReceivables"
-		    },
+		    "period": "at-end",
 		    "accounts": [
 			"Accounts Receivable",
 			"Assets:Owed To Us"
@@ -242,10 +261,7 @@
 		    "id": "vat-refund-owed",
 		    "kind": "line",
 		    "description": "VAT Refund Due",
-		    "period": "to-end",
-		    "tags": {
-			"tag": "uk-core:DeferredTaxAssetDebtors"
-		    },
+		    "period": "at-end",
 		    "accounts": [
 			"VAT:Input"
 		    ]
@@ -254,10 +270,7 @@
 		    "id": "bank",
 		    "kind": "line",
 		    "description": "Bank",
-		    "period": "to-end",
-		    "tags": {
-			"tag": "uk-core:CashBankOnHand"
-		    },
+		    "period": "at-end",
 		    "accounts": [
 			"Bank Accounts"
 		    ]
@@ -268,10 +281,6 @@
 	    "id": "prepayments-and-accrued-income",
 	    "kind": "group",
 	    "description": "Prepayments and Accrued Income",
-	    "tags": {
-		"tag": "uk-core:PrepaymentsAccruedIncomeNotExpressedWithinCurrentAssetSubtotal",
-		"sign": "reversed"
-	    },
 	    "lines": [
 	    ]
 	},
@@ -279,22 +288,13 @@
 	    "id": "creditors-within-1-year",
 	    "kind": "group",
 	    "description": "Creditors: falling due within one year",
-	    "tags": {
-		"tag": "uk-core:Creditors",
-		"context": "within-year-{0}",
-		"sign": "reversed"
-	    },
 	    "lines": [
 		{
 		    "id": "trade-creditors",
 		    "kind": "line",
 		    "description": "Trade Creditors",
-		    "period": "to-end",
-		    "tags": {
-			"tag": "uk-core:TradeCreditorsTradePayables",
-			"context": "within-year-{0}",
-			"sign": "reversed"
-		    },
+		    "period": "at-end",
+		    "FIXME": "within-year",
 		    "accounts": [
 			"Accounts Payable"
 		    ]
@@ -303,12 +303,8 @@
 		    "id": "other-creditors",
 		    "kind": "line",
 		    "description": "Other Creditors",
-		    "period": "to-end",
-		    "tags": {
-			"tag": "uk-core:OtherCreditorsIncludingTaxationSocialSecurityBalanceSheetSubtotal",
-			"context": "within-year-{0}",
-			"sign": "reversed"
-		    },
+		    "period": "at-end",
+		    "FIXME": "within-year",
 		    "accounts": [
 			"VAT:Output"
 		    ]
@@ -319,9 +315,6 @@
 	    "id": "net-current-assets",
 	    "kind": "computation",
 	    "description": "Net Current Assets",
-	    "tags": {
-		"tag": "uk-core:NetCurrentAssetsLiabilities"
-	    },
 	    "inputs": [
 		"current-assets",
 		"prepayments-and-accrued-income",
@@ -332,9 +325,6 @@
 	    "id": "total-assets-less-liabilities",
 	    "kind": "computation",
 	    "description": "Total Assets Less Liabilities",
-	    "tags": {
-		"tag": "uk-core:TotalAssetsLessCurrentLiabilities"
-	    },
 	    "inputs": [
 		"fixed-assets",
 		"current-assets",
@@ -346,11 +336,7 @@
 	    "id": "creditors-after-1-year",
 	    "kind": "group",
 	    "description": "Creditors: falling due after one year",
-	    "tags": {
-		"tag": "uk-core:Creditors",
-		"context": "after-year-{0}",
-		"sign": "reversed"
-	    },
+	    "FIXME": "after-year",
 	    "lines": [
 	    ]
 	},
@@ -358,20 +344,12 @@
 	    "id": "provisions-for-liabilities",
 	    "kind": "group",
 	    "description": "Provisions For Liabilities",
-	    "tags": {
-		"tag": 	"uk-core:ProvisionsForLiabilitiesBalanceSheetSubtotal",
-		"sign": "reversed"
-	    },
 	    "lines": [
 		{
 		    "id": "corporation-tax-owed",
 		    "kind": "line",
 		    "description": "Corporation Tax",
-		    "period": "to-end",
-		    "tags": {
-			"tag": "uk-core:TaxationIncludingDeferredTaxationBalanceSheetSubtotal",
-			"sign": "reversed"
-		    },
+		    "period": "at-end",
 		    "accounts": [
 			"Liabilities:Owed Corporation Tax"
 		    ]
@@ -382,10 +360,6 @@
 	    "id": "accruals-and-deferred-income",
 	    "kind": "group",
 	    "description": "Accrued liabilities and deferred income",
-	    "tags": {
-		"tag": "uk-core:AccruedLiabilitiesDeferredIncome",
-		"sign": "reversed"
-	    },
 	    "lines": [
 	    ]
 	},
@@ -393,9 +367,6 @@
 	    "id": "net-assets",
 	    "kind": "computation",
 	    "description": "Net Assets",
-	    "tags": {
-		"tag": "uk-core:NetAssetsLiabilities"
-	    },
 	    "inputs": [
 		"total-assets-less-liabilities",
 		"creditors-after-1-year",
@@ -415,7 +386,7 @@
 		    "accounts": [
 			"Equity:Shareholdings"
 		    ],
-		    "period": "to-end"
+		    "period": "at-end"
 		},
 		{
 		    "id": "profit-loss",
@@ -425,7 +396,7 @@
 			"Income",
 			"Expenses"
 		    ],
-		    "period": "to-end"
+		    "period": "at-end"
 		},
 		{
 		    "id": "dividends",
@@ -434,7 +405,7 @@
 		    "accounts": [
 			"Equity:Dividends"
 		    ],
-		    "period": "to-end"
+		    "period": "at-end"
 		},
 		{
 		    "kind": "line",
@@ -442,7 +413,7 @@
 		    "accounts": [
 			"Equity:Corporation Tax"
 		    ],
-		    "period": "to-end"
+		    "period": "at-end"
 		}
 	    ]
 	},
@@ -450,9 +421,6 @@
 	    "id": "total-capital-and-reserves",
 	    "kind": "computation",
 	    "description": "Total Capital and Reserves",
-	    "tags": {
-		"tag": "uk-core:Equity"
-	    },
 	    "inputs": [
 		"capital-and-reserves"
 	    ]
@@ -469,7 +437,7 @@
 		{
 		    "kind": "line",
 		    "description": "At start of period",
-		    "period": "to-start",
+		    "period": "at-start",
 		    "accounts": [
 			"Assets:Capital Equipment:Computer Equipment"
 		    ]
@@ -501,7 +469,7 @@
 		{
 		    "kind": "line",
 		    "description": "At start of period",
-		    "period": "to-start",
+		    "period": "at-start",
 		    "accounts": [
 			"Assets:Capital Equipment:Depreciation"
 		    ]
@@ -545,7 +513,7 @@
 		{
 		    "kind": "line",
 		    "description": "Ordinary Shares",
-		    "period": "to-start",
+		    "period": "at-start",
 		    "accounts": [
 			"Equity:Shareholdings:Ordinary Shares"
 		    ]
@@ -553,7 +521,7 @@
 		{
 		    "kind": "line",
 		    "description": "Preference Shares",
-		    "period": "to-start",
+		    "period": "at-start",
 		    "accounts": [
 			"Equity:Shareholdings:Preference Shares"
 		    ]

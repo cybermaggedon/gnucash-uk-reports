@@ -6,15 +6,20 @@ class BooleanFact(Fact):
     def __init__(self, value):
         self.value = value
 
-NONE=0
-CREDIT=1
-DEBIT=2
-
 class MoneyFact(Fact):
-    def __init__(self, value, balance=NONE):
+    def __init__(self, value, context):
         self.value = value
+        self.context = context
+        self.reverse = False
     def describe(self):
-        return str(self.value)
+        if self.name:
+            name = self.name
+            context = self.context.id
+            print("        {0} {1} {2}".format(
+                str(self.value), name, context
+            ))
+        else:
+            print("        {0}".format(str(self.value)))
 
 class CountFact(Fact):
     def __init__(self, value):
@@ -25,22 +30,80 @@ class StringFact(Fact):
         self.value = value
 
 class Taxonomy:
+    def __init__(self, cfg, name):
+        self.cfg = cfg
+        self.name = name
+        self.contexts = {}
+        self.next_context_id = 0
+
     def get_tag_name(self, id):
-        return "tag:FIXME"
-    def get_tag_context(self, id):
-        return "ctxt-FIXME"
-    def create_money_fact(self, id, value):
-        # FIXME: Credit hard-coded
-        m = MoneyFact(value, balance=CREDIT)
-        m.tag = self.get_tag_name(id)
-        m.context = self.get_tag_context(id)
+        key = "taxonomy.{0}.tags.{1}".format(self.name, id)
+        return self.cfg.get(key)
+
+    def get_sign_reversed(self, id):
+        key = "taxonomy.{0}.sign-reversed.{1}".format(self.name, id)
+        return self.cfg.get_bool(key)
+
+    def get_tag_dimensions(self, id):
+        key = "taxonomy.{0}.segments.{1}".format(self.name, id)
+        return self.cfg.get(key)
+
+    def create_money_fact(self, id, value, context):
+
+        m = MoneyFact(value, context)
+        m.name = self.get_tag_name(id)
+        m.reverse = self.get_sign_reversed(id)
+        m.context = context
         return m
 
+    def get_context(self, cdef):
+
+        key = cdef.get_key()
+
+        if key in self.contexts:
+            return self.contexts[key]
+
+        ctxt = Context(self, cdef)
+        ctxt.id = "ctxt-" + str(self.next_context_id)
+        self.next_context_id += 1
+        self.contexts[key] = ctxt
+        return ctxt
+
 class FRS101(Taxonomy):
-    pass
+    def __init__(self, cfg):
+        super().__init__(cfg, "frs-101")
+
+class ContextDefinition:
+    def __init__(self):
+        self.period = None
+        self.instant = None
+        self.segments = {}
+    def set_period(self, start, end):
+        self.period = (start, end)
+    def set_instant(self, instant):
+        self.instant = instant
+    def add_segments(self, id, tx):
+        segs = tx.get_tag_dimensions(id)
+        if segs:
+            for k in segs:
+                self.segments[k] = segs[k]
+    def get_key(self):
+        segs = [
+            "{0}:{1}".format(k, self.segments[k])
+            for k in self.segments
+        ]
+        segs.sort()
+        return (self.period, self.instant, "//".join(segs))
 
 class Context:
-    pass
+    def __init__(self, taxonomy, cdef):
+        self.period = None
+        self.taxonomy = taxonomy
+        self.definition = cdef
+    def create_money_fact(self, id, value):
+        return self.taxonomy.create_money_fact(id, value, self)
+    def describe(self):
+        print("    Context:", self.id, ",", self.definition.get_key())
 
 class Dataset:
     def describe(self):
@@ -55,16 +118,16 @@ class Section:
         print("    Heading:", self.header)
         if self.items:
             for it in self.items:
-                print("      ", it.description, ": ",
-                      it.describe())
+                it.describe()
         if self.total:
-            print("    Total: ", self.total.describe())
+            self.total.describe()
 
 class Series:
     def __init__(self, desc, values):
         self.description = desc
         self.values = values
     def describe(self):
-        return " ".join([v.describe() for v in self.values])
-
+        print("      {0}:".format(self.description))
+        for v in self.values:
+            v.describe()
 
