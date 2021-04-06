@@ -11,48 +11,6 @@ from datetime import datetime
 software = "gnucash-uk-reports"
 software_version = "0.0.1"
 
-formation_forms = {
-    "private-limited-company": "Private limited company, Ltd",
-    "public-limited-company-plc": "Public limited company, PLC",
-    "public-limited-company-not-quoted": "Public limited company, PLC, not quoted on any exchange",
-    "company-limited-by-guarantee": "Company limited by guarantee",
-    "unlimited-company": "Unlimited company",
-    "limited-liability-partnership": "Limited liability partnership, LLP",
-    "registered-charity": "Registered charity",
-    "community-interest-company": "Community interest company, CIC",
-    "industrial-and-provident-society": "Industrial and provident society",
-    "friendly-society": "Friendly society",
-    "incorporated-by-act-of-parliament": "Incorporated by Act of Parliament",
-    "incorporated-by-royal-charter": "Incorporated by Royal Charter",
-    "scottish-partnership": "Scottish partnership",
-    "other-incorporated-association": "Other incorporated association",
-    "branch-trading-in-uk": "Branch trading in UK",
-    "other-uk": "Other UK",
-    "other-non-uk": "Other non-UK"
-}
-
-industry_sectors = {
-    "a": "Agriculture, forestry and fishing",
-    "b": "Mining and quarrying",
-    "c": "Manufacturing",
-    "d": "Electricity, gas, steam and air conditioning supply",
-    "e": "Water supply, sewerage, waste management and remediation activities",
-    "f": "Construction",
-    "g": "Wholesale and retail trade, repair of motor vehicles and motorcycles",
-    "h": "Transportation and storage",
-    "i": "Accommodation and food service activities",
-    "j": "Information and communication",
-    "k": "Financial and insurance activities",
-    "l": "Real estate activities",
-    "m": "Professional, scientific and technical activities",
-    "n": "Administrative and support service activities",
-    "o": "Public administration and defence, compulsory social security",
-    "p": "Education",
-    "q": "Human health and social work activities",
-    "r": "Arts, entertainment and recreation",
-    "s": "Other service activities"
-}
-
 class BasicElement:
 
     def __init__(self, metadata, tx):

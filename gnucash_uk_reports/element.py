@@ -21,11 +21,11 @@ class Element:
             return WorksheetElement.load(elt_def, cfg, session, tx)
 
         if kind == "notes":
-            return NotesElement.load(elt_def, cfg)
+            return NotesElement.load(elt_def, cfg, tx)
 
         if kind == "ct600":
             from . ct600 import CT600
-            return CT600.load(elt_def, cfg, session)
+            return CT600.load(elt_def, cfg, session, tx)
 
         raise RuntimeError("Don't know element kind '%s'" % kind)
         

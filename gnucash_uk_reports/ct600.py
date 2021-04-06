@@ -30,20 +30,21 @@ business_type = {
 
 class CT600(BasicElement):
 
-    def __init__(self, metadata, elts, session, cfg):
-        self.metadata = metadata
+    def __init__(self, metadata, elts, session, cfg, tx):
+        super().__init__(metadata, tx)
         self.elements = elts
         self.session = session
         self.cfg = cfg
 
     @staticmethod
-    def load(elt_def, cfg, session):
+    def load(elt_def, cfg, session, tx):
 
         c = CT600(
             cfg.get("metadata"),
             elt_def.get("elements"),
             session,
-            cfg
+            cfg,
+            tx
         )
         return c
 
@@ -234,7 +235,8 @@ BODY {
 
                 worksheet_id = v.get("worksheet")
 
-                wsht = get_worksheet(worksheet_id, self.cfg, self.session)
+                wsht = get_worksheet(worksheet_id, self.cfg, self.session,
+                                     self.taxonomy)
 
                 value_id = v.get("value")
 
