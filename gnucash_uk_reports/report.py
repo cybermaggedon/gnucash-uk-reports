@@ -11,27 +11,28 @@ class TextReporter:
         fmt = NegativeParenFormatter()
 
         def format_number(n):
-            if abs(n) < 0.001:
+            if abs(n.value) < 0.001:
                 return "- "
-            return fmt.format("{0:.2f}", n)
+            return fmt.format("{0:.2f}", n.value)
 
-        periods = worksheet.get_periods()
-        sections = worksheet.get_sections()
+        ds = worksheet.get_dataset()
+
+        periods = ds.periods
+        sections = ds.sections
 
         out.write(fmt.format("{0:40}  ", ""))
         for period in periods:
-            out.write(fmt.format("{0:>10} ", period[0].name + " "))
+            out.write(fmt.format("{0:>10} ", period.name + " "))
 
         out.write("\n")
 
-        for section, id in sections:
+        for section in sections:
+
             out.write("\n")
 
-            detail = worksheet.describe_section(id)
+            if section.total == None and section.items == None:
 
-            if detail["total"] == None and detail["items"] == None:
-
-                out.write(fmt.format("{0:40}: ", detail["header"]))
+                out.write(fmt.format("{0:40}: ", section.header))
 
                 for period in periods:
                     out.write(fmt.format("{0:>10} ", " - "))
@@ -39,28 +40,28 @@ class TextReporter:
                 out.write("\n")
                 
 
-            elif detail["items"] == None:
+            elif section.items == None:
 
-                out.write(fmt.format("{0:40}: ", detail["header"]))
+                out.write(fmt.format("{0:40}: ", section.header))
 
                 for i in range(0, len(periods)):
 
-                    s = format_number(detail["total"][i])
+                    s = format_number(section.total.values[i])
                     out.write("{0:>10} ".format(s))
 
                 out.write("\n")
 
             else:
 
-                out.write(fmt.format("{0}:\n", detail["header"]))
+                out.write(fmt.format("{0}:\n", section.header))
 
-                for item in detail["items"]:
+                for item in section.items:
                     
-                    out.write(fmt.format("  {0:38}: ", item["description"]))
+                    out.write(fmt.format("  {0:38}: ", item.description))
 
                     for i in range(0, len(periods)):
 
-                        s = format_number(item["values"][i])
+                        s = format_number(item.values[i])
                         out.write(fmt.format("{0:>10} ", s))
 
                     out.write("\n")
@@ -69,7 +70,7 @@ class TextReporter:
 
                 for i in range(0, len(periods)):
 
-                    s = format_number(detail["total"][i])
+                    s = format_number(section.total.values[i])
                     out.write(fmt.format("{0:>10} ", s))
 
                 out.write("\n")

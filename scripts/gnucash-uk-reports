@@ -3,6 +3,7 @@
 from gnucash_uk_reports.config import Config
 from gnucash_uk_reports.worksheet import get_worksheet
 import gnucash_uk_reports.accounts as accounts
+from gnucash_uk_reports.fact import FRS101
 import sys
 
 from gnucash_uk_reports.element import get_element
@@ -17,7 +18,9 @@ file = cfg.get("accounts.file")
 
 session = accounts.Accounts(file)
 
-elt = get_element(sys.argv[2], cfg, session)
+tx = FRS101(cfg)
+
+elt = get_element(sys.argv[2], cfg, session, tx)
 
 if sys.argv[3] == "ixbrl":
     elt.to_ixbrl(sys.stdout)

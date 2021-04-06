@@ -128,13 +128,13 @@ class BasicElement:
         self.metadata = metadata
 
     @staticmethod
-    def load(elt_def, cfg, session):
+    def load(elt_def, cfg, session, tx):
 
         kind = elt_def.get("kind")
 
         if kind == "composite":
             from . composite import Composite
-            return Composite.load(elt_def, cfg, session)
+            return Composite.load(elt_def, cfg, session, tx)
 
         if kind == "title":
             from . title import Title
@@ -142,7 +142,7 @@ class BasicElement:
 
         if kind == "worksheet":
             from . worksheetelement import WorksheetElement
-            return WorksheetElement.load(elt_def, cfg, session)
+            return WorksheetElement.load(elt_def, cfg, session, tx)
 
         if kind == "notes":
             from . notes import NotesElement
@@ -1007,14 +1007,14 @@ h2 {
         )
 
     @staticmethod
-    def get_element(id, cfg, session):
+    def get_element(id, cfg, session, tx):
 
         elt_defs = cfg.get("elements")
 
         for elt_def in elt_defs:
 
             if elt_def.get("id") == id:
-                return BasicElement.load(elt_def, cfg, session)
+                return BasicElement.load(elt_def, cfg, session, tx)
 
         raise RuntimeError("Could not find element '%s'" % id)
 

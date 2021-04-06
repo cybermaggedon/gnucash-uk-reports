@@ -7,12 +7,12 @@ class Composite(BasicElement):
         self.elements = elts
 
     @staticmethod
-    def load(elt_def, cfg, session):
+    def load(elt_def, cfg, session, tx):
 
         c = Composite(
             cfg.get("metadata"),
             [
-                BasicElement.get_element(v, cfg, session)
+                BasicElement.get_element(v, cfg, session, tx)
                 for v in elt_def.get("elements")
             ]
         )

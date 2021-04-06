@@ -10,12 +10,12 @@ class WorksheetElement(BasicElement):
         self.title = title
         self.worksheet = worksheet
     @staticmethod
-    def load(elt_def, cfg, session):
+    def load(elt_def, cfg, session, tx):
 
         e = WorksheetElement(
             cfg.get("metadata"),
             elt_def.get("title"),
-            get_worksheet(elt_def.get("worksheet"), cfg, session)
+            get_worksheet(elt_def.get("worksheet"), cfg, session, tx)
         )
 
         return e
