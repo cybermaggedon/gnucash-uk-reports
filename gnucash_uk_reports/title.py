@@ -1,5 +1,6 @@
 
 from . basicelement import BasicElement
+from . fact import *
 
 import base64
 
@@ -23,7 +24,6 @@ class Title(BasicElement):
         return e
 
     def to_text(self, out):
-
         
         self.metadata.get("business").get("company-name").use(
             lambda val:
@@ -59,51 +59,64 @@ class Title(BasicElement):
         div = doc.createElement("div")
         div.setAttribute("class", "title page")
 
+        report = self.metadata.get("report")
+        business = self.metadata.get("business")
+        date = report.get_date("date")
+
+        report_date_cdef = ContextDefinition()
+        report_date_cdef.set_instant(date)
+        report_date_context = self.taxonomy.get_context(report_date_cdef)
+
+        report_period_cdef = ContextDefinition()
+        report_period_cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
+        )
+        report_period_context = self.taxonomy.get_context(report_period_cdef)
+        
         def company_name(val):
             div2 = doc.createElement("h1")
             div2.setAttribute("class", "heading")
-            par.add_nn(div2,
-                       "uk-bus:EntityCurrentLegalOrRegisteredName",
-                       "period-0", val)
+
+            fact = report_period_context.create_string_fact("company-name", val)
+            fact.append(doc, div2)
             div.appendChild(div2)
 
         def report_title(val):
             div2 = doc.createElement("div")
             div2.setAttribute("class", "subheading")
-            par.add_nn(div2,
-                       "uk-bus:ReportTitle",
-                       "period-0", val)
+            fact = report_period_context.create_string_fact("report-title", val)
+            fact.append(doc, div2)
             div.appendChild(div2)
 
         def company_number(val):
             div2 = par.doc.createElement("div")
             div2.setAttribute("class", "information")
             div2.appendChild(par.doc.createTextNode("Registered number: "))
-            par.add_nn(div2,
-                       "uk-bus:UKCompaniesHouseRegisteredNumber",
-                       "period-0", val)
+            fact = report_period_context.create_string_fact("company-number",
+                                                            val)
+            fact.append(doc, div2)
             div.appendChild(div2)
 
         def report_date(val):
             div2 = doc.createElement("div")
             div2.setAttribute("class", "information")
             div2.appendChild(par.doc.createTextNode("Date: "))
-            par.add_date(div2,
-                       "uk-bus:BusinessReportPublicationDate",
-                       "report-date", val)
+            fact = report_date_context.create_date_fact("report-date", val)
+            fact.append(doc, div2)
             div.appendChild(div2)
 
         def report_period(p):
             div2 = doc.createElement("div")
             div2.setAttribute("class", "information")
             div2.appendChild(par.doc.createTextNode("For the period: "))
-            par.add_date(div2,
-                       "uk-bus:StartDateForPeriodCoveredByReport",
-                       "report-date", p.get_date("start"))
+            fact = report_date_context.create_date_fact("period-start",
+                                                          p.get_date("start"))
+            fact.append(doc, div2)
             div2.appendChild(par.doc.createTextNode(" to "))
-            par.add_date(div2,
-                       "uk-bus:EndDateForPeriodCoveredByReport",
-                       "report-date", p.get_date("end"))
+            fact = report_date_context.create_date_fact("period-end",
+                                                          p.get_date("end"))
+            fact.append(doc, div2)
             div.appendChild(div2)
 
         self.metadata.get("business").get("company-name").use(company_name)
@@ -112,19 +125,27 @@ class Title(BasicElement):
         self.metadata.get("report").get("periods")[0].use(report_period)
         self.metadata.get("report").get_date("date").use(report_date)
 
-        directors = self.metadata.get("business.directors")
-        company_name = self.metadata.get("business").get("company-name")
-
+        # Directors
         div2 = doc.createElement("div")
         div.appendChild(div2)
         div2.setAttribute("class", "information")
         div2.appendChild(par.doc.createTextNode("Directors: "))
+
+        directors = self.metadata.get("business.directors")
+
         for i in range(0, len(directors)):
-            if i > 0:
-                div2.appendChild(par.doc.createTextNode(", "))
-            par.add_nn(div2, "uk-bus:NameEntityOfficer",
-                       "officer-{0}".format(i + 1),
-                       directors[i])
+
+            cdef = ContextDefinition()
+            cdef.set_period(
+                report.get("periods")[0].get_date("start"),
+                report.get("periods")[0].get_date("end")
+            )
+            cdef.lookup_segment("director", "director" + str(i + 1),
+                                self.taxonomy)
+            context = self.taxonomy.get_context(cdef)
+        
+            fact = context.create_string_fact("director", directors[i])
+            fact.append(par.doc, div2)
 
         sig = par.doc.createElement("div")
         sig.setAttribute("class", "signature")
@@ -134,10 +155,9 @@ class Title(BasicElement):
 
         p.appendChild(par.doc.createTextNode("Approved by the board of directors and authorised for publication on "))
 
-
         def report_date(val):
-            par.add_date(p, "uk-core:DateAuthorisationFinancialStatementsForIssue",
-                        "report-date", val)
+            fact = report_date_context.create_date_fact("report-date", val)
+            fact.append(par.doc, p)
 
         self.metadata.get("report").get_date("date").use(report_date)
 
@@ -151,10 +171,9 @@ class Title(BasicElement):
         def signer(val):
             for i in range(0, len(directors)):
                 if val == directors[i]:
-                    par.add_nn(p, "uk-core:DirectorSigningFinancialStatements",
-                               "officer-" + str(i + 1), "")
+                    fact = context.create_string_fact("signer", "")
+                    fact.append(par.doc, div2)
                     p.appendChild(par.doc.createTextNode(val))
-
 
         self.metadata.get("report").get("signing-director").use(signer)
 

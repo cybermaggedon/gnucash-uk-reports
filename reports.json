@@ -161,7 +161,10 @@
 		"contact-phone-area": "uk-bus:AreaCode",
 		"contact-phone-number": "uk-bus:LocalNumber",
 		"website-url": "uk-bus:WebsiteMainPageURL",
-		"website-description": "uk-bus:DescriptionOrOtherInformationOnWebsite"
+		"website-description": "uk-bus:DescriptionOrOtherInformationOnWebsite",
+		"small-company-exempt-from-audit": "uk-direp:StatementThatCompanyEntitledToExemptionFromAuditUnderSection477CompaniesAct2006RelatingToSmallCompanies",
+		"members-not-required-audit": "uk-direp:StatementThatMembersHaveNotRequiredCompanyToObtainAnAudit",
+		"accounts-prepared-small-company-regime": "uk-direp:StatementThatAccountsHaveBeenPreparedInAccordanceWithProvisionsSmallCompaniesRegime"
 	    },
 	    "sign-reversed": {
 		"cost-of-sales": true,
@@ -300,6 +303,7 @@
 	    "id": "turnover",
 	    "kind": "group",
 	    "description": "Turnover / revenue",
+	    "period": "in-year",
 	    "lines": [
 		{
 		    "kind": "line",
@@ -317,6 +321,7 @@
 	    "kind": "group",
 	    "description": "Cost of Sales",
 	    "hide-breakdown": true,
+	    "period": "in-year",
 	    "lines": [
 		{
 		    "id": "staffing",
@@ -333,6 +338,7 @@
 	    "id": "gross-profit",
 	    "kind": "computation",
 	    "description": "Gross Profit",
+	    "period": "in-year",
 	    "inputs": [
 		"turnover",
 		"cost-of-sales"
@@ -342,6 +348,7 @@
 	    "id": "administrative-expenses",
 	    "kind": "group",
 	    "description": "Administrative Expenses",
+	    "period": "in-year",
 	    "lines": [
 		{
 		    "id": "depreciation",
@@ -368,6 +375,7 @@
 	    "id": "profit",
 	    "kind": "computation",
 	    "description": "Profit (Loss)",
+	    "period": "in-year",
 	    "inputs": [
 		"gross-profit",
 		"administrative-expenses"
@@ -377,6 +385,7 @@
 	    "id": "fixed-assets",
 	    "kind": "group",
 	    "description": "Fixed Assets",
+	    "period": "at-end",
 	    "lines": [
 		{
 		    "id": "tangible-assets",

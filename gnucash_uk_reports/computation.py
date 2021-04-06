@@ -106,16 +106,22 @@ class Line(Computable):
                     taxonomy, pid)
 
 class Constant(Computable):
-    def __init__(self, id, description, values, taxonomy):
+    def __init__(self, id, description, values, taxonomy, period=AT_END):
         self.id = id
         self.description = description
         self.values = values
         self.taxonomy = taxonomy
+        self.period = period
 
     def compute(self, session, start, end, result):
 
         cdef = ContextDefinition()
-        cdef.set_period(start, end)
+        if self.period == AT_START:
+            cdef.set_instant(start, end)
+        elif self.period == AT_END:
+            cdef.set_period(end)
+        else:
+            cdef.set_period(start, end)
         cdef.add_segments(self.id, self.taxonomy)
         context = self.taxonomy.get_context(cdef)
 
@@ -134,15 +140,24 @@ class Constant(Computable):
         id = cfg.get("id")
         if id == None: id = create_uuid()
 
+        pspec = cfg.get("period")
+
+        pid = {
+            "in-year": IN_YEAR,
+            "to-start": AT_START,
+            "to-end": AT_END
+        }.get(pspec, AT_END)
+
         return Constant(id, cfg.get("description"), cfg.get("values"),
-                        taxonomy)
+                        taxonomy, pid)
 
 class Group(Computable):
-    def __init__(self, id, description, taxonomy):
+    def __init__(self, id, description, taxonomy, period=AT_END):
         self.id = id
         self.description = description
         self.lines = []
         self.taxonomy = taxonomy
+        self.period = period
 
     @staticmethod
     def load(cfg, comps, taxonomy):
@@ -150,7 +165,15 @@ class Group(Computable):
         id = cfg.get("id")
         if id == None: id = create_uuid()
 
-        g = Group(id, cfg.get("description"), taxonomy)
+        pspec = cfg.get("period")
+
+        pid = {
+            "in-year": IN_YEAR,
+            "to-start": AT_START,
+            "to-end": AT_END
+        }.get(pspec, AT_END)
+
+        g = Group(id, cfg.get("description"), taxonomy, pid)
 
         for l in cfg.get("lines"):
 
@@ -170,7 +193,12 @@ class Group(Computable):
     def compute(self, accounts, start, end, result):
 
         cdef = ContextDefinition()
-        cdef.set_period(start, end)
+        if self.period == AT_START:
+            cdef.set_instant(start, end)
+        elif self.period == AT_END:
+            cdef.set_instant(end)
+        else:
+            cdef.set_period(start, end)
         cdef.add_segments(self.id, self.taxonomy)
         context = self.taxonomy.get_context(cdef)
 
@@ -234,11 +262,12 @@ class Result:
         return self.values[id]
 
 class Computation(Computable):
-    def __init__(self, id, description, taxonomy):
+    def __init__(self, id, description, taxonomy, period):
         self.id = id
         self.description = description
         self.steps = []
         self.taxonomy = taxonomy
+        self.period = period
 
     def add(self, item):
         self.steps.append(AddOperation(item))
@@ -251,7 +280,12 @@ class Computation(Computable):
             total += v.compute(accounts, start, end, result)
 
         cdef = ContextDefinition()
-        cdef.set_period(start, end)
+        if self.period == AT_START:
+            cdef.set_instant(start, end)
+        elif self.period == AT_END:
+            cdef.set_instant(end)
+        else:
+            cdef.set_period(start, end)
         cdef.add_segments(self.id, self.taxonomy)
         context = self.taxonomy.get_context(cdef)
 
@@ -281,7 +315,15 @@ class Computation(Computable):
         id = cfg.get("id")
         if id == None: id = create_uuid()
 
-        comp = Computation(id, cfg.get("description"), taxonomy)
+        pspec = cfg.get("period")
+
+        pid = {
+            "in-year": IN_YEAR,
+            "to-start": AT_START,
+            "to-end": AT_END
+        }.get(pspec, AT_END)
+
+        comp = Computation(id, cfg.get("description"), taxonomy, pid)
 
         for item in cfg.get("inputs"):
             comp.add(comps[item])

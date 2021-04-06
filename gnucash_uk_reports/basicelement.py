@@ -88,8 +88,6 @@ class BasicElement:
 
     def add_style(self, elt):
 
-        return
-
         doc = self.doc
         
         style = doc.createElement("style")
@@ -562,7 +560,7 @@ h2 {
         )
         report_period_context = self.taxonomy.get_context(report_period_cdef)
         
-        report_title_fact = report_date_context.create_string_fact(
+        report_title_fact = report_period_context.create_string_fact(
             "report-title",
             report.get("title")
         )
@@ -621,7 +619,7 @@ h2 {
         )
 
         report.get_date("statement-date").use(
-            lambda val: report_period_context.create_date_fact(
+            lambda val: report_date_context.create_date_fact(
                 "balance-sheet-date", val
             )
         ).use(
@@ -744,7 +742,7 @@ h2 {
         cdef.set_instant(date)
         context = self.taxonomy.get_context(cdef)
 
-        fact = context.create_string_fact("entity-legal-date", "")
+        fact = context.create_date_fact("entity-legal-date", date)
         fact.append(self.doc, self.hidden)
         
 
@@ -783,7 +781,7 @@ h2 {
             fact.append(self.doc, self.hidden)
 
             if signer == directors[i]:
-                fact = context.create_string_fact("signer", directors[i])
+                fact = context.create_string_fact("signer", "")
                 fact.append(self.doc, self.hidden)
 
         # country context

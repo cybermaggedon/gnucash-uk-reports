@@ -1,6 +1,7 @@
 
 from . basicelement import BasicElement
 from . basicelement import software, software_version
+from . fact import *
 
 from datetime import datetime
 
@@ -29,6 +30,19 @@ class NotesElement(BasicElement):
 
     def get_note_elts(self, n, par):
 
+        report = self.metadata.get("report")
+
+        report_date_cdef = ContextDefinition()
+        report_date_cdef.set_instant(report.get("date"))
+        report_date_context = self.taxonomy.get_context(report_date_cdef)
+
+        report_period_cdef = ContextDefinition()
+        report_period_cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
+        )
+        report_period_context = self.taxonomy.get_context(report_period_cdef)
+        
         if n == "small-company-audit-exempt":
 
             val = self.metadata.get("report").get("periods")[0].get("end")
@@ -38,8 +52,8 @@ class NotesElement(BasicElement):
 
             text = "For the accounting period ending {0} the company was entitled to exemption from audit under section 477 of the Companies Act 2006 relating to small companies.".format(year_end.strftime("%d %B %Y"))
 
-            par.add_nn(elt, "uk-direp:StatementThatCompanyEntitledToExemptionFromAuditUnderSection477CompaniesAct2006RelatingToSmallCompanies",
-                       "period-0", text)
+            fact = report_period_context.create_string_fact("small-company-exempt-from-audit", text)
+            fact.append(par.doc, elt)
 
             return elt
 
@@ -47,31 +61,33 @@ class NotesElement(BasicElement):
 
             elt = par.doc.createElement("span")
 
-            par.add_nn(elt,
-                       "uk-direp:StatementThatMembersHaveNotRequiredCompanyToObtainAnAudit",
-                       "period-0",
-                       "The members have not required the company to obtain an audit of its financial statements for the accounting period in accordance with section 476.")
+            text = "The members have not required the company to obtain an audit of its financial statements for the accounting period in accordance with section 476."
+
+            fact = report_period_context.create_string_fact("members-not-required-audit", text)
+            fact.append(par.doc, elt)
 
             return elt
 
         if n == "micro-entity-provisions":
 
             elt = par.doc.createElement("span")
-            par.add_nn(elt, "uk-direp:StatementThatAccountsHaveBeenPreparedInAccordanceWithProvisionsSmallCompaniesRegime",
-                       "period-0", "These financial statements have been prepared in accordance with the micro-entity provisions.")
+            text = "These financial statements have been prepared in accordance with the micro-entity provisions."
+            
+            fact = report_period_context.create_string_fact("accounts-prepared-small-company-regime", text)
+            fact.append(par.doc, elt)
 
             return elt
 
         if n == "company":
 
-            cnum = self.metadata.get("business.company-number")
+            company_number = self.metadata.get("business.company-number")
             addr = self.metadata.get("business.contact.address")
 
             elt = par.doc.createElement("span")
             elt.appendChild(par.doc.createTextNode("The company is a private company limited by shares and is registered in England and Wales number "))
-            
-            par.add_nn(elt, "uk-bus:UKCompaniesHouseRegisteredNumber",
-                       "period-0", cnum)
+
+            fact = report_period_context.create_string_fact("company-number", company_number)
+            fact.append(par.doc, elt)
 
             elt.appendChild(par.doc.createTextNode(". The registered address is: "))
 
