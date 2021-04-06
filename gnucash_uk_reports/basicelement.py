@@ -11,14 +11,6 @@ from datetime import datetime
 software = "gnucash-uk-reports"
 software_version = "0.0.1"
 
-accounts_status = {
-}
-
-country_names = {
-    "UK": "uk-geo:UnitedKingdom",
-    "england-and-wales": "uk-geo:EnglandWales"
-}
-
 formation_forms = {
     "private-limited-company": "Private limited company, Ltd",
     "public-limited-company-plc": "Public limited company, PLC",
@@ -37,26 +29,6 @@ formation_forms = {
     "branch-trading-in-uk": "Branch trading in UK",
     "other-uk": "Other UK",
     "other-non-uk": "Other non-UK"
-}
-
-formation_form_name = {
-    "private-limited-company": "uk-bus:PrivateLimitedCompanyLtd",
-    "public-limited-company-plc": "uk-bus:PublicLimitedCompanyPLC",
-    "public-limited-company-not-quoted": "uk-bus:PublicLimitedCompanyPLCNotQuotedOnAnyExchange",
-    "company-limited-by-guarantee": "uk-bus:CompanyLimitedByGuarantee",
-    "unlimited-company": "uk-bus:UnlimitedCompany",
-    "limited-liability-partnership": "uk-bus:LimitedLiabilityPartnershipLLP",
-    "registered-charity": "uk-bus:RegisteredCharity",
-    "community-interest-company": "uk-bus:CommunityInterestCompanyCIC",
-    "industrial-and-provident-society": "uk-bus:IndustrialProvidentSociety",
-    "friendly-society": "uk-bus:FriendlySociety",
-    "incorporated-by-act-of-parliament": "uk-bus:IncorporatedByActParliament",
-    "incorporated-by-royal-charter": "uk-bus:IncorporatedByRoyalCharter",
-    "scottish-partnership": "uk-bus:ScottishPartnership",
-    "other-incorporated-association": "uk-bus:OtherIncorporatedAssociation",
-    "branch-trading-in-uk": "uk-bus:BranchTradingInUK",
-    "other-uk": "uk-bus:OtherUK",
-    "other-non-uk": "uk-bus:OtherNon-UK"
 }
 
 industry_sectors = {
@@ -518,20 +490,6 @@ h2 {
                 ])
             )
 
-        # formation-country-0
-        country = business.get("company-formation").get("country")
-        if country:
-            if country in country_names:
-                self.resources.appendChild(
-                    self.create_context("formation-country", [
-                        self.create_entity(company_number, [
-                            self.create_segment_member("uk-geo:CountriesRegionsDimension",
-                                                       country_names[country])
-                        ]),
-                        self.create_period(self.periods[0])
-                ])
-            )
-
         # formation-date
         date = business.get("company-formation").get("date")
         if date:
@@ -946,131 +904,169 @@ h2 {
         fact = context.create_string_fact("accounts-status", "")
         fact.append(self.doc, self.hidden)
 
-        return
-
-        report.get("accounts-status").use(
-            lambda x:
-            self.add_nn(self.hidden, "uk-bus:AccountsStatusAuditedOrUnaudited",
-                        "accounts-status-period", "")
+        # entity-legal-form
+        val = business.get("company-formation.form")
+        cdef = ContextDefinition()
+        cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
         )
+        cdef.lookup_segment("entity-legal-form", val, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
 
-        form = business.get("company-formation.form")
-        if form:
-            if form in formation_forms:
-                self.add_nn(self.hidden, "uk-bus:LegalFormEntity",
-                            "formation-form", "")
+        fact = context.create_string_fact("entity-legal-form", "")
+        fact.append(self.doc, self.hidden)
 
-        country = business.get("company-formation.country")
-        if country:
-            if country in country_names:
-                self.add_nn(self.hidden,
-                            "uk-bus:CountryFormationOrIncorporation",
-                            "formation-country", "")
+        # entity-legal-country
+        val = business.get("company-formation.country")
+        cdef = ContextDefinition()
+        cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
+        )
+        cdef.lookup_segment("countries-regions", val, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
 
-        date = business.get("company-formation.date")
-        self.add_nn(self.hidden,
-                    "uk-bus:DateFormationOrIncorporation",
-                    "formation-date", date)
+        fact = context.create_string_fact("entity-legal-country", "")
+        fact.append(self.doc, self.hidden)
 
+        # entity-legal-date
+        date = business.get("company-formation").get_date("date")
+        cdef = ContextDefinition()
+        cdef.set_instant(date)
+        context = self.taxonomy.get_context(cdef)
+
+        fact = context.create_string_fact("entity-legal-date", "")
+        fact.append(self.doc, self.hidden)
+        
+
+        # average-employees
         def add_avg_employee_counts(val):
             for i in range(0, len(val)):
 
-                elt = self.doc.createElement("ix:nonFraction")
-                elt.setAttribute("name", "uk-core:AverageNumberEmployeesDuringPeriod")
-                elt.setAttribute("contextRef", "period-" + str(i))
-                elt.setAttribute("format", "ixt2:numdotdecimal")
-                elt.setAttribute("decimals", "0")
-                elt.setAttribute("unitRef", "pure")
-                elt.appendChild(self.doc.createTextNode(str(val[i])))
+                cdef = ContextDefinition()
+                cdef.set_period(
+                    report.get("periods")[i].get_date("start"),
+                    report.get("periods")[i].get_date("end")
+                )
+                context = self.taxonomy.get_context(cdef)
 
-                self.hidden.appendChild(elt)
+                fact = context.create_count_fact("average-employees", val[i])
+                fact.append(self.doc, self.hidden)
 
         report.get("average-employees").use(add_avg_employee_counts)
 
+        # director and signer
         directors = business.get("directors")
-        if directors:
-            for i in range(0, len(directors)):
-                nm = "uk-bus:NameEntityOfficer"
-                self.add_nn(self.hidden, nm, "officer-{0}".format(i + 1),
-                            directors[i])
+        signer = report.get("signing-director")
 
-        def signer(val):
-            for i in range(0, len(directors)):
-                if val == directors[i]:
-                    self.add_nn(self.hidden,
-                                "uk-core:DirectorSigningFinancialStatements",
-                                "officer-" + str(i + 1), "")
+        for i in range(0, len(directors)):
 
-        report.get("signing-director").use(signer)
+            cdef = ContextDefinition()
+            cdef.set_period(
+                report.get("periods")[0].get_date("start"),
+                report.get("periods")[0].get_date("end")
+            )
+            cdef.lookup_segment("director", "director" + str(i + 1),
+                                self.taxonomy)
+            context = self.taxonomy.get_context(cdef)
+        
+            fact = context.create_string_fact("director", directors[i])
+            fact.append(self.doc, self.hidden)
+
+            if signer == directors[i]:
+                fact = context.create_string_fact("signer", directors[i])
+                fact.append(self.doc, self.hidden)
+
+        # country context
+        country = business.get("contact").get("country")
+
+        cdef = ContextDefinition()
+        cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
+        )
+        cdef.lookup_segment("countries-regions", country, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
 
         business.get("contact").get("name").use(
-            lambda val: self.add_nn(self.hidden,
-                                    "uk-bus:NameContactDepartmentOrPerson",
-                                    "country-0", val)
+            lambda val: context.create_string_fact("contact-name", val)
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
 
         def add_address(val):
             for i in range(0, 2):
                 if len(val) > (i):
-                    nm = "uk-bus:AddressLine{0}".format(i+1)
-                    self.add_nn(self.hidden, nm, "country-0", val[i])
+                    nm = "contact-address{0}".format(i+1)
+                    fact = context.create_string_fact(nm, val[i])
+                    fact.append(self.doc, self.hidden)
                 
         business.get("contact").get("address").use(
             lambda val: add_address(val)
         )
 
         business.get("contact").get("location").use(
-            lambda val: self.add_nn(self.hidden,
-                                    "uk-bus:PrincipalLocation-CityOrTown",
-                                    "country-0", val)
+            lambda val: context.create_string_fact("contact-location", val)
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
 
         business.get("contact").get("county").use(
-            lambda val: self.add_nn(self.hidden,
-                                    "uk-bus:CountyRegion",
-                                    "country-0", val)
+            lambda val: context.create_string_fact("contact-county", val)
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
 
         business.get("contact").get("postcode").use(
-            lambda val: self.add_nn(self.hidden,
-                                    "uk-bus:PostalCodeZip",
-                                    "country-0", val)
+            lambda val: context.create_string_fact("contact-postcode", val)
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
 
         def add_phone(val):
             val.get("country").use(
-                lambda val:
-                self.add_nn(self.hidden, "uk-bus:CountryCode",
-                            "phone-0", val)
+                lambda val: context.create_string_fact("contact-phone-country",
+                                                       val)
+            ).use(
+                lambda x: x.append(self.doc, self.hidden)
             )
-
             val.get("area").use(
-                lambda val:
-                self.add_nn(self.hidden, "uk-bus:AreaCode",
-                            "phone-0", val)
+                lambda val: context.create_string_fact("contact-phone-area",
+                                                       val)
+            ).use(
+                lambda x: x.append(self.doc, self.hidden)
             )
-
             val.get("number").use(
-                lambda val:
-                self.add_nn(self.hidden, "uk-bus:LocalNumber",
-                            "phone-0", val)
+                lambda val: context.create_string_fact("contact-phone-number",
+                                                       val)
+            ).use(
+                lambda x: x.append(self.doc, self.hidden)
             )
 
         business.get("contact").get("phone").use(
             lambda val: add_phone(val)
         )
 
-        business.get("website").get("url").use(
-            lambda val: self.add_nn(self.hidden,
-                               "uk-bus:WebsiteMainPageURL",
-                               "web-0", val)
+        # website context
+        val = business.get("contact.country")
+        cdef = ContextDefinition()
+        cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
         )
+        cdef.lookup_segment("countries-regions", val, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
 
-        business.get("website").get("description").use(
-            lambda val: self.add_nn(self.hidden,
-                               "uk-bus:DescriptionOrOtherInformationOnWebsite",
-                               "web-0", val)
-        )
+        # website URL
+        val = business.get("website.url")
+        fact = context.create_string_fact("website-url", val)
+        fact.append(self.doc, self.hidden)
+        
+        # website description
+        val = business.get("website.description")
+        fact = context.create_string_fact("website-description", val)
+        fact.append(self.doc, self.hidden)
 
     @staticmethod
     def get_element(id, cfg, session, tx):

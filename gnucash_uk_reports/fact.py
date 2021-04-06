@@ -23,8 +23,31 @@ class MoneyFact(Fact):
             print("        {0}".format(str(self.value)))
 
 class CountFact(Fact):
-    def __init__(self, value):
+    def __init__(self, value, context, unit="pure"):
         self.value = value
+        self.context = context
+        self.reverse = False
+        self.unit = unit
+    def describe(self):
+        if self.name:
+            name = self.name
+            context = self.context.id
+            print("        {0} {1} {2}".format(
+                str(self.value), name, context
+            ))
+        else:
+            print("        {0}".format(str(self.value)))
+    def append(self, doc, par):
+        if self.name:
+            elt = doc.createElement("ix:nonFraction")
+            elt.setAttribute("name", self.name)
+            elt.setAttribute("contextRef", self.context.id)
+            elt.setAttribute("unitRef", self.unit)
+            elt.setAttribute("decimals", "0")
+            elt.appendChild(doc.createTextNode(str(self.value)))
+            par.appendChild(elt)
+        else:
+            par.appendChild(doc.createTextNode(str(self.value)))
 
 class StringFact(Fact):
     def __init__(self, value, context):
@@ -105,6 +128,14 @@ class Taxonomy:
         m.context = context
         return m
 
+    def create_count_fact(self, id, value, context):
+
+        m = CountFact(value, context)
+        m.name = self.get_tag_name(id)
+        m.reverse = self.get_sign_reversed(id)
+        m.context = context
+        return m
+
     def create_string_fact(self, id, value, context):
 
         m = StringFact(value, context)
@@ -171,6 +202,8 @@ class Context:
         self.definition = cdef
     def create_money_fact(self, id, value):
         return self.taxonomy.create_money_fact(id, value, self)
+    def create_count_fact(self, id, value):
+        return self.taxonomy.create_count_fact(id, value, self)
     def create_string_fact(self, id, value):
         return self.taxonomy.create_string_fact(id, value, self)
     def create_date_fact(self, id, value):
