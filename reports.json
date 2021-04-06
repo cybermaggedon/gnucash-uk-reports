@@ -125,6 +125,7 @@
 
 		"report-title": "uk-bus:ReportTitle",
 		"report-date": "uk-bus:BusinessReportPublicationDate",
+		"issue-date": "uk-core:DateAuthorisationFinancialStatementsForIssue",
 		"period-start": "uk-bus:StartDateForPeriodCoveredByReport",
 		"period-end": "uk-bus:EndDateForPeriodCoveredByReport",
 		"software": "uk-bus:NameProductionSoftware",

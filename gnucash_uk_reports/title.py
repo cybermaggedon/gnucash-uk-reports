@@ -159,7 +159,8 @@ class Title(BasicElement):
         p.appendChild(par.doc.createTextNode("Approved by the board of directors and authorised for publication on "))
 
         def report_date(val):
-            fact = report_date_context.create_date_fact("report-date", val)
+            fact = report_date_context.create_date_fact("issue-date",
+                                                        val)
             fact.append(par.doc, p)
 
         self.metadata.get("report").get_date("date").use(report_date)
