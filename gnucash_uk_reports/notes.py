@@ -5,18 +5,19 @@ from . basicelement import software, software_version
 from datetime import datetime
 
 class NotesElement(BasicElement):
-    def __init__(self, metadata, title, notes):
-        super().__init__(metadata)
+    def __init__(self, metadata, title, notes, tx):
+        super().__init__(metadata, tx)
         self.title = title
         self.notes = notes
 
     @staticmethod
-    def load(elt_def, cfg):
+    def load(elt_def, cfg, tx):
 
         e = NotesElement(
             cfg.get("metadata"),
             elt_def.get("title"),
-            elt_def.get("notes")
+            elt_def.get("notes"),
+            tx
         )
 
         return e

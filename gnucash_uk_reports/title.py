@@ -4,19 +4,20 @@ from . basicelement import BasicElement
 import base64
 
 class Title(BasicElement):
-    def __init__(self, metadata, img, type):
-        super().__init__(metadata)
+    def __init__(self, metadata, img, type, tx):
+        super().__init__(metadata, tx)
         self.title = metadata.get("report").get("title")
         self.date = metadata.get("report").get("date")
         self.img = img
         self.type = type
     @staticmethod
-    def load(elt_def, cfg):
+    def load(elt_def, cfg, tx):
 
         e = Title(
             cfg.get("metadata"),
             elt_def.get("signature-image"),
-            elt_def.get("signature-type")
+            elt_def.get("signature-type"),
+            tx
         )
 
         return e

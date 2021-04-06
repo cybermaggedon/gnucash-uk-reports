@@ -120,7 +120,19 @@
 		"corporation-tax-owed": "uk-core:TaxationIncludingDeferredTaxationBalanceSheetSubtotal",
 		"accruals-and-deferred-income": "uk-core:AccruedLiabilitiesDeferredIncome",
 		"net-assets": "uk-core:NetAssetsLiabilities",
-		"total-capital-and-reserves": "uk-core:Equity"
+		"total-capital-and-reserves": "uk-core:Equity",
+
+		"report-title": "uk-bus:ReportTitle",
+		"report-date": "uk-bus:BusinessReportPublicationDate",
+		"period-start": "uk-bus:StartDateForPeriodCoveredByReport",
+		"period-end": "uk-bus:EndDateForPeriodCoveredByReport",
+		"software": "uk-bus:NameProductionSoftware",
+		"software-version": "uk-bus:VersionProductionSoftware",
+		"company-name": "uk-bus:EntityCurrentLegalOrRegisteredName",
+		"company-number": "uk-bus:UKCompaniesHouseRegisteredNumber",
+		"vat-registration": "uk-bus:VATRegistrationNumber",
+		"balance-sheet-date": "uk-bus:BalanceSheetDate"
+
 	    },
 	    "sign-reversed": {
 		"cost-of-sales": true,

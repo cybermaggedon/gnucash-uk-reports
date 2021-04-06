@@ -4,7 +4,6 @@ from . worksheetelement import WorksheetElement
 from . period import Period
 from . composite import Composite
 
-
 class Element:
 
     @staticmethod

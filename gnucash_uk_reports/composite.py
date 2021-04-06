@@ -2,8 +2,8 @@
 from . basicelement import BasicElement
 
 class Composite(BasicElement):
-    def __init__(self, metadata, elts):
-        super().__init__(metadata)
+    def __init__(self, metadata, elts, tx):
+        super().__init__(metadata, tx)
         self.elements = elts
 
     @staticmethod
@@ -14,7 +14,8 @@ class Composite(BasicElement):
             [
                 BasicElement.get_element(v, cfg, session, tx)
                 for v in elt_def.get("elements")
-            ]
+            ],
+            tx
         )
         return c
 

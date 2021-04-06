@@ -5,8 +5,8 @@ from . report import TextReporter
 from . ixbrl import IxbrlReporter
 
 class WorksheetElement(BasicElement):
-    def __init__(self, metadata, title, worksheet):
-        super().__init__(metadata)
+    def __init__(self, metadata, title, worksheet, tx):
+        super().__init__(metadata, tx)
         self.title = title
         self.worksheet = worksheet
     @staticmethod
@@ -15,7 +15,8 @@ class WorksheetElement(BasicElement):
         e = WorksheetElement(
             cfg.get("metadata"),
             elt_def.get("title"),
-            get_worksheet(elt_def.get("worksheet"), cfg, session, tx)
+            get_worksheet(elt_def.get("worksheet"), cfg, session, tx),
+            tx
         )
 
         return e

@@ -1,6 +1,7 @@
 
 class Fact:
-    pass
+    def use(self, fn):
+        return fn(self)
 
 class BooleanFact(Fact):
     def __init__(self, value):
@@ -26,8 +27,51 @@ class CountFact(Fact):
         self.value = value
 
 class StringFact(Fact):
-    def __init__(self, value):
+    def __init__(self, value, context):
         self.value = value
+        self.context = context
+    def describe(self):
+        if self.name:
+            name = self.name
+            context = self.context.id
+            print("        {0} {1} {2}".format(
+                self.value, name, context
+            ))
+        else:
+            print("        {0}".format(str(self.value)))
+    def append(self, doc, par):
+        if self.name:
+            elt = doc.createElement("ix:nonNumeric")
+            elt.setAttribute("name", self.name)
+            elt.setAttribute("contextRef", self.context.id)
+            elt.appendChild(doc.createTextNode(self.value))
+            par.appendChild(elt)
+        else:
+            par.appendChild(doc.createTextNode(self.value))
+
+class DateFact(Fact):
+    def __init__(self, value, context):
+        self.value = value
+        self.context = context
+    def describe(self):
+        if self.name:
+            name = self.name
+            context = self.context.id
+            print("        {0} {1} {2}".format(
+                self.value, name, context
+            ))
+        else:
+            print("        {0}".format(str(self.value)))
+    def append(self, doc, par):
+        if self.name:
+            elt = doc.createElement("ix:nonNumeric")
+            elt.setAttribute("name", self.name)
+            elt.setAttribute("contextRef", self.context.id)
+            elt.setAttribute("format", "ixt2:datedaymonthyearen")
+            elt.appendChild(doc.createTextNode(self.value.strftime("%d %B %Y")))
+            par.appendChild(elt)
+        else:
+            par.appendChild(doc.createTextNode(self.value.strftime("%d %B %Y")))
 
 class Taxonomy:
     def __init__(self, cfg, name):
@@ -56,6 +100,20 @@ class Taxonomy:
         m.context = context
         return m
 
+    def create_string_fact(self, id, value, context):
+
+        m = StringFact(value, context)
+        m.name = self.get_tag_name(id)
+        m.context = context
+        return m
+
+    def create_date_fact(self, id, value, context):
+
+        m = DateFact(value, context)
+        m.name = self.get_tag_name(id)
+        m.context = context
+        return m
+
     def get_context(self, cdef):
 
         key = cdef.get_key()
@@ -77,11 +135,14 @@ class ContextDefinition:
     def __init__(self):
         self.period = None
         self.instant = None
+        self.entity = None
         self.segments = {}
     def set_period(self, start, end):
         self.period = (start, end)
     def set_instant(self, instant):
         self.instant = instant
+    def set_entity(self, id):
+        self.entity = id
     def add_segments(self, id, tx):
         segs = tx.get_tag_dimensions(id)
         if segs:
@@ -93,7 +154,7 @@ class ContextDefinition:
             for k in self.segments
         ]
         segs.sort()
-        return (self.period, self.instant, "//".join(segs))
+        return (self.entity, self.period, self.instant, "//".join(segs))
 
 class Context:
     def __init__(self, taxonomy, cdef):
@@ -102,6 +163,10 @@ class Context:
         self.definition = cdef
     def create_money_fact(self, id, value):
         return self.taxonomy.create_money_fact(id, value, self)
+    def create_string_fact(self, id, value):
+        return self.taxonomy.create_string_fact(id, value, self)
+    def create_date_fact(self, id, value):
+        return self.taxonomy.create_date_fact(id, value, self)
     def describe(self):
         print("    Context:", self.id, ",", self.definition.get_key())
 

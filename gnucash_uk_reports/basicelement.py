@@ -1,6 +1,8 @@
 
 from . period import Period
 
+from . fact import *
+
 from xml.dom.minidom import getDOMImplementation
 from xml.dom import XHTML_NAMESPACE
 import json
@@ -124,8 +126,9 @@ industry_sector_names = {
 
 class BasicElement:
 
-    def __init__(self, metadata):
+    def __init__(self, metadata, tx):
         self.metadata = metadata
+        self.taxonomy = tx
 
     @staticmethod
     def load(elt_def, cfg, session, tx):
@@ -138,7 +141,7 @@ class BasicElement:
 
         if kind == "title":
             from . title import Title
-            return Title.load(elt_def, cfg)
+            return Title.load(elt_def, cfg, tx)
 
         if kind == "worksheet":
             from . worksheetelement import WorksheetElement
@@ -146,15 +149,17 @@ class BasicElement:
 
         if kind == "notes":
             from . notes import NotesElement
-            return NotesElement.load(elt_def, cfg)
+            return NotesElement.load(elt_def, cfg, tx)
 
         if kind == "ct600":
             from . ct600 import CT600
-            return CT600.load(elt_def, cfg, session)
+            return CT600.load(elt_def, cfg, session, tx)
 
         raise RuntimeError("Don't know element kind '%s'" % kind)
 
     def add_style(self, elt):
+
+        return
 
         doc = self.doc
         
@@ -382,6 +387,8 @@ h2 {
         html = self.doc.documentElement
 
         html.setAttribute("xmlns", XHTML_NAMESPACE)
+
+        # FIXME: Hard-coded
         html.setAttribute("xmlns:ix", "http://www.xbrl.org/2013/inlineXBRL")
         html.setAttribute("xmlns:uk-bus",
                           "http://xbrl.frc.org.uk/cd/2021-01-01/business")
@@ -433,9 +440,9 @@ h2 {
         hdr.appendChild(resources)
         self.resources = resources
 
-        self.create_contexts()
-
         self.create_metadata()
+
+        self.create_contexts()
 
         currency = self.metadata.get("report").get("currency")
 
@@ -463,10 +470,43 @@ h2 {
         elt = self.to_ixbrl_elt(self)
         body.appendChild(elt)
 
-#        out.write(doc.toprettyxml())
-        out.write(doc.toxml())
+        out.write(doc.toprettyxml())
+#        out.write(doc.toxml())
 
     def create_contexts(self):
+
+        report = self.metadata.get("report")
+        business = self.metadata.get("business")
+
+#        report_date = report.get("date")
+
+        company_number = business.get("company-number")
+
+        for key in self.taxonomy.contexts:
+
+            ctxt = self.taxonomy.contexts[key]
+            cdef = ctxt.definition
+
+            segs = [
+                self.create_segment_member(k, cdef.segments[k])
+                for k in cdef.segments
+            ]
+
+            crit = [
+                self.create_entity(company_number, segs)
+            ]
+
+            if cdef.period:
+                crit.append(self.create_period(cdef.period[0], cdef.period[1]))
+
+            if cdef.instant:
+                crit.append(self.create_instant_period(cdef.instant))
+
+            ce = self.create_context(ctxt.id, crit)
+
+            self.resources.appendChild(ce)
+
+        return
 
         report = self.metadata.get("report")
         business = self.metadata.get("business")
@@ -758,16 +798,16 @@ h2 {
 
         return cperiod
 
-    def create_period(self, p):
+    def create_period(self, s, e):
 
         cperiod = self.doc.createElement("xbrli:period")
 
         start = self.doc.createElement("xbrli:startDate")
-        start.appendChild(self.doc.createTextNode(str(p.start)))
+        start.appendChild(self.doc.createTextNode(str(s)))
         cperiod.appendChild(start)
 
         end = self.doc.createElement("xbrli:endDate")
-        end.appendChild(self.doc.createTextNode(str(p.end)))
+        end.appendChild(self.doc.createTextNode(str(e)))
         cperiod.appendChild(end)
 
         return cperiod
@@ -784,54 +824,90 @@ h2 {
         return seg
 
     def create_metadata(self):
-
         report = self.metadata.get("report")
         business = self.metadata.get("business")
 
-        report.get("title").use(
-            lambda val:
-            self.add_nn(self.hidden, "uk-bus:ReportTitle", "period-0", val)
+        company_number = business.get("company-number")
+        report_date = report.get_date("date")
+
+        report_date_cdef = ContextDefinition()
+        report_date_cdef.set_instant(report_date)
+        report_date_context = self.taxonomy.get_context(report_date_cdef)
+
+        report_period_cdef = ContextDefinition()
+        report_period_cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
+        )
+        report_period_context = self.taxonomy.get_context(report_period_cdef)
+        
+        report_title_fact = report_date_context.create_string_fact(
+            "report-title",
+            report.get("title")
         )
 
-        report.get_date("date").use(
-            lambda val:
-            self.add_date(self.hidden, "uk-bus:BusinessReportPublicationDate",
-                          "report-date", val))
+        report_title_fact.append(self.doc, self.hidden)
+
+        report_date_context.create_date_fact("report-date", report_date).use(
+            lambda x: x.append(self.doc, self.hidden)
+        )
 
         report.get("periods")[0].get_date("start").use(
             lambda val:
-            self.add_date(self.hidden,
-                          "uk-bus:StartDateForPeriodCoveredByReport",
-                          "report-date", val))
+            report_date_context.create_date_fact("period-start", val)
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
+        )
 
         report.get("periods")[0].get_date("end").use(
             lambda val:
-            self.add_date(self.hidden,
-                          "uk-bus:EndDateForPeriodCoveredByReport",
-                          "report-date", val))
+            report_date_context.create_date_fact("period-end", val)
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
+        )
 
-        self.add_nn(self.hidden, "uk-bus:NameProductionSoftware", "period-0",
-               software)
-        self.add_nn(self.hidden, "uk-bus:VersionProductionSoftware", "period-0",
-               software_version)
+        report_period_context.create_string_fact("software", software).use(
+            lambda x: x.append(self.doc, self.hidden)
+        )
+
+        report_period_context.create_string_fact("software-version",
+                                                 software_version).use(
+            lambda x: x.append(self.doc, self.hidden)
+        )
 
         business.get("company-name").use(
-            lambda val: self.add_nn(self.hidden, 
-                                    "uk-bus:EntityCurrentLegalOrRegisteredName",
-                                    "period-0", val)
+            lambda val: report_period_context.create_string_fact(
+                "company-name", val
+            )
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
 
         business.get("company-number").use(
-            lambda val: self.add_nn(self.hidden,
-                                    "uk-bus:UKCompaniesHouseRegisteredNumber",
-                                    "period-0", val)
+            lambda val: report_period_context.create_string_fact(
+                "company-number", val
+            )
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
 
         business.get("vat-registration").use(
-            lambda val: self.add_nn(self.hidden,
-                                    "uk-bus:VATRegistrationNumber",
-                                    "period-0", val)
+            lambda val: report_period_context.create_string_fact(
+                "vat-registration", val
+            )
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
+
+        report.get_date("statement-date").use(
+            lambda val: report_period_context.create_date_fact(
+                "balance-sheet-date", val
+            )
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
+        )
+
+        return
 
         report.get_date("statement-date").use(
             lambda val:
