@@ -2,6 +2,8 @@
 from . period import Period
 from . basicelement import BasicElement
 
+from . worksheet import get_worksheet
+
 from xml.dom.minidom import getDOMImplementation
 from xml.dom import XHTML_NAMESPACE
 
@@ -28,23 +30,26 @@ business_type = {
 
 class CT600(BasicElement):
 
-    def __init__(self, metadata, elts):
+    def __init__(self, metadata, elts, session, cfg):
         self.metadata = metadata
         self.elements = elts
+        self.session = session
+        self.cfg = cfg
 
     @staticmethod
     def load(elt_def, cfg, session):
 
         c = CT600(
             cfg.get("metadata"),
-            [
-                self.get_element(v, cfg, session)
-                for v in elt_def.get("elements")
-            ]
+            elt_def.get("elements"),
+            session,
+            cfg
         )
         return c
 
     def add_style(self, elt):
+
+        return
 
         doc = self.doc
         
@@ -160,7 +165,7 @@ BODY {
         hdr.appendChild(resources)
         self.resources = resources
 
-        self.create_contexts()
+#        self.create_contexts()
 
         self.create_metadata()
 
@@ -202,30 +207,78 @@ BODY {
         title.appendChild(par.doc.createTextNode("CT600"))
         div.appendChild(title)
 
-        for d in report_data:
+        for v in self.elements:
 
-            row = par.doc.createElement("div")
-            row.setAttribute("class", "data")
-            div.appendChild(row)
+            if v.get("kind") == "config":
+                elt = self.make_data(par, str(v.get("field")),
+                                     v.get("description"),
+                                     self.metadata.get(v.get("key")),
+                                     v.get("tag"))
+                div.appendChild(elt)
 
-            num = par.doc.createElement("div")
-            num.setAttribute("class", "number")
-            row.appendChild(num)
-            num.appendChild(par.doc.createTextNode(str(d.number)))
+            if v.get("kind") == "config-date":
+                elt = self.make_data(par, str(v.get("field")),
+                                     v.get("description"),
+                                     self.metadata.get_date(v.get("key")),
+                                     v.get("tag"))
+                div.appendChild(elt)
 
-            desc = par.doc.createElement("div")
-            desc.setAttribute("class", "description")
-            row.appendChild(desc)
-            desc.appendChild(par.doc.createTextNode(d.description + ": "))
+            if v.get("kind") == "bool":
+                elt = self.make_data(par, str(v.get("field")),
+                                     v.get("description"),
+                                     v.get_bool("value"),
+                                     v.get("tag"))
+                div.appendChild(elt)
 
-            try:
-                value = getattr(self, d.value)()
-            except:
-                value = d.value(self)
+            if v.get("kind") == "worksheet-value":
 
-            row.appendChild(self.get_value_elt(par, value, d.tag))
+                worksheet_id = v.get("worksheet")
+
+                wsht = get_worksheet(worksheet_id, self.cfg, self.session)
+
+                value_id = v.get("value")
+
+                # FIXME: Assumed first period.
+                found = False
+                for it in wsht.items[0]:
+                    if it.defn.id == value_id:
+                        value = it.value
+                        found = True
+
+                if found == False:
+                    raise RuntimeError("Couldn't find value '%s'" % value_id)
+
+                if v.get("sign-reverse"):
+                    value *= -1
+
+                elt = self.make_data(par, str(v.get("field")),
+                                     v.get("description"),
+                                     value,
+                                     v.get("tag"))
+                div.appendChild(elt)
 
         return div
+
+#        for d in report_data:
+
+    def make_data(self, par, field, desc, value, tag):
+
+        row = par.doc.createElement("div")
+        row.setAttribute("class", "data")
+
+        num = par.doc.createElement("div")
+        num.setAttribute("class", "number")
+        row.appendChild(num)
+        num.appendChild(par.doc.createTextNode(field))
+
+        descelt = par.doc.createElement("div")
+        descelt.setAttribute("class", "description")
+        row.appendChild(descelt)
+        descelt.appendChild(par.doc.createTextNode(desc + ": "))
+            
+        row.appendChild(self.get_value_elt(par, value, tag))
+
+        return row
 
     def get_value_elt(self, par, value, tag):
 
@@ -236,7 +289,6 @@ BODY {
             valelt.appendChild(par.doc.createTextNode(str(value)))
             return valelt
 
-        print(type(value))
         if isinstance(value, date):
             par.add_date(valelt, tag["tag"], "period", value)
         elif isinstance(value, float):

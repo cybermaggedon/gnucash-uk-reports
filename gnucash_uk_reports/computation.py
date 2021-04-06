@@ -76,7 +76,7 @@ class Line(Computable):
 
     def get_output(self, result):
 
-        output = SimpleValue(self.description, result.get(self.id))
+        output = SimpleValue(self, self.description, result.get(self.id))
 
         output.tags = self.tags
 
@@ -114,7 +114,7 @@ class Constant(Computable):
 
     def get_output(self, result):
 
-        output = SimpleValue(self.description, result.get(self.id))
+        output = SimpleValue(self, self.description, result.get(self.id))
 
         output.tags = self.tags
 
@@ -169,7 +169,7 @@ class Group(Computable):
     def get_output(self, result):
 
         if len(self.lines) == 0:
-            output = NilValue(self.description)
+            output = NilValue(self, self.description)
 
             output.tags = self.tags
 
@@ -180,6 +180,7 @@ class Group(Computable):
             # For a hidden breakdown, create a breakdown object which is not
             # returned, and a Total object which references it
             bd = Breakdown(
+                self,
                 self.description,
                 result.get(self.id),
                 items= [
@@ -187,12 +188,13 @@ class Group(Computable):
                 ]
             )
 
-            output = Total(self.description, result.get(self.id),
+            output = Total(self, self.description, result.get(self.id),
                            items=[bd])
 
         else:
 
             output = Breakdown(
+                self,
                 self.description,
                 result.get(self.id),
                 items= [
@@ -247,7 +249,7 @@ class Computation(Computable):
 
         if len(self.steps) == 0:
             
-            output = NilValue(self.description)
+            output = NilValue(self, self.description)
 
             output.tags = self.tags
 
@@ -255,7 +257,7 @@ class Computation(Computable):
 
         # Assume item contains AddOperations x.item provides value.
         # Needs rework if we do something more complicated.
-        output = Total(self.description, result.get(self.id),
+        output = Total(self, self.description, result.get(self.id),
                        items=[
                            item.item for item in self.steps
                        ])

@@ -718,6 +718,93 @@
 	    "id": "ct600",
 	    "kind": "ct600",
 	    "elements": [
+		{
+		    "field": "1",
+		    "id": "company-name",
+		    "description": "Company name",
+		    "kind": "config",
+		    "key": "business.company-name",
+		    "tag": {
+			"tag": "ct-comp:CompanyName"
+		    }
+		},
+		{
+		    "field": "3",
+		    "id": "utr",
+		    "description": "UTR",
+		    "kind": "config",
+		    "key": "tax.utr",
+		    "tag": {
+			"tag": "ct-comp:TaxReference"
+		    }
+		},
+		{
+		    "field": "5",
+		    "id": "start",
+		    "description": "NI trading activity",
+		    "kind": "bool",
+		    "value": false,
+		    "tag": {
+			"tag": "ct-comp:NITradingActivity"
+		    }
+		},
+		{
+		    "field": "30",
+		    "id": "start",
+		    "description": "Start of period",
+		    "kind": "config-date",
+		    "key": "tax.period.start",
+		    "tag": {
+			"tag": "ct-comp:StartOfPeriodCoveredByReturn"
+		    }
+		},
+		{
+		    "field": "35",
+		    "id": "start",
+		    "description": "End of period",
+		    "kind": "config-date",
+		    "key": "tax.period.end",
+		    "tag": {
+			"tag": "ct-comp:EndOfPeriodCoveredByReturn"
+		    }
+		},
+		{
+		    "field": "145",
+		    "id": "total-turnover-from-trade",
+		    "description": "Total Turnover From Trade",
+		    "kind": "worksheet-value",
+		    "worksheet": "profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "turnover",
+		    "tag": {
+			"tag": "ct-comp:FIXME"
+		    }
+		},
+		{
+		    "field": "155",
+		    "id": "trading-profits",
+		    "description": "Trading profits",
+		    "kind": "worksheet-value",
+		    "worksheet": "profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "gross-profit",
+		    "tag": {
+			"tag": "ct-comp:FIXME"
+		    }
+		},
+		{
+		    "field": "160",
+		    "id": "trading-losses",
+		    "description": "Trading losses",
+		    "kind": "worksheet-value",
+		    "worksheet": "profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "administrative-expenses",
+		    "tag": {
+			"tag": "ct-comp:FIXME",
+			"sign-reverse": true
+		    }
+		}
 	    ]
 	}
 

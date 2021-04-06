@@ -3,23 +3,27 @@ class WorksheetItem:
     pass
 
 class SimpleValue(WorksheetItem):
-    def __init__(self, desc, value):
+    def __init__(self, defn, desc, value):
+        self.defn = defn
         self.description = desc
         self.value = value
 
 class Breakdown(WorksheetItem):
-    def __init__(self, desc, value, items):
+    def __init__(self, defn, desc, value, items):
+        self.defn = defn
         self.description = desc
         self.value = value
         self.items = items
 
 class NilValue(WorksheetItem):
-    def __init__(self, desc):
+    def __init__(self, defn, desc):
+        self.defn = defn
         self.description = desc
         self.value = 0
 
 class Total(WorksheetItem):
-    def __init__(self, desc, value, items):
+    def __init__(self, defn, desc, value, items):
+        self.defn = defn
         self.description = desc
         self.value = value
         self.items = items

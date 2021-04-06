@@ -11,20 +11,21 @@ class MultiPeriodWorksheet(Worksheet):
 
     @staticmethod
     def create(cfg, report, comps, session):
-        mpr = MultiPeriodWorksheet.load(cfg, report, comps)
+
+        periods = []
+        for pdef in cfg.get("metadata.report.periods"):
+            periods.append(Period.load(pdef))
+
+        mpr = MultiPeriodWorksheet.load(cfg, report, comps, periods)
         mpr.process(session)
         return mpr
 
     @staticmethod
-    def load(cfg, report, comps):
+    def load(cfg, report, comps, periods):
 
-        mpr = MultiPeriodWorksheet([], [])
+        mpr = MultiPeriodWorksheet([], periods)
 
         mpr.id = report.get("id")
-        mpr.metadata = report.get("metadata")
-
-        for pdef in cfg.get("metadata.report.periods"):
-            mpr.periods.append(Period.load(pdef))
 
         for part in report.get("items"):
             mpr.parts.append(comps[part])
