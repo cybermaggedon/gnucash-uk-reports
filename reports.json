@@ -115,7 +115,6 @@
 		"tag": "uk-core:TurnoverRevenue",
 		"context": "period-{0}"
 	    }
-	    
 	},
 	{
 	    "id": "cost-of-sales",

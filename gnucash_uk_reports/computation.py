@@ -4,6 +4,7 @@ import datetime
 import uuid
 
 from . worksheet_model import SimpleValue, Breakdown, NilValue, Total
+from . fact import *
 
 def create_uuid():
     return str(uuid.uuid4())
@@ -15,42 +16,40 @@ TO_END = 3
 class Computable:
     def compute(self, accounts, start, end, result):
         raise RuntimeError("Not implemented")
-    def get_description(self):
-        return self.description
-    def load_tags(self, tags):
-        self.tags = tags
 
     @staticmethod
-    def load(cfg, comps):
+    def load(cfg, comps, taxonomy):
 
         kind = cfg.get("kind")
 
         if kind == "group":
-            return Group.load(cfg, comps)
+            return Group.load(cfg, comps, taxonomy)
 
         if kind == "computation":
-            return Computation.load(cfg, comps)
+            return Computation.load(cfg, comps, taxonomy)
 
         if kind == "line":
-            return Line.load(cfg, comps)
+            return Line.load(cfg, comps, taxonomy)
 
         if kind == "constant":
-            return Constant.load(cfg, comps)
+            return Constant.load(cfg, comps, taxonomy)
 
         raise RuntimeError("Don't understand computable type '%s'" % kind)
 
 class Line(Computable):
-    def __init__(self, id, description, accounts, tags, period=TO_END):
+
+    def __init__(self, id, description, accounts, taxonomy, period=TO_END):
         self.id = id
         self.description = description
         self.accounts = accounts
-        self.load_tags(tags)
+        self.taxonomy = taxonomy
         self.period = period
 
     def compute(self, session, start, end, result):
 
         total = 0
 
+        # FIXME: If there are transactions preceding 1970, this won't work.
         if self.period == TO_START:
             history = datetime.date(1970, 1, 1)
             start, end = history, start
@@ -70,21 +69,19 @@ class Line(Computable):
 
             total += acct_total
 
-        result.set(self.id, total)
+        result.set(self.id, self.taxonomy.create_money_fact(self.id, total))
 
         return total
 
     def get_output(self, result):
 
-        output = SimpleValue(self, self.description, result.get(self.id))
-
-        output.tags = self.tags
+        return SimpleValue(self, self.description, result.get(self.id))
 
         return output
 
 
     @staticmethod
-    def load(cfg, comps):
+    def load(cfg, comps, taxonomy):
         id = cfg.get("id")
         if id == None: id = create_uuid()
 
@@ -96,57 +93,54 @@ class Line(Computable):
             "to-end": TO_END
         }.get(pspec, TO_END)
 
-        return  Line(id, cfg.get("description"), cfg.get("accounts"),
-                     cfg.get("tags"), pid)
+        return Line(id, cfg.get("description"), cfg.get("accounts"),
+                    taxonomy, pid)
 
 class Constant(Computable):
-    def __init__(self, id, description, values, tags):
+    def __init__(self, id, description, values, taxonomy):
         self.id = id
         self.description = description
         self.values = values
-        self.load_tags(tags)
+        self.taxonomy = taxonomy
 
     def compute(self, session, start, end, result):
 
         val = self.values[str(end)]
-        result.set(self.id, val)
+        result.set(self.id, self.taxonomy.create_money_fact(self.id, val))
         return val
 
     def get_output(self, result):
 
         output = SimpleValue(self, self.description, result.get(self.id))
 
-        output.tags = self.tags
-
         return output
 
     @staticmethod
-    def load(cfg, comps):
+    def load(cfg, comps, taxonomy):
         id = cfg.get("id")
         if id == None: id = create_uuid()
 
-        return  Constant(id, cfg.get("description"), cfg.get("values"),
-                     cfg.get("tags"))
+        return Constant(id, cfg.get("description"), cfg.get("values"),
+                        taxonomy)
 
 class Group(Computable):
-    def __init__(self, id, description, tags):
+    def __init__(self, id, description, taxonomy):
         self.id = id
         self.description = description
         self.lines = []
-        self.load_tags(tags)
+        self.taxonomy = taxonomy
 
     @staticmethod
-    def load(cfg, comps):
+    def load(cfg, comps, taxonomy):
 
         id = cfg.get("id")
         if id == None: id = create_uuid()
-        tags = cfg.get("tags")
 
-        g = Group(id, cfg.get("description"), tags)
+        g = Group(id, cfg.get("description"), taxonomy)
 
         for l in cfg.get("lines"):
 
-            elt = Computable.load(l, comps)
+            elt = Computable.load(l, comps, taxonomy)
             g.add(elt)
 
         def set_hide(x):
@@ -163,16 +157,14 @@ class Group(Computable):
         total = 0
         for line in self.lines:
             total += line.compute(accounts, start, end, result)
-        result.set(self.id, total)
+        result.set(self.id, self.taxonomy.create_money_fact(self.id, total))
         return total
 
     def get_output(self, result):
 
         if len(self.lines) == 0:
-            output = NilValue(self, self.description)
-
-            output.tags = self.tags
-
+            output = NilValue(self, self.description,
+                              self.taxonomy.create_money_fact(self.id, 0))
             return output
 
         if self.hide_breakdown:
@@ -202,8 +194,6 @@ class Group(Computable):
                 ]
             )
 
-        output.tags = self.tags
-
         return output
 
 class AddOperation(Computable):
@@ -225,11 +215,11 @@ class Result:
         return self.values[id]
 
 class Computation(Computable):
-    def __init__(self, id, description, tags):
+    def __init__(self, id, description, taxonomy):
         self.id = id
         self.description = description
         self.steps = []
-        self.load_tags(tags)
+        self.taxonomy = taxonomy
 
     def add(self, item):
         self.steps.append(AddOperation(item))
@@ -241,7 +231,7 @@ class Computation(Computable):
         for v in self.steps:
             total += v.compute(accounts, start, end, result)
 
-        result.set(self.id, total)
+        result.set(self.id, self.taxonomy.create_money_fact(self.id, total))
 
         return total
 
@@ -249,10 +239,8 @@ class Computation(Computable):
 
         if len(self.steps) == 0:
             
-            output = NilValue(self, self.description)
-
-            output.tags = self.tags
-
+            output = NilValue(self, self.description,
+                              self.taxonomy.create_money_fact(self.id, 0))
             return output
 
         # Assume item contains AddOperations x.item provides value.
@@ -262,18 +250,15 @@ class Computation(Computable):
                            item.item for item in self.steps
                        ])
 
-        output.tags = self.tags
-
         return output
 
     @staticmethod
-    def load(cfg, comps):
+    def load(cfg, comps, taxonomy):
 
         id = cfg.get("id")
         if id == None: id = create_uuid()
-        tags = cfg.get("tags")
 
-        comp = Computation(id, cfg.get("description"), tags)
+        comp = Computation(id, cfg.get("description"), taxonomy)
 
         for item in cfg.get("inputs"):
             comp.add(comps[item])

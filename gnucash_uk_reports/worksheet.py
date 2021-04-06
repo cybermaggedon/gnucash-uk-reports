@@ -1,15 +1,15 @@
 
 from . multi_period import MultiPeriodWorksheet
-from . single_period import SinglePeriodWorksheet
 from . computation import Computable
+from . fact import FRS101
 
-def get_worksheet(id, cfg, session):
+def get_worksheet(id, cfg, session, taxonomy=FRS101()):
 
     comp_defs = cfg.get("computations")
 
     comps = {}
     for comp_def in comp_defs:
-        comp =  Computable.load(comp_def, comps)
+        comp =  Computable.load(comp_def, comps, taxonomy)
         comps[comp.id] = comp
 
     for ws_def in cfg.get("worksheets"):
@@ -20,9 +20,6 @@ def get_worksheet(id, cfg, session):
 
             if kind == "multi-period":
                 return MultiPeriodWorksheet.create(cfg, ws_def, comps, session)
-
-            if kind == "single-period":
-                return SinglePeriodWorksheet.create(cfg, ws_def, comps, session)
 
             raise RuntimeError("Don't know worksheet type '%s'" % kind)
 

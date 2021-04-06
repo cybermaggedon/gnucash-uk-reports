@@ -2,11 +2,12 @@
 from . period import Period
 from . computation import Result
 from . worksheet_model import Worksheet, SimpleValue, Breakdown, NilValue, Total
+from . fact import *
 
 class MultiPeriodWorksheet(Worksheet):
 
-    def __init__(self, parts, periods):
-        self.parts = parts
+    def __init__(self, inputs, periods):
+        self.inputs = inputs
         self.periods = periods
 
     @staticmethod
@@ -18,6 +19,7 @@ class MultiPeriodWorksheet(Worksheet):
 
         mpr = MultiPeriodWorksheet.load(cfg, report, comps, periods)
         mpr.process(session)
+
         return mpr
 
     @staticmethod
@@ -27,36 +29,90 @@ class MultiPeriodWorksheet(Worksheet):
 
         mpr.id = report.get("id")
 
-        for part in report.get("items"):
-            mpr.parts.append(comps[part])
+        for input in report.get("items"):
+            mpr.inputs.append(comps[input])
 
         return mpr
 
     def process(self, session):
 
-        all_items = []
+        self.outputs = {}
 
         for period in self.periods:
 
             result = Result()
 
-            for part in self.parts:
-                part.compute(session, period.start, period.end, result)
+            for input in self.inputs:
+                input.compute(session, period.start, period.end, result)
 
-            work_items = []
+            period_output = {}
 
-            for part in self.parts:
-                work_items.append(part.get_output(result))
+            for input in self.inputs:
+                period_output[input] = input.get_output(result)
 
-            all_items.append(work_items)
+            self.outputs[period] = period_output
 
-        self.items = all_items
+    def get_dataset(self):
+
+        ds = Dataset()
+        ds.periods = [v for v in self.periods]
+        ds.sections = []
+        
+        for input in self.inputs:
+
+            output0 = self.outputs[self.periods[0]][input]
+
+            if isinstance(output0, Breakdown):
+
+                sec = Section()
+                sec.header = input.description
+                sec.total = Series("Total", [
+                    self.outputs[period][input].value
+                    for period in self.periods
+                ])
+
+                sec.items = [
+                    Series(
+                        output0.items[i].description,
+                        [
+                            self.outputs[period][input].items[i].value
+                            for period in self.periods
+                        ]
+                    )
+                    for i in range(0, len(output0.items))
+                ]
+
+                ds.sections.append(sec)
+
+            elif isinstance(output0, NilValue):
+
+                sec = Section()
+                sec.header = input.description
+                sec.items = None
+                sec.total = Series("Total", [
+                    self.outputs[period][input].value
+                    for period in self.periods
+                ])
+                ds.sections.append(sec)
+
+            elif isinstance(output0, Total):
+
+                sec = Section()
+                sec.header = input.description
+                sec.items = None
+                sec.total = Series("Total", [
+                    self.outputs[period][input].value
+                    for period in self.periods
+                ])
+                ds.sections.append(sec)
+
+        return ds
 
     def get_periods(self):
         return [(self.periods[v], v) for v in range(0, len(self.periods))]
 
     def get_sections(self):
-        return [(self.parts[v], v) for v in range(0, len(self.parts))]
+        return [(self.inputs[v], v) for v in range(0, len(self.inputs))]
 
     def describe_section(self, section):
 

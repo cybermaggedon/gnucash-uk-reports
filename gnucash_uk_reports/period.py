@@ -14,6 +14,6 @@ class Period:
             datetime.fromisoformat(cfg.get("end")).date()
         )
     def __str__(self):
-        return "{0} ({1}-{2})".format(self.name, self.start, self.end)
+        return "{0} ({1}..{2})".format(self.name, self.start, self.end)
     def __repr__(self):
-        return "Period({0},{1}-{2})".format(self.name, self.start, self.end)
+        return "Period({0},{1}..{2})".format(self.name, self.start, self.end)
