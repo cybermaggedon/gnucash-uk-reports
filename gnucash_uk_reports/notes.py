@@ -86,6 +86,8 @@ class NotesElement(BasicElement):
             contact_context = par.get_contact_context()
             for i in range(0, 3):
                 if len(addr) > (i):
+                    if i > 0:
+                        elt.appendChild(par.doc.createTextNode(", "))
                     nm = "contact-address{0}".format(i+1)
                     fact = contact_context.create_string_fact(nm, addr[i])
                     fact.append(par.doc, elt)

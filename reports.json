@@ -165,7 +165,12 @@
 		"small-company-exempt-from-audit": "uk-direp:StatementThatCompanyEntitledToExemptionFromAuditUnderSection477CompaniesAct2006RelatingToSmallCompanies",
 		"members-not-required-audit": "uk-direp:StatementThatMembersHaveNotRequiredCompanyToObtainAnAudit",
 		"accounts-prepared-small-company-regime": "uk-direp:StatementThatAccountsHaveBeenPreparedInAccordanceWithProvisionsSmallCompaniesRegime",
-		"directors-duty": "uk-direp:StatementThatDirectorsAcknowledgeTheirResponsibilitiesUnderCompaniesAct"
+		"directors-duty": "uk-direp:StatementThatDirectorsAcknowledgeTheirResponsibilitiesUnderCompaniesAct",
+		"fixed-assets-analysis": "uk-core:PropertyPlantEquipmentGrossCost",
+		"fixed-assets-additions": "uk-core:IncreaseDecreaseInPropertyPlantEquipment",
+		"depreciation-analysis": "uk-core:AccumulatedDepreciationImpairmentPropertyPlantEquipment",
+		"depreciation-charge": "uk-core:IncreaseFromDepreciationChargeForYearPropertyPlantEquipment",
+		"carrying-final": "uk-core:PropertyPlantEquipmentIncludingRight-of-useAssets"
 	    },
 	    "sign-reversed": {
 		"cost-of-sales": true,
@@ -592,6 +597,7 @@
 	    "description": "Fixed Assets",
 	    "lines": [
 		{
+		    "id": "fixed-assets-inital",
 		    "kind": "line",
 		    "description": "At start of period",
 		    "period": "at-start",
@@ -600,21 +606,15 @@
 		    ]
 		},
 		{
+		    "id": "fixed-assets-additions",
 		    "kind": "line",
 		    "description": "Additions",
 		    "period": "in-year",
 		    "accounts": [
 			"Assets:Capital Equipment:Computer Equipment"
-		    ],
-		    "tags": {
-			"tag": "uk-core:IncreaseDecreaseInPropertyPlantEquipment",
-			"context": "period-{0}"
-		    }
+		    ]
 		}
-	    ],
-	    "tags": {
-		"tag": "uk-core:PropertyPlantEquipmentGrossCost"
-	    }
+	    ]
 	},
 
 
@@ -632,21 +632,15 @@
 		    ]
 		},
 		{
+		    "id": "depreciation-charge",
 		    "kind": "line",
 		    "description": "Charge",
 		    "period": "in-year",
 		    "accounts": [
 			"Assets:Capital Equipment:Depreciation"
-		    ],
-		    "tags": {
-			"tag": "uk-core:IncreaseFromDepreciationChargeForYearPropertyPlantEquipment",
-			"context": "period-{0}"
-		    }
+		    ]
 		}
-	    ],
-	    "tags": {
-		"tag": "uk-core:AccumulatedDepreciationImpairmentPropertyPlantEquipment"
-	    }
+	    ]
 	},
 
 	{
@@ -656,16 +650,14 @@
 	    "inputs": [
 		"fixed-assets-analysis",
 		"depreciation-analysis"
-	    ],
-	    "tags": {
-		"tag": "uk-core:PropertyPlantEquipmentIncludingRight-of-useAssets"
-	    }
+	    ]
 	},
 	
 	{
 	    "id": "share-capital",
 	    "kind": "group",
 	    "description": "Share Capital",
+	    "period": "at-end",
 	    "lines": [
 		{
 		    "kind": "line",
@@ -695,18 +687,12 @@
 	}
 
     ],
-
-
     
     "worksheets": [
 
 	{
 	    "id": "balance-sheet",
 	    "kind": "multi-period",
-
-	    "tags": {
-	    },
-
 	    "items": [
 		"fixed-assets",
 		"current-assets",

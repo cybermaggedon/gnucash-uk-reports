@@ -98,8 +98,8 @@ class Line(Computable):
 
         pid = {
             "in-year": IN_YEAR,
-            "to-start": AT_START,
-            "to-end": AT_END
+            "at-start": AT_START,
+            "at-end": AT_END
         }.get(pspec, AT_END)
 
         return Line(id, cfg.get("description"), cfg.get("accounts"),
@@ -144,8 +144,8 @@ class Constant(Computable):
 
         pid = {
             "in-year": IN_YEAR,
-            "to-start": AT_START,
-            "to-end": AT_END
+            "at-start": AT_START,
+            "at-end": AT_END
         }.get(pspec, AT_END)
 
         return Constant(id, cfg.get("description"), cfg.get("values"),
@@ -169,8 +169,8 @@ class Group(Computable):
 
         pid = {
             "in-year": IN_YEAR,
-            "to-start": AT_START,
-            "to-end": AT_END
+            "at-start": AT_START,
+            "at-end": AT_END
         }.get(pspec, AT_END)
 
         g = Group(id, cfg.get("description"), taxonomy, pid)
@@ -319,8 +319,8 @@ class Computation(Computable):
 
         pid = {
             "in-year": IN_YEAR,
-            "to-start": AT_START,
-            "to-end": AT_END
+            "at-start": AT_START,
+            "at-end": AT_END
         }.get(pspec, AT_END)
 
         comp = Computation(id, cfg.get("description"), taxonomy, pid)

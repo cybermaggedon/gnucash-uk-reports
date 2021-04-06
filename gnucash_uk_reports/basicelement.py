@@ -398,8 +398,8 @@ h2 {
         elt = self.to_ixbrl_elt(self)
         body.appendChild(elt)
 
-        out.write(doc.toprettyxml())
-#        out.write(doc.toxml())
+#        out.write(doc.toprettyxml())
+        out.write(doc.toxml())
 
     def create_contexts(self):
 

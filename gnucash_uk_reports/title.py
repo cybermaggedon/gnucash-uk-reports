@@ -135,6 +135,9 @@ class Title(BasicElement):
 
         for i in range(0, len(directors)):
 
+            if i > 0:
+                div2.appendChild(par.doc.createTextNode(", "))
+
             cdef = ContextDefinition()
             cdef.set_period(
                 report.get("periods")[0].get_date("start"),
