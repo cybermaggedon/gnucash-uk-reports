@@ -433,198 +433,6 @@ h2 {
 
             self.resources.appendChild(ce)
 
-        return
-
-        report = self.metadata.get("report")
-        business = self.metadata.get("business")
-
-        report_date = report.get("date")
-
-        company_number = business.get("company-number")
-
-        directors = business.get("directors")
-
-        # report-date
-        self.resources.appendChild(self.create_context("report-date", [
-            self.create_entity(company_number),
-            self.create_instant_period(report_date)
-        ]))
-
-        # period-<n> (report periods)
-        for i in range(0, len(self.periods)):
-            self.resources.appendChild(self.create_context("period-" + str(i), [
-                self.create_entity(company_number),
-                self.create_period(self.periods[i])
-            ]))
-
-        # entity-trading-<n> (report periods)
-        for i in range(0, len(self.periods)):
-            self.resources.appendChild(self.create_context("entity-trading-" + str(i), [
-                self.create_entity(company_number),
-                self.create_period(self.periods[i])
-            ]))
-
-        # director<n>
-        for i in range(0, len(directors)):
-            name = "officer-" + str(i + 1)
-            self.resources.appendChild(self.create_context(name, [
-                self.create_entity(company_number,
-                                   [
-                                       self.create_segment_member("uk-bus:EntityOfficersDimension",
-                                                                  "uk-bus:Director" + str(i + 1))
-                                   ]),
-                self.create_period(self.periods[0])
-            ]))
-
-        # formation-form
-        form = business.get("company-formation").get("form")
-        if form:
-            if form in formation_forms:
-                self.resources.appendChild(
-                    self.create_context("formation-form", [
-                        self.create_entity(company_number, [
-                            self.create_segment_member("uk-bus:LegalFormEntityDimension",
-                                                       formation_form_name[form])
-                        ]),
-                        self.create_period(self.periods[0])
-                ])
-            )
-
-        # formation-date
-        date = business.get("company-formation").get("date")
-        if date:
-            self.resources.appendChild(
-                self.create_context("formation-date", [
-                    self.create_entity(company_number, []),
-                    self.create_instant_period(date)
-                ])
-            )
-
-        # standards-period
-        stds = report.get("accounting-standards")
-        if stds != None and stds in accounting_standards:
-            self.resources.appendChild(
-                self.create_context("standards-period", [
-                    self.create_entity(company_number, [
-                        self.create_segment_member("uk-bus:AccountingStandardsDimension",
-                                                   accounting_standards[stds])
-                    ]),
-                    self.create_period(self.periods[0])
-                ])
-            )
-
-        # accounts-type-period
-        actype = report.get("accounts-type")
-        if actype != None and actype in accounts_type:
-            self.resources.appendChild(
-                self.create_context("accounts-type-period", [
-                    self.create_entity(company_number, [
-                        self.create_segment_member("uk-bus:AccountsTypeDimension",
-                                                   accounts_type[actype]),
-                    ]),
-                    self.create_period(self.periods[0])
-                ])
-            )
-                                
-
-        # accounts-status-period
-        stat = report.get("accounts-status")
-        if stat != None and stat in accounts_status:
-            self.resources.appendChild(
-                self.create_context("accounts-status-period", [
-                    self.create_entity(company_number, [
-                        self.create_segment_member("uk-bus:AccountsStatusDimension",
-                                                   accounts_status[stat])
-                        ]),
-                    self.create_period(self.periods[0])
-                ])
-            )
-
-        # period-end-<n>
-        for i in range(0, len(self.periods)):
-            self.resources.appendChild(
-                self.create_context("period-end-" + str(i), [
-                    self.create_entity(company_number),
-                    self.create_instant_period(self.periods[i].end)
-                ])
-            )
-
-        # within-year-<n>
-        for i in range(0, len(self.periods)):
-            self.resources.appendChild(
-                self.create_context("within-year-" + str(i), [
-                    self.create_entity(company_number, [
-                        self.create_segment_member("uk-core:MaturitiesOrExpirationPeriodsDimension",
-                                                   "uk-core:WithinOneYear")
-                    ]),
-                    self.create_instant_period(self.periods[i].end)
-                ])
-            )
-
-        # after-year-<n>
-        for i in range(0, len(self.periods)):
-            self.resources.appendChild(
-                self.create_context("after-year-" + str(i), [
-                    self.create_entity(company_number, [
-                        self.create_segment_member("uk-core:MaturitiesOrExpirationPeriodsDimension",
-                                                   "uk-core:AfterOneYear")
-                    ]),
-                    self.create_instant_period(self.periods[i].end)
-                ])
-            )
-
-        # sector-0
-        sector = business.get("industry-sector")
-        if sector:
-            if sector in industry_sectors:
-                self.resources.appendChild(self.create_context("sector-0", [
-                    self.create_entity(company_number, [
-                        self.create_segment_member("uk-bus:MainIndustrySectorDimension",
-                                                   industry_sector_names[sector])
-                    ]),
-                    self.create_period(self.periods[0])
-                ]))
-
-        # country-0
-        country = business.get("contact").get("country")
-        if country:
-            if country in country_names:
-
-                self.resources.appendChild(
-                    self.create_context("country-0", [
-                        self.create_entity(company_number, [
-                            self.create_segment_member("uk-geo:CountriesRegionsDimension",
-                                                       country_names[country])
-                        ]), 
-                        self.create_period(self.periods[0])
-                    ])
-                )
-
-        # web-0
-        country = business.get("contact").get("country")
-        if country:
-            if country in country_names:
-
-                self.resources.appendChild(
-                    self.create_context("web-0", [
-                        self.create_entity(company_number, [
-                            self.create_segment_member("uk-geo:CountriesRegionsDimension",
-                                                       country_names[country])
-                        ]), 
-                        self.create_period(self.periods[0])
-                    ])
-                )
-
-        # phone-0
-        # FIXME: Hard-coded
-        self.resources.appendChild(self.create_context("phone-0", [
-            self.create_entity(company_number, [
-                self.create_segment_member("uk-bus:PhoneNumberTypeDimension",
-                                           "uk-bus:Landline")
-            ]),
-            self.create_period(self.periods[0])
-        ]))
-
     def add_nn(self, par, name, ctxt, val):
         par.appendChild(self.make_nn(name, ctxt, val))
 
@@ -1023,6 +831,18 @@ h2 {
         ).use(
             lambda x: x.append(self.doc, self.hidden)
         )
+
+        # phone context
+        val = business.get("contact.phone.type")
+        cdef = ContextDefinition()
+        cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
+        )
+        cdef.lookup_segment("phone-number-type", val, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
+
+        # phone
 
         def add_phone(val):
             val.get("country").use(

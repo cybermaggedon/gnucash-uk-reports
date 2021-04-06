@@ -39,7 +39,8 @@
 		"phone": {
 		    "country": "+44",
 		    "area": "7900",
-		    "number": "0123456"
+		    "number": "0123456",
+		    "type": "landline"
 		},
 		"country": "UK"
 	    },
@@ -281,6 +282,12 @@
 			"director8": "uk-bus:Director8",
 			"director9": "uk-bus:Director9",
 			"director10": "uk-bus:Director10"
+		    }
+		},
+		"phone-number-type": {
+		    "dimension": "uk-bus:PhoneNumberTypeDimension",
+		    "map": {
+			"landline": "uk-bus:Landline"
 		    }
 		}
 	    }
