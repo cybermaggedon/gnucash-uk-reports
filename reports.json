@@ -131,8 +131,18 @@
 		"company-name": "uk-bus:EntityCurrentLegalOrRegisteredName",
 		"company-number": "uk-bus:UKCompaniesHouseRegisteredNumber",
 		"vat-registration": "uk-bus:VATRegistrationNumber",
-		"balance-sheet-date": "uk-bus:BalanceSheetDate"
-
+		"balance-sheet-date": "uk-bus:BalanceSheetDate",
+		"activities": "uk-bus:DescriptionPrincipalActivities",
+		"sic1": "uk-bus:SICCodeRecordedUKCompaniesHouse1",
+		"sic2": "uk-bus:SICCodeRecordedUKCompaniesHouse2",
+		"sic3": "uk-bus:SICCodeRecordedUKCompaniesHouse3",
+		"sic4": "uk-bus:SICCodeRecordedUKCompaniesHouse4",
+		"industry-sector": "uk-bus:MainIndustrySector",
+		"is-dormant": "uk-bus:EntityDormantTruefalse",
+		"trading-status": "uk-bus:EntityTradingStatus",
+		"accounting-standards": "uk-bus:AccountingStandardsApplied",
+		"accounts-type": "uk-bus:AccountsTypeFullOrAbbreviated",
+		"accounts-status": "uk-bus:AccountsStatusAuditedOrUnaudited"
 	    },
 	    "sign-reversed": {
 		"cost-of-sales": true,
@@ -154,6 +164,62 @@
 		"creditors-after-1-year": {
 		    "uk-core:MaturitiesOrExpirationPeriodsDimension":
 		    "uk-core:AfterOneYear"
+		}
+	    },
+	    "lookup": {
+		"accounting-standards": {
+		    "dimension": "uk-bus:AccountingStandardsDimension",
+		    "map": {
+			"frsse": "uk-bus:FRSSE",
+			"frs101": "uk-bus:FRS101",
+			"frs102": "uk-bus:FRS102",
+			"full-irs": "uk-bus:FullIFRS",
+			"small-entities-regime": "uk-bus:SmallEntities",
+			"micro-entities": "uk-bus:Micro-entities",
+			"other-standards": "uk-bus:OtherStandards"
+		    }
+		},
+		"industry-sector": {
+		    "dimension": "uk-bus:MainIndustrySectorDimension",
+		    "map": {
+			"a": "uk-bus:A-AgricultureForestryFishing",
+			"b": "uk-bus:B-MiningQuarrying",
+			"c": "uk-bus:C-Manufacturing",
+			"d": "uk-bus:D-ElectricityGasSteamAirConditioningSupply",
+			"e": "uk-bus:E-WaterSupplySewerageWasteManagementRemediationActivities",
+			"f": "uk-bus:F-Construction",
+			"g": "uk-bus:G-WholesaleRetailTradeRepairMotorVehiclesMotorcycles",
+			"h": "uk-bus:H-TransportationStorage",
+			"i": "uk-bus:I-AccommodationFoodServiceActivities",
+			"j": "uk-bus:J-InformationCommunication",
+			"k": "uk-bus:K-FinancialInsuranceActivities",
+			"l": "uk-bus:L-RealEstateActivities",
+			"m": "uk-bus:M-ProfessionalScientificTechnicalActivities",
+			"n": "uk-bus:N-AdministrativeSupportServiceActivities",
+			"o": "uk-bus:O-PublicAdministrationDefenceCompulsorySocialSecurity",
+			"p": "uk-bus:P-Education",
+			"q": "uk-bus:Q-HumanHealthSocialWorkActivities",
+			"r": "uk-bus:R-ArtsEntertainmentRecreation",
+			"s": "uk-bus:S-OtherServiceActivities"
+		    }
+		},
+		"accounts-type": {
+		    "dimension": "uk-bus:AccountsTypeDimension",
+		    "map": {
+			"full-accounts": "uk-bus:FullAccounts",
+			"abbreviated-accounts": "uk-bus:AbbreviatedAccounts",
+			"abridged-accounts": "uk-bus:AbridgedAccounts"
+		    }
+		},
+		"accounts-status": {
+		    "dimension": "uk-bus:AccountsStatusDimension",
+		    "map": {
+			"audited": "uk-bus:Audited",
+			"audit-exempt-no-accountants-report": "uk-bus:AuditExempt-NoAccountantsReport",
+			"audit-exempt-with-accountants-report": "uk-bus:AuditExemptWithAccountantsReport",
+			"independent-examination": "uk-bus:IndependentExaminationCharity",
+			"other-reporting-regime": "uk-bus:OtherReportingRegime"
+		    }
 		}
 	    }
 	}

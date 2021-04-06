@@ -55,7 +55,7 @@ class Config(dict):
         return DateValue.fromisoformat(val)
     def get_bool(self, key, dflt=None):
         val = self.get(key, dflt)
-        return val == True
+        return BoolValue(val == True)
     def use(self, fn):
         return fn(self)
 

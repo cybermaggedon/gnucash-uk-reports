@@ -92,6 +92,11 @@ class Taxonomy:
         key = "taxonomy.{0}.segments.{1}".format(self.name, id)
         return self.cfg.get(key)
 
+    def lookup_dimension(self, id, val):
+        k1 = "taxonomy.{0}.lookup.{1}.dimension".format(self.name, id)
+        k2 = "taxonomy.{0}.lookup.{1}.map.{2}".format(self.name, id, val)
+        return self.cfg.get(k1), self.cfg.get(k2)
+
     def create_money_fact(self, id, value, context):
 
         m = MoneyFact(value, context)
@@ -148,6 +153,9 @@ class ContextDefinition:
         if segs:
             for k in segs:
                 self.segments[k] = segs[k]
+    def lookup_segment(self, id, val, tx):
+        dim, seg = tx.lookup_dimension(id, val)
+        self.segments[dim] = seg
     def get_key(self):
         segs = [
             "{0}:{1}".format(k, self.segments[k])

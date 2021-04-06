@@ -11,28 +11,7 @@ from datetime import datetime
 software = "gnucash-uk-reports"
 software_version = "0.0.1"
 
-accounting_standards = {
-    "frsse": "uk-bus:FRSSE",
-    "frs101": "uk-bus:FRS101",
-    "frs102": "uk-bus:FRS102",
-    "full-irs": "uk-bus:FullIFRS",
-    "small-entities-regime": "uk-bus:SmallEntities",
-    "micro-entities": "uk-bus:Micro-entities",
-    "other-standards": "uk-bus:OtherStandards"
-}
-
 accounts_status = {
-    "audited": "uk-bus:Audited",
-    "audit-exempt-no-accountants-report": "uk-bus:AuditExempt-NoAccountantsReport",
-    "audit-exempt-with-accountants-report": "uk-bus:AuditExemptWithAccountantsReport",
-    "independent-examination": "uk-bus:IndependentExaminationCharity",
-    "other-reporting-regime": "uk-bus:OtherReportingRegime"
-}
-
-accounts_type = {
-    "full-accounts": "uk-bus:FullAccounts",
-    "abbreviated-accounts": "uk-bus:AbbreviatedAccounts",
-    "abridged-accounts": "uk-bus:AbridgedAccounts"
 }
 
 country_names = {
@@ -100,28 +79,6 @@ industry_sectors = {
     "q": "Human health and social work activities",
     "r": "Arts, entertainment and recreation",
     "s": "Other service activities"
-}
-
-industry_sector_names = {
-    "a": "uk-bus:A-AgricultureForestryFishing",
-    "b": "uk-bus:B-MiningQuarrying",
-    "c": "uk-bus:C-Manufacturing",
-    "d": "uk-bus:D-ElectricityGasSteamAirConditioningSupply",
-    "e": "uk-bus:E-WaterSupplySewerageWasteManagementRemediationActivities",
-    "f": "uk-bus:F-Construction",
-    "g": "uk-bus:G-WholesaleRetailTradeRepairMotorVehiclesMotorcycles",
-    "h": "uk-bus:H-TransportationStorage",
-    "i": "uk-bus:I-AccommodationFoodServiceActivities",
-    "j": "uk-bus:J-InformationCommunication",
-    "k": "uk-bus:K-FinancialInsuranceActivities",
-    "l": "uk-bus:L-RealEstateActivities",
-    "m": "uk-bus:M-ProfessionalScientificTechnicalActivities",
-    "n": "uk-bus:N-AdministrativeSupportServiceActivities",
-    "o": "uk-bus:O-PublicAdministrationDefenceCompulsorySocialSecurity",
-    "p": "uk-bus:P-Education",
-    "q": "uk-bus:Q-HumanHealthSocialWorkActivities",
-    "r": "uk-bus:R-ArtsEntertainmentRecreation",
-    "s": "uk-bus:S-OtherServiceActivities"
 }
 
 class BasicElement:
@@ -477,8 +434,6 @@ h2 {
 
         report = self.metadata.get("report")
         business = self.metadata.get("business")
-
-#        report_date = report.get("date")
 
         company_number = business.get("company-number")
 
@@ -907,56 +862,91 @@ h2 {
             lambda x: x.append(self.doc, self.hidden)
         )
 
-        return
-
-        report.get_date("statement-date").use(
-            lambda val:
-            self.add_date(self.hidden, "uk-bus:BalanceSheetDate",
-                          "report-date", val)
-        )
-
         business.get("activities").use(
-            lambda val: self.add_nn(self.hidden,
-                               "uk-bus:DescriptionPrincipalActivities",
-                               "period-0", val)
+            lambda val: report_period_context.create_string_fact(
+                "activities", val
+            )
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
 
         def add_sic_codes(val):
             for i in range(0, 3):
                 if len(val) > (i):
-                    nm = "uk-bus:SICCodeRecordedUKCompaniesHouse{0}".format(i+1)
-                    self.add_nn(self.hidden, nm, "period-0", val[i])
+                    nm = "sic{0}".format(i+1)
+                    fact = report_period_context.create_string_fact(nm, val[i])
+                    fact.append(self.doc, self.hidden)
                 
         business.get("sic-codes").use(
             lambda val: add_sic_codes(val)
         )
 
+        # industry-sector
         sector = business.get("industry-sector")
-        if sector:
-            if sector in industry_sectors:
-                self.add_nn(self.hidden, "uk-bus:MainIndustrySector",
-                            "sector-0", "")
+        sector_cdef = ContextDefinition()
+        sector_cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
+        )
+        sector_cdef.lookup_segment("industry-sector", sector,
+                                      self.taxonomy)
+        sector_context = self.taxonomy.get_context(sector_cdef)
 
-        business.get("is-dormant").use(
-            lambda val: self.add_nn(self.hidden,
-                                    "uk-bus:EntityDormantTruefalse",
-                                    "period-0", json.dumps(val))
+        fact = sector_context.create_string_fact("industry-sector", "")
+        fact.append(self.doc, self.hidden)
+
+        business.get_bool("is-dormant").use(
+            lambda val: report_period_context.create_string_fact(
+                "is-dormant", json.dumps(val)
+            )
+        ).use(
+            lambda x: x.append(self.doc, self.hidden)
         )
 
-        self.add_nn(self.hidden, "uk-bus:EntityTradingStatus",
-                    "entity-trading-0", "")
+        fact = report_period_context.create_string_fact("trading-status", "")
+        fact.append(self.doc, self.hidden)
 
-        report.get("accounting-standards").use(
-            lambda x:
-            self.add_nn(self.hidden, "uk-bus:AccountingStandardsApplied",
-                        "standards-period", "")
+        # accounting-standards
+        stds = report.get("accounting-standards")
+        standards_cdef = ContextDefinition()
+        standards_cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
         )
+        standards_cdef.lookup_segment("accounting-standards", stds,
+                                      self.taxonomy)
+        standards_context = self.taxonomy.get_context(standards_cdef)
 
-        report.get("accounts-type").use(
-            lambda x:
-            self.add_nn(self.hidden, "uk-bus:AccountsTypeFullOrAbbreviated",
-                        "accounts-type-period", "")
+        fact = standards_context.create_string_fact("accounting-standards", "")
+        fact.append(self.doc, self.hidden)
+
+        # accounts-type
+        val = report.get("accounts-type")
+        cdef = ContextDefinition()
+        cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
         )
+        cdef.lookup_segment("accounts-type", val, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
+
+        fact = context.create_string_fact("accounts-type", "")
+        fact.append(self.doc, self.hidden)
+
+        # accounts-status
+        val = report.get("accounts-status")
+        cdef = ContextDefinition()
+        cdef.set_period(
+            report.get("periods")[0].get_date("start"),
+            report.get("periods")[0].get_date("end")
+        )
+        cdef.lookup_segment("accounts-status", val, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
+
+        fact = context.create_string_fact("accounts-status", "")
+        fact.append(self.doc, self.hidden)
+
+        return
 
         report.get("accounts-status").use(
             lambda x:
