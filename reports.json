@@ -164,7 +164,8 @@
 		"website-description": "uk-bus:DescriptionOrOtherInformationOnWebsite",
 		"small-company-exempt-from-audit": "uk-direp:StatementThatCompanyEntitledToExemptionFromAuditUnderSection477CompaniesAct2006RelatingToSmallCompanies",
 		"members-not-required-audit": "uk-direp:StatementThatMembersHaveNotRequiredCompanyToObtainAnAudit",
-		"accounts-prepared-small-company-regime": "uk-direp:StatementThatAccountsHaveBeenPreparedInAccordanceWithProvisionsSmallCompaniesRegime"
+		"accounts-prepared-small-company-regime": "uk-direp:StatementThatAccountsHaveBeenPreparedInAccordanceWithProvisionsSmallCompaniesRegime",
+		"directors-duty": "uk-direp:StatementThatDirectorsAcknowledgeTheirResponsibilitiesUnderCompaniesAct"
 	    },
 	    "sign-reversed": {
 		"cost-of-sales": true,

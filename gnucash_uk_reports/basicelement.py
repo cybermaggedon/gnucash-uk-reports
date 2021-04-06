@@ -367,6 +367,7 @@ h2 {
         hdr.appendChild(resources)
         self.resources = resources
 
+        # This creates some contexts, hence do this first.
         self.create_metadata()
 
         self.create_contexts()
@@ -542,23 +543,56 @@ h2 {
 
         return seg
 
+    def get_report_date_context(self):
+
+        report_date = self.metadata.get("report.date")
+
+        cdef = ContextDefinition()
+        cdef.set_instant(report_date)
+        context = self.taxonomy.get_context(cdef)
+
+        return context
+
+    def get_report_period(self):
+
+        return Period.load(self.metadata.get("report.periods")[0])
+
+    def get_report_period_context(self):
+
+        report_period = self.get_report_period()
+
+        cdef = ContextDefinition()
+        cdef.set_period(
+            report_period.start, report_period.end
+        )
+        context = self.taxonomy.get_context(cdef)
+        return context
+
+    def get_contact_context(self):
+
+        business = self.metadata.get("business")
+        period = self.get_report_period()
+
+        country = business.get("contact").get("country")
+
+        cdef = ContextDefinition()
+        cdef.set_period(period.start, period.end)
+        cdef.lookup_segment("countries-regions", country, self.taxonomy)
+        context = self.taxonomy.get_context(cdef)
+
+        return context
+
     def create_metadata(self):
+
         report = self.metadata.get("report")
         business = self.metadata.get("business")
+        report_period = self.get_report_period()
 
         company_number = business.get("company-number")
         report_date = report.get_date("date")
 
-        report_date_cdef = ContextDefinition()
-        report_date_cdef.set_instant(report_date)
-        report_date_context = self.taxonomy.get_context(report_date_cdef)
-
-        report_period_cdef = ContextDefinition()
-        report_period_cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        report_period_context = self.taxonomy.get_context(report_period_cdef)
+        report_date_context = self.get_report_date_context()
+        report_period_context = self.get_report_period_context()
         
         report_title_fact = report_period_context.create_string_fact(
             "report-title",
@@ -571,19 +605,13 @@ h2 {
             lambda x: x.append(self.doc, self.hidden)
         )
 
-        report.get("periods")[0].get_date("start").use(
-            lambda val:
-            report_date_context.create_date_fact("period-start", val)
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
+        fact = report_date_context.create_date_fact("period-start",
+                                                    report_period.start)
+        fact.append(self.doc, self.hidden)
 
-        report.get("periods")[0].get_date("end").use(
-            lambda val:
-            report_date_context.create_date_fact("period-end", val)
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
+        fact = report_date_context.create_date_fact("period-end",
+                                                    report_period.end)
+        fact.append(self.doc, self.hidden)
 
         report_period_context.create_string_fact("software", software).use(
             lambda x: x.append(self.doc, self.hidden)
@@ -745,7 +773,6 @@ h2 {
         fact = context.create_date_fact("entity-legal-date", date)
         fact.append(self.doc, self.hidden)
         
-
         # average-employees
         def add_avg_employee_counts(val):
             for i in range(0, len(val)):
@@ -785,22 +812,16 @@ h2 {
                 fact.append(self.doc, self.hidden)
 
         # country context
-        country = business.get("contact").get("country")
+        context = self.get_contact_context()
 
-        cdef = ContextDefinition()
-        cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        cdef.lookup_segment("countries-regions", country, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
-
+        # contact name
         business.get("contact").get("name").use(
             lambda val: context.create_string_fact("contact-name", val)
         ).use(
             lambda x: x.append(self.doc, self.hidden)
         )
 
+        # address
         def add_address(val):
             for i in range(0, 2):
                 if len(val) > (i):
@@ -812,6 +833,7 @@ h2 {
             lambda val: add_address(val)
         )
 
+        # location
         business.get("contact").get("location").use(
             lambda val: context.create_string_fact("contact-location", val)
         ).use(

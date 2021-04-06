@@ -172,7 +172,7 @@ class Title(BasicElement):
             for i in range(0, len(directors)):
                 if val == directors[i]:
                     fact = context.create_string_fact("signer", "")
-                    fact.append(par.doc, div2)
+                    fact.append(par.doc, p)
                     p.appendChild(par.doc.createTextNode(val))
 
         self.metadata.get("report").get("signing-director").use(signer)

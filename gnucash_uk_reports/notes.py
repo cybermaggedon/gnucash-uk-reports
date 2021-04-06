@@ -32,16 +32,8 @@ class NotesElement(BasicElement):
 
         report = self.metadata.get("report")
 
-        report_date_cdef = ContextDefinition()
-        report_date_cdef.set_instant(report.get("date"))
-        report_date_context = self.taxonomy.get_context(report_date_cdef)
-
-        report_period_cdef = ContextDefinition()
-        report_period_cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        report_period_context = self.taxonomy.get_context(report_period_cdef)
+        report_date_context = par.get_report_date_context()
+        report_period_context = par.get_report_period_context()
         
         if n == "small-company-audit-exempt":
 
@@ -91,36 +83,39 @@ class NotesElement(BasicElement):
 
             elt.appendChild(par.doc.createTextNode(". The registered address is: "))
 
+            contact_context = par.get_contact_context()
             for i in range(0, 3):
-                if i < len(addr):
-                    if i > 0:
-                        elt.appendChild(par.doc.createTextNode(", "))
-                    par.add_nn(elt, "uk-bus:AddressLine" + str(i+1),
-                               "country-0", addr[i])
+                if len(addr) > (i):
+                    nm = "contact-address{0}".format(i+1)
+                    fact = contact_context.create_string_fact(nm, addr[i])
+                    fact.append(par.doc, elt)
 
-            loc = self.metadata.get("business.contact.location").use(
-                lambda val: (
-                    elt.appendChild(par.doc.createTextNode(", ")),
-                    par.add_nn(elt, "uk-bus:PrincipalLocation-CityOrTown",
-                           "country-0", val)
+            def location(val):
+                elt.appendChild(par.doc.createTextNode(", "))
+                fact = contact_context.create_string_fact(
+                    "contact-location", val
                 )
-            )
+                fact.append(par.doc, elt)
 
-            loc = self.metadata.get("business.contact.county").use(
-                lambda val: (
-                    elt.appendChild(par.doc.createTextNode(", ")),
-                    par.add_nn(elt, "uk-bus:CountyRegion",
-                               "country-0", val)
-                )
-            )
+            loc = self.metadata.get("business.contact.location").use(location)
 
-            loc = self.metadata.get("business.contact.postcode").use(
-                lambda val: (
-                    elt.appendChild(par.doc.createTextNode(" ")),
-                    par.add_nn(elt, "uk-bus:PostalCodeZip",
-                               "country-0", val)
+            def county(val):
+                elt.appendChild(par.doc.createTextNode(", "))
+                fact = contact_context.create_string_fact(
+                    "contact-county", val
                 )
-            )
+                fact.append(par.doc, elt)
+
+            loc = self.metadata.get("business.contact.county").use(county)
+
+            def postcode(val):
+                elt.appendChild(par.doc.createTextNode(" "))
+                fact = contact_context.create_string_fact(
+                    "contact-postcode", val
+                )
+                fact.append(par.doc, elt)
+
+            loc = self.metadata.get("business.contact.postcode").use(postcode)
 
             elt.appendChild(par.doc.createTextNode("."))
 
@@ -132,8 +127,8 @@ class NotesElement(BasicElement):
 
             text = "The directors acknowledge their responsibilities for complying with the requirements of the Act withrespect to accounting records and the preparation of financial statements."
 
-            par.add_nn(elt, "uk-direp:StatementThatDirectorsAcknowledgeTheirResponsibilitiesUnderCompaniesAct",
-                       "period-0", text)
+            fact = report_period_context.create_string_fact("directors-duty", text)
+            fact.append(par.doc, elt)
 
             return elt
             
@@ -142,11 +137,20 @@ class NotesElement(BasicElement):
             elt = par.doc.createElement("span")
 
             elt.appendChild(par.doc.createTextNode("These accounts were generated using "))
-            par.add_nn(elt, "uk-bus:NameProductionSoftware",
-                         "period-0", software)
+
+
+            fact = report_period_context.create_string_fact(
+                "software", software
+            )
+            fact.append(par.doc, elt)
+
             elt.appendChild(par.doc.createTextNode(" version "))
-            par.add_nn(elt, "uk-bus:VersionProductionSoftware",
-                         "period-0", software_version)
+
+            fact = report_period_context.create_string_fact(
+                "software-version", software_version
+            )
+            fact.append(par.doc, elt)
+
             elt.appendChild(par.doc.createTextNode("."))
 
             return elt
