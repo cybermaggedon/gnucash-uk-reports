@@ -28,7 +28,7 @@ business_type = {
     "company": "Company"
 }
 
-class FactElement(BasicElement):
+class FactTable(BasicElement):
 
     def __init__(self, metadata, elts, session, cfg, tx):
         super().__init__(metadata, tx)
@@ -39,9 +39,9 @@ class FactElement(BasicElement):
     @staticmethod
     def load(elt_def, cfg, session, tx):
 
-        c = FactElement(
+        c = FactTable(
             cfg.get("metadata"),
-            elt_def.get("elements"),
+            elt_def.get("facts"),
             session,
             cfg,
             tx
@@ -50,8 +50,6 @@ class FactElement(BasicElement):
 
     def add_style(self, elt):
 
-        return
-
         doc = self.doc
         
         style = doc.createElement("style")
@@ -59,6 +57,10 @@ class FactElement(BasicElement):
         elt.appendChild(style)
             
         style_text = """
+
+BODY {
+  background-color: #d0f8f8;
+}
 
 .hidden {
   display: none;
@@ -75,6 +77,8 @@ class FactElement(BasicElement):
 }
 
 .data .number {
+  width: 2em;
+  text-align: center;
   color: white;
   background-color: #30a090;
   border: 2px solid #004030;
@@ -83,8 +87,8 @@ class FactElement(BasicElement):
   padding-right: 1rem;
 }
 
-BODY {
-  background-color: #c0f0e8;
+.data .description {
+  width: 14em;
 }
 
 .data .value {
@@ -241,6 +245,7 @@ BODY {
                 value_id = v.get("value")
 
                 ds = wsht.get_dataset()
+                continue
 
                 # FIXME: Assumed first period.
                 found = False
@@ -411,7 +416,7 @@ report_data = [
             "tag": "ct-comp:TaxReference"
         }),
 
-    Box(4, "Type of company", FactElement.get_company_type),
+    Box(4, "Type of company", FactTable.get_company_type),
 
     Box(5, "NI trading activity",
         lambda x: x.metadata.get_bool("tax.ni.trading"),
@@ -498,7 +503,7 @@ report_data = [
 
 #    Box(7, "NI employer", "get_ni_employer"),
 #    Box(8, "Special circumstances", "get_special_circumstances"),
-    Box(30, "Period from", FactElement.get_period_from, tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
+    Box(30, "Period from", FactTable.get_period_from, tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
     Box(31, "Period to", "get_period_to", tag={"tag": "ct-comp:EndOfPeriodCoveredByReturn"}),
     Box("-", "Start of period covered by return", "get_period_from",
         tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),

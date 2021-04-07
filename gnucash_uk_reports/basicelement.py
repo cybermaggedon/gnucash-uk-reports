@@ -38,9 +38,9 @@ class BasicElement:
             from . notes import NotesElement
             return NotesElement.load(elt_def, cfg, tx)
 
-        if kind == "facts":
-            from . factelement import FactElement
-            return FactElement.load(elt_def, cfg, session, tx)
+        if kind == "facttable":
+            from . facttable import FactTable
+            return FactTable.load(elt_def, cfg, session, tx)
 
         raise RuntimeError("Don't know element kind '%s'" % kind)
 

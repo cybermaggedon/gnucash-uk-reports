@@ -618,8 +618,8 @@
 
 	{
 	    "id": "ct600",
-	    "kind": "facts",
-	    "elements": [
+	    "kind": "facttable",
+	    "facts": [
 		{
 		    "field": "1",
 		    "id": "company-name",
