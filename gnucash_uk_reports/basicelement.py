@@ -328,6 +328,18 @@ h2 {
         # This creates some contexts, hence do this first.
         self.create_metadata()
 
+        # FIXME: Hard-coded
+        frc_schema = "https://xbrl.frc.org.uk/FRS-102/2021-01-01/FRS-102-2021-01-01.xsd"        
+        schema = doc.createElement("link:schemaRef")
+        schema.setAttribute("xlink:type", "simple")
+        schema.setAttribute("xlink:href", frc_schema)
+        schema.appendChild(doc.createTextNode(""))
+        refs.appendChild(schema)
+
+        elt = self.to_ixbrl_elt(self)
+        body.appendChild(elt)
+
+        # Contexts get created above, hence do this last.
         self.create_contexts()
 
         currency = self.metadata.get("report").get("currency")
@@ -346,18 +358,8 @@ h2 {
         unit.appendChild(measure)
         resources.appendChild(unit)
        
-        frc_schema = "https://xbrl.frc.org.uk/FRS-102/2021-01-01/FRS-102-2021-01-01.xsd"        
-        schema = doc.createElement("link:schemaRef")
-        schema.setAttribute("xlink:type", "simple")
-        schema.setAttribute("xlink:href", frc_schema)
-        schema.appendChild(doc.createTextNode(""))
-        refs.appendChild(schema)
-
-        elt = self.to_ixbrl_elt(self)
-        body.appendChild(elt)
-
-#        out.write(doc.toprettyxml())
-        out.write(doc.toxml())
+        out.write(doc.toprettyxml())
+#        out.write(doc.toxml())
 
     def create_contexts(self):
 

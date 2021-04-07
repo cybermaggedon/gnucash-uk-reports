@@ -1,7 +1,7 @@
 
 from . period import Period
 from . basicelement import BasicElement
-
+from . fact import *
 from . worksheet import get_worksheet
 
 from xml.dom.minidom import getDOMImplementation
@@ -104,7 +104,7 @@ BODY {
 
         style.appendChild(doc.createTextNode(style_text))
 
-    def to_ixbrl(self, out):
+    def ASDto_ixbrl(self, out):
 
         impl = getDOMImplementation()
 
@@ -212,27 +212,40 @@ BODY {
         title.appendChild(par.doc.createTextNode("FACTS FIXME"))
         div.appendChild(title)
 
+        period = Period.load(self.metadata.get("report.periods")[0])
+
+        cdef = ContextDefinition()
+        cdef.set_instant(period.end)
+        context = self.taxonomy.get_context(cdef)
+
         for v in self.elements:
 
             if v.get("kind") == "config":
-                elt = self.make_data(par, str(v.get("field")),
-                                     v.get("description"),
-                                     self.metadata.get(v.get("key")),
-                                     v.get("tag"))
+
+                fact = context.create_string_fact(
+                    v.get("id"), self.metadata.get(v.get("key"))
+                )
+
+                elt = self.make_data(par, v.get("field"),
+                                     v.get("description"), fact)
                 div.appendChild(elt)
 
             if v.get("kind") == "config-date":
-                elt = self.make_data(par, str(v.get("field")),
-                                     v.get("description"),
-                                     self.metadata.get_date(v.get("key")),
-                                     v.get("tag"))
+                fact = context.create_date_fact(
+                    v.get("id"), self.metadata.get_date(v.get("key"))
+                )
+
+                elt = self.make_data(par, v.get("field"),
+                                     v.get("description"), fact)
                 div.appendChild(elt)
 
             if v.get("kind") == "bool":
-                elt = self.make_data(par, str(v.get("field")),
-                                     v.get("description"),
-                                     v.get_bool("value"),
-                                     v.get("tag"))
+                fact = context.create_bool_fact(
+                    v.get("id"), v.get_bool("value")
+                )
+
+                elt = self.make_data(par, v.get("field"),
+                                     v.get("description"), fact)
                 div.appendChild(elt)
 
             if v.get("kind") == "worksheet-value":
@@ -245,32 +258,29 @@ BODY {
                 value_id = v.get("value")
 
                 ds = wsht.get_dataset()
-                continue
 
                 # FIXME: Assumed first period.
                 found = False
-                for it in wsht.items[0]:
-                    if it.defn.id == value_id:
-                        value = it.value
+                for section in ds.sections:
+                    if section.id == value_id:
+                        if section.total == None:
+                            raise RuntimeError("BUNCHES")
+                        fact = section.total.values[0]
                         found = True
 
                 if found == False:
                     raise RuntimeError("Couldn't find value '%s'" % value_id)
 
-                if v.get("sign-reverse"):
-                    value *= -1
-
                 elt = self.make_data(par, str(v.get("field")),
                                      v.get("description"),
-                                     value,
-                                     v.get("tag"))
+                                     fact)
                 div.appendChild(elt)
 
         return div
 
 #        for d in report_data:
 
-    def make_data(self, par, field, desc, value, tag):
+    def make_data(self, par, field, desc, fact):
 
         row = par.doc.createElement("div")
         row.setAttribute("class", "data")
@@ -284,236 +294,134 @@ BODY {
         descelt.setAttribute("class", "description")
         row.appendChild(descelt)
         descelt.appendChild(par.doc.createTextNode(desc + ": "))
-            
-        row.appendChild(self.get_value_elt(par, value, tag))
-
-        return row
-
-    def get_value_elt(self, par, value, tag):
 
         valelt = par.doc.createElement("div")
         valelt.setAttribute("class", "value")
+        row.appendChild(valelt)
+        fact.append(par.doc, valelt)
 
-        if "tag" not in tag:
-            valelt.appendChild(par.doc.createTextNode(str(value)))
-            return valelt
-
-        if isinstance(value, date):
-            par.add_date(valelt, tag["tag"], "period", value)
-        elif isinstance(value, float):
-            par.add_number(valelt, tag["tag"], "period", value)
-        elif isinstance(value, bool):
-            svar = par.make_nn(tag["tag"], "period", json.dumps(value))
-            valelt.appendChild(svar)
-            if value:
-                valelt.setAttribute("class", valelt.getAttribute("class") + " true")
-            else:
-                valelt.setAttribute("class", valelt.getAttribute("class") + " false")
-        else:
-            par.add_nn(valelt, tag["tag"], "period", str(value))
-
-        return valelt
-
-    def create_contexts(self):
-
-        company_number = self.metadata.get("business.company-number")
-
-        date = self.metadata.get("tax.date")
-        ct = self.metadata.get("tax.business-type")
-
-        self.resources.appendChild(self.create_context("report-date", [
-            self.create_entity(company_number, [
-                self.create_segment_member("ct-comp:BusinessTypeDimension",
-                                           business_type_name[ct]),
-            ]),
-            self.create_instant_period(date)
-        ]))
-
-        date = self.metadata.get("tax.period.start")
-
-        self.resources.appendChild(self.create_context("period-start", [
-            self.create_entity(company_number, [
-                self.create_segment_member("ct-comp:BusinessTypeDimension",
-                                           business_type_name[ct]),
-            ]),
-            self.create_instant_period(date)
-        ]))
-
-        date = self.metadata.get("tax.period.end")
-
-        self.resources.appendChild(self.create_context("period-end", [
-            self.create_entity(company_number, [
-                self.create_segment_member("ct-comp:BusinessTypeDimension",
-                                           business_type_name[ct]),
-            ]),
-            self.create_instant_period(date)
-        ]))
-
-        period = Period.load(self.metadata.get("tax.period"))
-
-        self.resources.appendChild(self.create_context("period", [
-            self.create_entity(company_number, [
-                self.create_segment_member("ct-comp:BusinessTypeDimension",
-                                           business_type_name[ct]),
-            ]),
-            self.create_period(period)
-        ]))
-
-        return
+        return row
 
     def create_metadata(self):
 
         report = self.metadata.get("report")
         business = self.metadata.get("business")
 
-    def get_company_name(self):
-        return self.metadata.get("business.company-name")
+# report_data = [
 
-    def get_company_number(self):
-        return self.metadata.get("business.company-number")
+#     Box(1, "Company Name",
+#         lambda x: x.metadata.get("business.company-name"),
+#         tag={
+#             "tag": "ct-comp:CompanyName"
+#         }
+#     ),
 
-    def get_company_type(self):
-        ct = self.metadata.get("tax.business-type")
-        return business_type[ct]
-
-    def get_tax_reference(self):
-        return self.metadata.get("tax.utr")
-
-    def get_period_from(self):
-        return self.metadata.get_date("tax.period.start")
-
-    def get_period_to(self):
-        return self.metadata.get_date("tax.period.end")
-
-    def get_ni_trading_activity(self):
-        return self.metadata.get_bool("tax.ni-trading")
-
-    def get_partner_in_a_firm(self):
-        return self.metadata.get_bool("tax.partner-in-a-firm")
-
-    def get_software(self):
-        return "gnucash-uk-accounts"
-
-    def get_software_version(self):
-        return "0.0.1"
-
+#     Box(2, "Company Number",
+#         lambda x: x.metadata.get("business.company-number")),
     
+#     Box(3, "Tax reference",
+#         lambda x: x.metadata.get("tax.utr"), {
+#             "tag": "ct-comp:TaxReference"
+#         }),
 
-report_data = [
+#     Box(4, "Type of company", FactTable.get_company_type),
 
-    Box(1, "Company Name",
-        lambda x: x.metadata.get("business.company-name"),
-        tag={
-            "tag": "ct-comp:CompanyName"
-        }
-    ),
+#     Box(5, "NI trading activity",
+#         lambda x: x.metadata.get_bool("tax.ni.trading"),
+#         tag={
+#             "tag": "ct-comp:NITradingActivity"
+#         }),
 
-    Box(2, "Company Number",
-        lambda x: x.metadata.get("business.company-number")),
-    
-    Box(3, "Tax reference",
-        lambda x: x.metadata.get("tax.utr"), {
-            "tag": "ct-comp:TaxReference"
-        }),
+#     Box(6, "NI SME", lambda x: x.metadata.get_bool("tax.ni.sme"),
+#         {
+#             "tag": "ct-comp:NISmallOrMediumEnterprise"
+#         }),
 
-    Box(4, "Type of company", FactTable.get_company_type),
+#     Box(7, "NI Employer", lambda x: x.metadata.get_bool("tax.ni.employer"),
+#         {
+#             "tag": "ct-comp:NIEmployer"
+#         }),
 
-    Box(5, "NI trading activity",
-        lambda x: x.metadata.get_bool("tax.ni.trading"),
-        tag={
-            "tag": "ct-comp:NITradingActivity"
-        }),
+#     Box(8, "NI employer and SME with non-SME partnership profits",
+#         lambda x: x.metadata.get_bool("tax.ni.employer-and-sme-with-non-sme-partnership-profits", False),
+#         {
+#             "tag": "ct-comp:NIEmployerAndSMEWithNon-SMEPartnershipProfits"
+#         }),
 
-    Box(6, "NI SME", lambda x: x.metadata.get_bool("tax.ni.sme"),
-        {
-            "tag": "ct-comp:NISmallOrMediumEnterprise"
-        }),
+#     Box(8, "NI SME and not an NI employer with SME partnership profits",
+#         lambda x: x.metadata.get_bool("tax.ni.sme-and-not-an-ni-employer-with-sme-partnership-profits", False),
+#         {
+#             "tag": "ct-comp:NISMEAndNotAnNIEmployerWithSMEPartnershipProfits"
+#         }),
 
-    Box(7, "NI Employer", lambda x: x.metadata.get_bool("tax.ni.employer"),
-        {
-            "tag": "ct-comp:NIEmployer"
-        }),
+#     Box(8, "SME and NI employer with excluded trade with back office election",
+#         lambda x: x.metadata.get_bool("tax.ni.sme-and-ni-employer-with-excluded-trade-with-back-office-election", False),
+#         {
+#             "tag": "ct-comp:SMEAndNIEmployerWithExcludedTradeWithBackOfficeElection"
+#         }),
 
-    Box(8, "NI employer and SME with non-SME partnership profits",
-        lambda x: x.metadata.get_bool("tax.ni.employer-and-sme-with-non-sme-partnership-profits", False),
-        {
-            "tag": "ct-comp:NIEmployerAndSMEWithNon-SMEPartnershipProfits"
-        }),
+#     Box(8, "NI pre commencement intangibles",
+#         lambda x: x.metadata.get_bool("tax.ni.pre-commencement-intangibles", False),
+#         {
+#             "tag": "ct-comp:NIPreCommencementIntangibles"
+#         }),
 
-    Box(8, "NI SME and not an NI employer with SME partnership profits",
-        lambda x: x.metadata.get_bool("tax.ni.sme-and-not-an-ni-employer-with-sme-partnership-profits", False),
-        {
-            "tag": "ct-comp:NISMEAndNotAnNIEmployerWithSMEPartnershipProfits"
-        }),
+#     Box(8, "SME NI large company rules election",
+#         lambda x: x.metadata.get_bool("tax.ni.sme-large-company-rules-election", False),
+#         {
+#             "tag": "ct-comp:SMENILargeCompanyRulesElection"
+#         }),
 
-    Box(8, "SME and NI employer with excluded trade with back office election",
-        lambda x: x.metadata.get_bool("tax.ni.sme-and-ni-employer-with-excluded-trade-with-back-office-election", False),
-        {
-            "tag": "ct-comp:SMEAndNIEmployerWithExcludedTradeWithBackOfficeElection"
-        }),
+#     Box(8, "Northern Ireland profits included",
+#         lambda x: x.metadata.get_bool("tax.ni.profits-included", False),
+#         {
+#             "tag": "ct-comp:NorthernIrelandProfitsIncluded"
+#         }),
 
-    Box(8, "NI pre commencement intangibles",
-        lambda x: x.metadata.get_bool("tax.ni.pre-commencement-intangibles", False),
-        {
-            "tag": "ct-comp:NIPreCommencementIntangibles"
-        }),
+#     Box(8, "Northern Ireland corporation tax included",
+#         lambda x: x.metadata.get_bool("tax.ni.corporation-tax-included", False),
+#         {
+#             "tag": "ct-comp:NorthernIrelandCorporationTaxIncluded"
+#         }),
 
-    Box(8, "SME NI large company rules election",
-        lambda x: x.metadata.get_bool("tax.ni.sme-large-company-rules-election", False),
-        {
-            "tag": "ct-comp:SMENILargeCompanyRulesElection"
-        }),
+#     Box(8, "Northern Ireland corporation tax included",
+#         lambda x: x.metadata.get_bool("tax.ni.corporation-tax-included", False),
+#         {
+#             "tag": "ct-comp:NorthernIrelandCorporationTaxIncluded"
+#         }),
 
-    Box(8, "Northern Ireland profits included",
-        lambda x: x.metadata.get_bool("tax.ni.profits-included", False),
-        {
-            "tag": "ct-comp:NorthernIrelandProfitsIncluded"
-        }),
+#     Box(8, "NI trading losses used against rest of UK/mainstream profits",
+#         lambda x: x.metadata.get_bool("tax.ni.group-relief-ni-trading-losses-used-against-rest-of-uk-mainstream-profits", False),
+#         {
+#             "tag": "ct-comp:GroupReliefNITradingLossesUsedAgainstRestOfUKMainstreamProfits"
+#         }),
 
-    Box(8, "Northern Ireland corporation tax included",
-        lambda x: x.metadata.get_bool("tax.ni.corporation-tax-included", False),
-        {
-            "tag": "ct-comp:NorthernIrelandCorporationTaxIncluded"
-        }),
+#     Box(8, "NI trading losses used against NI trading profits",
+#         lambda x: x.metadata.get_bool("tax.ni.group-relief-trading-losses-used-against-ni-trading-profits", False),
+#         {
+#             "tag": "ct-comp:GroupReliefNITradingLossesUsedAgainstRestOfUKMainstreamProfits"
+#         }),
 
-    Box(8, "Northern Ireland corporation tax included",
-        lambda x: x.metadata.get_bool("tax.ni.corporation-tax-included", False),
-        {
-            "tag": "ct-comp:NorthernIrelandCorporationTaxIncluded"
-        }),
-
-    Box(8, "NI trading losses used against rest of UK/mainstream profits",
-        lambda x: x.metadata.get_bool("tax.ni.group-relief-ni-trading-losses-used-against-rest-of-uk-mainstream-profits", False),
-        {
-            "tag": "ct-comp:GroupReliefNITradingLossesUsedAgainstRestOfUKMainstreamProfits"
-        }),
-
-    Box(8, "NI trading losses used against NI trading profits",
-        lambda x: x.metadata.get_bool("tax.ni.group-relief-trading-losses-used-against-ni-trading-profits", False),
-        {
-            "tag": "ct-comp:GroupReliefNITradingLossesUsedAgainstRestOfUKMainstreamProfits"
-        }),
-
-    Box(8, "Rest of UK/mainstream losses used against NI trading profits",
-        lambda x: x.metadata.get_bool("tax.ni.group-relief-rest-of-uk-mainstream-losses-used-against-ni-trading-profits", False),
-        {
-            "tag": "ct-comp:GroupReliefRestOfUKMainstreamLossesUsedAgainstNITradingProfits"
-        }),
+#     Box(8, "Rest of UK/mainstream losses used against NI trading profits",
+#         lambda x: x.metadata.get_bool("tax.ni.group-relief-rest-of-uk-mainstream-losses-used-against-ni-trading-profits", False),
+#         {
+#             "tag": "ct-comp:GroupReliefRestOfUKMainstreamLossesUsedAgainstNITradingProfits"
+#         }),
 
 
-#    Box(7, "NI employer", "get_ni_employer"),
-#    Box(8, "Special circumstances", "get_special_circumstances"),
-    Box(30, "Period from", FactTable.get_period_from, tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
-    Box(31, "Period to", "get_period_to", tag={"tag": "ct-comp:EndOfPeriodCoveredByReturn"}),
-    Box("-", "Start of period covered by return", "get_period_from",
-        tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
-    Box("-", "End of period covered by return", "get_period_to",
-        tag={"tag": "ct-comp:EndOfPeriodCoveredByReturn"}),
-    Box("-", "Company is a partner in a firm", "get_partner_in_a_firm",
-        tag={"tag": "ct-comp:CompanyIsAPartnerInAFirm"}),
-    Box("-", "Software", "get_software",
-        tag={"tag": "ct-comp:ct-comp:NameOfProductionSoftware"}),
-    Box("-", "Version", "get_software_version",
-        tag={"tag": "ct-comp:ct-comp:VersionOfProductionSoftware"}),
-]
+# #    Box(7, "NI employer", "get_ni_employer"),
+# #    Box(8, "Special circumstances", "get_special_circumstances"),
+#     Box(30, "Period from", FactTable.get_period_from, tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
+#     Box(31, "Period to", "get_period_to", tag={"tag": "ct-comp:EndOfPeriodCoveredByReturn"}),
+#     Box("-", "Start of period covered by return", "get_period_from",
+#         tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
+#     Box("-", "End of period covered by return", "get_period_to",
+#         tag={"tag": "ct-comp:EndOfPeriodCoveredByReturn"}),
+#     Box("-", "Company is a partner in a firm", "get_partner_in_a_firm",
+#         tag={"tag": "ct-comp:CompanyIsAPartnerInAFirm"}),
+#     Box("-", "Software", "get_software",
+#         tag={"tag": "ct-comp:ct-comp:NameOfProductionSoftware"}),
+#     Box("-", "Version", "get_software_version",
+#         tag={"tag": "ct-comp:ct-comp:VersionOfProductionSoftware"}),
+# ]
 

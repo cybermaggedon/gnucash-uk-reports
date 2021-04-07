@@ -65,6 +65,7 @@ class MultiPeriodWorksheet(Worksheet):
             if isinstance(output0, Breakdown):
 
                 sec = Section()
+                sec.id = input.id
                 sec.header = input.description
                 sec.total = Series("Total", [
                     self.outputs[period][input].value
@@ -87,6 +88,7 @@ class MultiPeriodWorksheet(Worksheet):
             elif isinstance(output0, NilValue):
 
                 sec = Section()
+                sec.id = input.id
                 sec.header = input.description
                 sec.items = None
                 sec.total = Series("Total", [
@@ -98,6 +100,7 @@ class MultiPeriodWorksheet(Worksheet):
             elif isinstance(output0, Total):
 
                 sec = Section()
+                sec.id = input.id
                 sec.header = input.description
                 sec.items = None
                 sec.total = Series("Total", [

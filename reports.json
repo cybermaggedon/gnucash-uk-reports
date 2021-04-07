@@ -625,50 +625,29 @@
 		    "id": "company-name",
 		    "description": "Company name",
 		    "kind": "config",
-		    "key": "business.company-name",
-		    "tag": {
-			"tag": "ct-comp:CompanyName"
-		    }
+		    "key": "business.company-name"
 		},
 		{
 		    "field": "3",
 		    "id": "utr",
 		    "description": "UTR",
 		    "kind": "config",
-		    "key": "tax.utr",
-		    "tag": {
-			"tag": "ct-comp:TaxReference"
-		    }
+		    "key": "tax.utr"
 		},
-		{
-		    "field": "5",
-		    "id": "start",
-		    "description": "NI trading activity",
-		    "kind": "bool",
-		    "value": false,
-		    "tag": {
-			"tag": "ct-comp:NITradingActivity"
-		    }
-		},
+	
 		{
 		    "field": "30",
-		    "id": "start",
+		    "id": "start-of-period",
 		    "description": "Start of period",
 		    "kind": "config-date",
-		    "key": "tax.period.start",
-		    "tag": {
-			"tag": "ct-comp:StartOfPeriodCoveredByReturn"
-		    }
+		    "key": "tax.period.start"
 		},
 		{
 		    "field": "35",
-		    "id": "start",
+		    "id": "end-of-period",
 		    "description": "End of period",
 		    "kind": "config-date",
-		    "key": "tax.period.end",
-		    "tag": {
-			"tag": "ct-comp:EndOfPeriodCoveredByReturn"
-		    }
+		    "key": "tax.period.end"
 		},
 		{
 		    "field": "145",
@@ -677,10 +656,7 @@
 		    "kind": "worksheet-value",
 		    "worksheet": "profit-and-loss",
 		    "period-config": "tax.period",
-		    "value": "turnover",
-		    "tag": {
-			"tag": "ct-comp:FIXME"
-		    }
+		    "value": "turnover"
 		},
 		{
 		    "field": "155",
@@ -689,10 +665,7 @@
 		    "kind": "worksheet-value",
 		    "worksheet": "profit-and-loss",
 		    "period-config": "tax.period",
-		    "value": "gross-profit",
-		    "tag": {
-			"tag": "ct-comp:FIXME"
-		    }
+		    "value": "gross-profit"
 		},
 		{
 		    "field": "160",
@@ -701,11 +674,7 @@
 		    "kind": "worksheet-value",
 		    "worksheet": "profit-and-loss",
 		    "period-config": "tax.period",
-		    "value": "administrative-expenses",
-		    "tag": {
-			"tag": "ct-comp:FIXME",
-			"sign-reverse": true
-		    }
+		    "value": "administrative-expenses"
 		}
 	    ]
 	}
