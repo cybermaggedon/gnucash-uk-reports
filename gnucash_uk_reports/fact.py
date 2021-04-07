@@ -1,5 +1,6 @@
 
 import json
+import copy
 
 class Fact:
     def use(self, fn):
@@ -23,18 +24,24 @@ class MoneyFact(Fact):
     def append(self, doc, par):
         value = self.value
         if self.reverse: value *= -1
-        if self.name:
+        if hasattr(self, "name"):
             elt = doc.createElement("ix:nonFraction")
             elt.setAttribute("name", self.name)
             elt.setAttribute("contextRef", self.context.id)
             elt.setAttribute("unitRef", self.unit)
             elt.setAttribute("decimals", "2")
-            if self.reverse:
+            if value < 0:
                 elt.setAttribute("sign", "-")
             elt.appendChild(doc.createTextNode(str(value)))
             par.appendChild(elt)
         else:
             par.appendChild(doc.createTextNode(str(value)))
+    def copy(self):
+        return copy.copy(self)
+    def rename(self, id, context, tx):
+        self.name = tx.get_tag_name(id)
+        self.context = context
+        self.reverse = tx.get_sign_reversed(id)
 
 class CountFact(Fact):
     def __init__(self, value, context, unit="pure"):
@@ -58,6 +65,33 @@ class CountFact(Fact):
             elt.setAttribute("contextRef", self.context.id)
             elt.setAttribute("unitRef", self.unit)
             elt.setAttribute("decimals", "0")
+            elt.appendChild(doc.createTextNode(str(self.value)))
+            par.appendChild(elt)
+        else:
+            par.appendChild(doc.createTextNode(str(self.value)))
+
+class NumberFact(Fact):
+    def __init__(self, value, context, unit="pure"):
+        self.value = value
+        self.context = context
+        self.reverse = False
+        self.unit = unit
+    def describe(self):
+        if self.name:
+            name = self.name
+            context = self.context.id
+            print("        {0} {1} {2}".format(
+                str(self.value), name, context
+            ))
+        else:
+            print("        {0}".format(str(self.value)))
+    def append(self, doc, par):
+        if self.name:
+            elt = doc.createElement("ix:nonFraction")
+            elt.setAttribute("name", self.name)
+            elt.setAttribute("contextRef", self.context.id)
+            elt.setAttribute("unitRef", self.unit)
+            elt.setAttribute("decimals", "2")
             elt.appendChild(doc.createTextNode(str(self.value)))
             par.appendChild(elt)
         else:
@@ -148,6 +182,10 @@ class Taxonomy:
         key = "taxonomy.{0}.sign-reversed.{1}".format(self.name, id)
         return self.cfg.get_bool(key)
 
+    def get_time_dimension(self, id):
+        key = "taxonomy.{0}.time-dimension.{1}".format(self.name, id)
+        return self.cfg.get(key)
+
     def get_tag_dimensions(self, id):
         key = "taxonomy.{0}.segments.{1}".format(self.name, id)
         return self.cfg.get(key)
@@ -166,8 +204,14 @@ class Taxonomy:
         return m
 
     def create_count_fact(self, id, value, context):
-
         m = CountFact(value, context)
+        m.name = self.get_tag_name(id)
+        m.reverse = self.get_sign_reversed(id)
+        m.context = context
+        return m
+
+    def create_number_fact(self, id, value, context):
+        m = NumberFact(value, context)
         m.name = self.get_tag_name(id)
         m.reverse = self.get_sign_reversed(id)
         m.context = context
@@ -231,6 +275,8 @@ class ContextDefinition:
         self.instant = instant
     def set_entity(self, id):
         self.entity = id
+    def add_segment(self, k, v):
+        self.segments[k] = v
     def add_segments(self, id, tx):
         segs = tx.get_tag_dimensions(id)
         if segs:
@@ -256,6 +302,8 @@ class Context:
         return self.taxonomy.create_money_fact(id, value, self)
     def create_count_fact(self, id, value):
         return self.taxonomy.create_count_fact(id, value, self)
+    def create_number_fact(self, id, value):
+        return self.taxonomy.create_number_fact(id, value, self)
     def create_string_fact(self, id, value):
         return self.taxonomy.create_string_fact(id, value, self)
     def create_bool_fact(self, id, value):

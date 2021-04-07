@@ -7,7 +7,7 @@
 	    },
 	    "tags": {
 		"company-name": "ct-comp:CompanyName",
-		"utr": "ct-comp:TaxReference",
+		"tax-reference": "ct-comp:TaxReference",
 		"return-period-start": "ct-comp:StartOfPeriodCoveredByReturn",
 		"return-period-end": "ct-comp:EndOfPeriodCoveredByReturn",
 		"account-period-start": "ct-comp:PeriodOfAccountStartDate",
@@ -951,7 +951,20 @@
 		"administrative-expenses": "FIXME:FIXME"
 	    },
 	    "sign-reversed": {
-		"administrative-expenses": true
+		"administrative-expenses": true,
+		"management-expenses-relief": true,
+		"total-deductions-and-reliefs": true,
+		"fy1-tax-at-first-rate": true,
+		"corporation-tax-chargeable": true,
+		"corporation-tax-chargeable-payable": true
+	    },
+	    "time-dimension": {
+		"company-name": "instant",
+		"tax-reference": "instant",
+		"return-period-start": "instant",
+		"return-period-end": "instant",
+		"account-period-start": "instant",
+		"account-period-end": "instant"
 	    },
 	    "segments": {
 		"company-name": {

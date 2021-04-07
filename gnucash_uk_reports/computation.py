@@ -38,12 +38,14 @@ class Computable:
 
 class Line(Computable):
 
-    def __init__(self, id, description, accounts, taxonomy, period=AT_END):
+    def __init__(self, id, description, accounts, taxonomy, period=AT_END,
+                 reverse=False):
         self.id = id
         self.description = description
         self.accounts = accounts
         self.taxonomy = taxonomy
         self.period = period
+        self.reverse = reverse
 
     def compute(self, session, start, end, result):
 
@@ -75,6 +77,8 @@ class Line(Computable):
 
             total += acct_total
 
+        if self.reverse: total *= -1
+        
         cdef.add_segments(self.id, self.taxonomy)
         context = self.taxonomy.get_context(cdef)
 
@@ -103,7 +107,7 @@ class Line(Computable):
         }.get(pspec, AT_END)
 
         return Line(id, cfg.get("description"), cfg.get("accounts"),
-                    taxonomy, pid)
+                    taxonomy, pid, cfg.get_bool("reverse-sign"))
 
 class Constant(Computable):
     def __init__(self, id, description, values, taxonomy, period=AT_END):

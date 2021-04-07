@@ -476,6 +476,73 @@
 		    ]
 		}
 	    ]
+	},
+
+	{
+	    "id": "dpl-management-expenses",
+	    "kind": "group",
+	    "description": "Management Expenses",
+	    "period": "in-year",
+	    "lines": [
+		{
+		    "id": "other-charges",
+		    "kind": "line",
+		    "description": "Other",
+		    "accounts": [
+			"Expenses:VAT Purchases",
+			"Expenses:Other non-VAT expenses"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "dpl-machinery-plant",
+		    "kind": "line",
+		    "description": "Machinery and plant",
+		    "period": "in-year",
+		    "accounts": [
+			"Assets:Capital Equipment:Computer Equipment"
+		    ],
+		    "reverse-sign": true
+		}
+	    ]
+	},
+
+	{
+	    "id": "dpl-net-profit",
+	    "kind": "computation",
+	    "description": "Trading Profits",
+	    "inputs": [
+		"turnover",
+		"cost-of-sales"		
+	    ]
+	},
+
+	{
+	    "id": "dpl-profit",
+	    "kind": "computation",
+	    "description": "Profit",
+	    "inputs": [
+		"dpl-management-expenses",
+		"dpl-net-profit"
+	    ]
+	},
+
+	{
+	    "id": "dpl-tax-owed",
+	    "kind": "group",
+	    "description": "Corporation Tax Owed",
+	    "period": "in-year",
+	    "lines": [
+		{
+		    "id": "dpl-corporation-tax",
+		    "kind": "line",
+		    "description": "Other",
+		    "accounts": [
+			"Equity:Corporation Tax"
+		    ],
+		    "period": "in-year"
+		}
+	    ]
 	}
 
     ],
@@ -507,9 +574,6 @@
 	    "kind": "multi-period",
 	    "description": "Profit and Loss",
 
-	    "tags": {
-	    },
-
 	    "items": [
 		"turnover",
 		"cost-of-sales",
@@ -525,9 +589,6 @@
 	    "kind": "multi-period",
 	    "description": "Fixed Assets",
 
-	    "tags": {
-	    },
-
 	    "items": [
 		"fixed-assets-analysis",
 		"depreciation-analysis",
@@ -541,11 +602,24 @@
 	    "kind": "multi-period",
 	    "description": "Share Capital",
 
-	    "tags": {
-	    },
-
 	    "items": [
 		"share-capital"
+	    ]
+
+	},
+	
+	{
+	    "id": "detailed-profit-and-loss",
+	    "kind": "multi-period",
+	    "description": "Detailed Profit and Loss",
+
+	    "items": [
+		"turnover",
+		"cost-of-sales",
+		"dpl-net-profit",
+		"dpl-management-expenses",
+		"dpl-profit",
+		"dpl-tax-owed"
 	    ]
 
 	}
@@ -617,6 +691,13 @@
 	},
 
 	{
+	    "id": "dpl",
+	    "kind": "worksheet",
+	    "title": "Detailed Profit and Loss",
+	    "worksheet": "detailed-profit-and-loss"
+	},
+
+	{
 	    "id": "ct600",
 	    "kind": "facttable",
 	    "facts": [
@@ -629,53 +710,214 @@
 		},
 		{
 		    "field": "3",
-		    "id": "utr",
-		    "description": "UTR",
+		    "id": "tax-reference",
+		    "description": "Tax reference",
 		    "kind": "config",
 		    "key": "tax.utr"
 		},
 	
 		{
 		    "field": "30",
-		    "id": "start-of-period",
-		    "description": "Start of period",
+		    "id": "return-period-start",
+		    "description": "Return period start",
 		    "kind": "config-date",
 		    "key": "tax.period.start"
 		},
 		{
 		    "field": "35",
-		    "id": "end-of-period",
-		    "description": "End of period",
+		    "id": "return-period-end",
+		    "description": "Return period end",
 		    "kind": "config-date",
 		    "key": "tax.period.end"
 		},
 		{
-		    "field": "145",
-		    "id": "total-turnover-from-trade",
-		    "description": "Total Turnover From Trade",
-		    "kind": "worksheet-value",
-		    "worksheet": "profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "turnover"
+		    "field": "?",
+		    "id": "account-period-start",
+		    "description": "Start of accounts period",
+		    "kind": "config-date",
+		    "key": "tax.period.start"
 		},
+		{
+		    "field": "?",
+		    "id": "account-period-end",
+		    "description": "End of accounts period",
+		    "kind": "config-date",
+		    "key": "tax.period.end"
+		},
+		{
+		    "field": "?",
+		    "id": "partner-in-a-firm",
+		    "description": "Company is a partner in a firm",
+		    "kind": "bool",
+		    "value": "false"
+		},
+
 		{
 		    "field": "155",
-		    "id": "trading-profits",
+		    "id": "adjusted-trading-profit-of-this-period",
 		    "description": "Trading profits",
 		    "kind": "worksheet-value",
-		    "worksheet": "profit-and-loss",
+		    "worksheet": "detailed-profit-and-loss",
 		    "period-config": "tax.period",
-		    "value": "gross-profit"
+		    "value": "dpl-net-profit"
 		},
+
 		{
-		    "field": "160",
-		    "id": "trading-losses",
-		    "description": "Trading losses",
+		    "field": "165",
+		    "id": "net-trading-profits",
+		    "description": "Net trading profits",
 		    "kind": "worksheet-value",
-		    "worksheet": "profit-and-loss",
+		    "worksheet": "detailed-profit-and-loss",
 		    "period-config": "tax.period",
-		    "value": "administrative-expenses"
+		    "value": "dpl-net-profit"
+		},
+
+		{
+		    "field": "220",
+		    "id": "net-chargeable-gains",
+		    "description": "Net chargeable gains",
+		    "kind": "money",
+		    "value": 0
+		},
+
+		{
+		    "field": "235",
+		    "id": "profits-before-other-deductions-and-reliefs",
+		    "description": "Profits before other deductions and reliefs",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-net-profit"
+		},
+
+		{
+		    "field": "245",
+		    "id": "management-expenses-relief",
+		    "description": "Management expenses",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-management-expenses"
+		},
+
+		{
+		    "field": "295",
+		    "id": "total-deductions-and-reliefs",
+		    "description": "Total deductions and reliefs",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-management-expenses"
+		},
+
+		{
+		    "field": "300",
+		    "id": "profits-before-charges-and-group-relief",
+		    "description": "Profits before qualifying donations and group relief",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-profit"
+		},
+
+		{
+		    "field": "305",
+		    "id": "qualifying-donations",
+		    "description": "Qualifying donations",
+		    "kind": "money",
+		    "value": 0
+		},
+
+		{
+		    "field": "310",
+		    "id": "group-relief-claimed",
+		    "description": "Group relief",
+		    "kind": "money",
+		    "value": 0
+		},
+
+		{
+		    "field": "312",
+		    "id": "group-relief-claimed-for-carried-forward-losses",
+		    "description": "Group relief for carried forward losses",
+		    "kind": "money",
+		    "value": 0
+		},
+
+		{
+		    "field": "315",
+		    "id": "total-profits-chargeable-to-corporation-tax",
+		    "description": "Profits chargeable to Corporation Tax",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-profit"
+		},
+		
+		{
+		    "field": "330",
+		    "id": "financial-year1-covered-by-the-return",
+		    "description": "Financial year 1 covered by the return",
+		    "kind": "string",
+		    "value": "2020"
+		},
+
+		{
+		    "field": "335",
+		    "id": "fy1-amount-of-profit-chargeable-at-first-rate",
+		    "description": "FY1 amount of profit chargable at first rate",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-profit"
+		},
+		    
+		{
+		    "field": "340",
+		    "id": "fy1-first-rate-of-tax",
+		    "description": "FY1 first rate of tax",
+		    "kind": "number",
+		    "value": 19
+		},
+		  
+		{
+		    "field": "345",
+		    "id": "fy1-tax-at-first-rate",
+		    "description": "FY1 tax at first rate",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-tax-owed"
+		},
+		  
+		{
+		    "field": "430",
+		    "id": "corporation-tax-chargeable",
+		    "description": "Corporation tax",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-tax-owed"
+		},
+		  
+		{
+		    "field": "435",
+		    "id": "marginal-rate-relief-for-ring-fence-trades-payable",
+		    "description": "Marginal relief for ring fence trades",
+		    "kind": "money",
+		    "value": 0
+		},
+		   
+		{
+		    "field": "440",
+		    "id": "corporation-tax-chargeable-payable",
+		    "description": "Corporation tax chargeable",
+		    "kind": "worksheet-value",
+		    "worksheet": "detailed-profit-and-loss",
+		    "period-config": "tax.period",
+		    "value": "dpl-tax-owed"
 		}
+		     
 	    ]
 	}
 

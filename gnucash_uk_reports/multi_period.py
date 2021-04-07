@@ -72,16 +72,18 @@ class MultiPeriodWorksheet(Worksheet):
                     for period in self.periods
                 ])
 
-                sec.items = [
-                    Series(
+                items = []
+                for i in range(0, len(output0.items)):
+                    srs  = Series(
                         output0.items[i].description,
                         [
                             self.outputs[period][input].items[i].value
                             for period in self.periods
                         ]
                     )
-                    for i in range(0, len(output0.items))
-                ]
+                    srs.id = output0.defn.lines[i].id
+                    items.append(srs)
+                sec.items = items
 
                 ds.sections.append(sec)
 

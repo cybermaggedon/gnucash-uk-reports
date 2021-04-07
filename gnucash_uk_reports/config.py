@@ -34,6 +34,8 @@ class Config(dict):
             return IntValue(val)
         if isinstance(val, dict):
             return Config(val)
+        if isinstance(val, float):
+            return FloatValue(val)
         raise RuntimeError("Can't help with type {0}".format(type(val)))
     def get(self, key, deflt=None):
         if "." not in key:
@@ -73,6 +75,12 @@ class Config(dict):
 class StringValue(str):
     def __new__(cls, value):
         return str.__new__(cls, value)
+    def use(self, fn):
+        return fn(self)
+
+class FloatValue(float):
+    def __new__(cls, value):
+        return float.__new__(cls, value)
     def use(self, fn):
         return fn(self)
 
