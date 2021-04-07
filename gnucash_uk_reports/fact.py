@@ -207,6 +207,14 @@ class Taxonomy:
         self.contexts[key] = ctxt
         return ctxt
 
+    def get_namespaces(self):
+        key = "taxonomy.{0}.namespaces".format(self.name)
+        return self.cfg.get(key)
+
+    def get_schema(self):
+        key = "taxonomy.{0}.schema".format(self.name)
+        return self.cfg.get(key)
+
 class FRS101(Taxonomy):
     def __init__(self, cfg):
         super().__init__(cfg, "frs-101")

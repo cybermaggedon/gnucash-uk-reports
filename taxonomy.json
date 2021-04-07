@@ -1,6 +1,13 @@
 {
     "taxonomy": {
 	"frs-101": {
+	    "schema": "https://xbrl.frc.org.uk/FRS-102/2021-01-01/FRS-102-2021-01-01.xsd",
+	    "namespaces": {
+		"uk-bus": "http://xbrl.frc.org.uk/cd/2021-01-01/business",
+		"uk-geo": "http://xbrl.frc.org.uk/cd/2021-01-01/countries",
+		"uk-core": "http://xbrl.frc.org.uk/fr/2021-01-01/core",
+		"uk-direp": "http://xbrl.frc.org.uk/reports/2021-01-01/direp"
+	    },
 	    "tags": {
 		"turnover": "uk-core:TurnoverRevenue",
 		"cost-of-sales": "uk-core:CostSales",

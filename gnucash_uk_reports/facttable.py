@@ -203,6 +203,18 @@ BODY {
         out.write(doc.toprettyxml())
 #        out.write(doc.toxml())
 
+    def get_context(self, id):
+
+        period = Period.load(self.metadata.get("report.periods")[0])
+
+        cdef = ContextDefinition()
+        cdef.set_instant(period.end)
+        cdef.add_segments(id, self.taxonomy)
+
+        context = self.taxonomy.get_context(cdef)
+
+        return context
+
     def to_ixbrl_elt(self, par):
 
         div = par.doc.createElement("div")
@@ -214,16 +226,14 @@ BODY {
 
         period = Period.load(self.metadata.get("report.periods")[0])
 
-        cdef = ContextDefinition()
-        cdef.set_instant(period.end)
-        context = self.taxonomy.get_context(cdef)
-
         for v in self.elements:
 
             if v.get("kind") == "config":
 
+                id = v.get("id")
+                context = self.get_context(id)
                 fact = context.create_string_fact(
-                    v.get("id"), self.metadata.get(v.get("key"))
+                    id, self.metadata.get(v.get("key"))
                 )
 
                 elt = self.make_data(par, v.get("field"),
@@ -231,8 +241,11 @@ BODY {
                 div.appendChild(elt)
 
             if v.get("kind") == "config-date":
+
+                id = v.get("id")
+                context = self.get_context(id)
                 fact = context.create_date_fact(
-                    v.get("id"), self.metadata.get_date(v.get("key"))
+                    id, self.metadata.get_date(v.get("key"))
                 )
 
                 elt = self.make_data(par, v.get("field"),
@@ -240,8 +253,11 @@ BODY {
                 div.appendChild(elt)
 
             if v.get("kind") == "bool":
+
+                id = v.get("id")
+                context = self.get_context(id)
                 fact = context.create_bool_fact(
-                    v.get("id"), v.get_bool("value")
+                    id, v.get_bool("value")
                 )
 
                 elt = self.make_data(par, v.get("field"),

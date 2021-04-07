@@ -273,15 +273,7 @@ h2 {
 
         html.setAttribute("xmlns", XHTML_NAMESPACE)
 
-        # FIXME: Hard-coded
         html.setAttribute("xmlns:ix", "http://www.xbrl.org/2013/inlineXBRL")
-        html.setAttribute("xmlns:uk-bus",
-                          "http://xbrl.frc.org.uk/cd/2021-01-01/business")
-        html.setAttribute("xmlns:uk-geo",
-                          "http://xbrl.frc.org.uk/cd/2021-01-01/countries")
-        html.setAttribute("xmlns:uk-core", 
-                          "http://xbrl.frc.org.uk/fr/2021-01-01/core")
-        html.setAttribute("xmlns:uk-direp", "http://xbrl.frc.org.uk/reports/2021-01-01/direp")
         html.setAttribute("xmlns:link", "http://www.xbrl.org/2003/linkbase")
         html.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
         html.setAttribute("xmlns:xbrli", "http://www.xbrl.org/2003/instance")
@@ -289,6 +281,10 @@ h2 {
         html.setAttribute("xmlns:ixt2",
                           "http://www.xbrl.org/inlineXBRL/transformation/2011-07-31")
         html.setAttribute("xmlns:iso4217", "http://www.xbrl.org/2003/iso4217")
+
+        ns = self.taxonomy.get_namespaces()
+        for k in ns:
+            html.setAttribute("xmlns:" + k, ns[k])
 
         self.html = html
 
@@ -328,11 +324,10 @@ h2 {
         # This creates some contexts, hence do this first.
         self.create_metadata()
 
-        # FIXME: Hard-coded
-        frc_schema = "https://xbrl.frc.org.uk/FRS-102/2021-01-01/FRS-102-2021-01-01.xsd"        
+        schema_url = self.taxonomy.get_schema()
         schema = doc.createElement("link:schemaRef")
         schema.setAttribute("xlink:type", "simple")
-        schema.setAttribute("xlink:href", frc_schema)
+        schema.setAttribute("xlink:href", schema_url)
         schema.appendChild(doc.createTextNode(""))
         refs.appendChild(schema)
 
