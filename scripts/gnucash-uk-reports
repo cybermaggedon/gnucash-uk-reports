@@ -14,11 +14,13 @@ if len(sys.argv) < 4:
 
 cfg = Config.load(sys.argv[1])
 
+tx_cfg = Config.load("taxonomy.json")
+
 file = cfg.get("accounts.file")
 
 session = accounts.Accounts(file)
 
-tx = FRS101(cfg)
+tx = FRS101(tx_cfg)
 
 elt = get_element(sys.argv[2], cfg, session, tx)
 

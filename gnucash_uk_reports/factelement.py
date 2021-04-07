@@ -28,7 +28,7 @@ business_type = {
     "company": "Company"
 }
 
-class CT600(BasicElement):
+class FactElement(BasicElement):
 
     def __init__(self, metadata, elts, session, cfg, tx):
         super().__init__(metadata, tx)
@@ -39,7 +39,7 @@ class CT600(BasicElement):
     @staticmethod
     def load(elt_def, cfg, session, tx):
 
-        c = CT600(
+        c = FactElement(
             cfg.get("metadata"),
             elt_def.get("elements"),
             session,
@@ -141,7 +141,7 @@ BODY {
             t.appendChild(doc.createTextNode(val));
             head.appendChild(t)
 
-        add_title("CT600")
+        add_title("FIXME: Facts")
 
         self.add_style(head)
 
@@ -202,10 +202,10 @@ BODY {
     def to_ixbrl_elt(self, par):
 
         div = par.doc.createElement("div")
-        div.setAttribute("class", "ct600 document")
+        div.setAttribute("class", "facts document")
 
         title = par.doc.createElement("h2")
-        title.appendChild(par.doc.createTextNode("CT600"))
+        title.appendChild(par.doc.createTextNode("FACTS FIXME"))
         div.appendChild(title)
 
         for v in self.elements:
@@ -239,6 +239,8 @@ BODY {
                                      self.taxonomy)
 
                 value_id = v.get("value")
+
+                ds = wsht.get_dataset()
 
                 # FIXME: Assumed first period.
                 found = False
@@ -409,7 +411,7 @@ report_data = [
             "tag": "ct-comp:TaxReference"
         }),
 
-    Box(4, "Type of company", CT600.get_company_type),
+    Box(4, "Type of company", FactElement.get_company_type),
 
     Box(5, "NI trading activity",
         lambda x: x.metadata.get_bool("tax.ni.trading"),
@@ -496,7 +498,7 @@ report_data = [
 
 #    Box(7, "NI employer", "get_ni_employer"),
 #    Box(8, "Special circumstances", "get_special_circumstances"),
-    Box(30, "Period from", CT600.get_period_from, tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
+    Box(30, "Period from", FactElement.get_period_from, tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
     Box(31, "Period to", "get_period_to", tag={"tag": "ct-comp:EndOfPeriodCoveredByReturn"}),
     Box("-", "Start of period covered by return", "get_period_from",
         tag={"tag": "ct-comp:StartOfPeriodCoveredByReturn"}),
