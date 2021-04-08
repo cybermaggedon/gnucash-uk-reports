@@ -25,6 +25,7 @@ class Taxonomy:
                 self.get_tag_name(val.id),
                 val.value
             )
+            fact.dimensions = self.get_tag_dimensions(val.id)
             return fact
 
         if isinstance(val, DateDatum):
@@ -33,6 +34,7 @@ class Taxonomy:
                 self.get_tag_name(val.id),
                 val.value
             )
+            fact.dimensions = self.get_tag_dimensions(val.id)
             return fact
 
         if isinstance(val, MoneyDatum):
@@ -49,6 +51,7 @@ class Taxonomy:
                 self.get_tag_name(val.id),
                 val.value
             )
+            fact.dimensions = self.get_tag_dimensions(val.id)
             return fact
 
         if isinstance(val, CountDatum):
@@ -57,6 +60,7 @@ class Taxonomy:
                 self.get_tag_name(val.id),
                 val.value
             )
+            fact.dimensions = self.get_tag_dimensions(val.id)
             return fact
 
         raise RuntimeError("Not implemented: " + str(type(val)))
@@ -68,10 +72,6 @@ class Taxonomy:
     def get_sign_reversed(self, id):
         key = "taxonomy.{0}.sign-reversed.{1}".format(self.name, id)
         return self.cfg.get_bool(key)
-
-    def get_time_dimension(self, id):
-        key = "taxonomy.{0}.time-dimension.{1}".format(self.name, id)
-        return self.cfg.get(key)
 
     def get_tag_dimensions(self, id):
         key = "taxonomy.{0}.segments.{1}".format(self.name, id)

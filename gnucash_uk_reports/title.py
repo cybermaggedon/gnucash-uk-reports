@@ -139,7 +139,7 @@ class Title(BasicElement):
 
         p.appendChild(par.doc.createTextNode("Approved by the board of directors and authorised for publication on "))
 
-        ri.get("report-date").use(
+        ri.get("authorised-date").use(
             lambda val: taxonomy.create_fact(val).append(doc, p)
         )
 

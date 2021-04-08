@@ -61,6 +61,7 @@
 	    "accounting-standards": "micro-entities",
 	    "balance-sheet-date": "2021-08-31",
 	    "date": "2021-08-31",
+	    "authorised-date": "2021-08-31",
 	    "currency": "GBP",
 	    "signed-by": "B Smith",
  	    "periods": [
@@ -242,13 +243,15 @@
 	    "id": "creditors-within-1-year",
 	    "kind": "group",
 	    "description": "Creditors: falling due within one year",
+	    "segments": {
+		"matures": "within-1-year"
+	    },
 	    "lines": [
 		{
 		    "id": "trade-creditors",
 		    "kind": "line",
 		    "description": "Trade Creditors",
 		    "period": "at-end",
-		    "FIXME": "within-year",
 		    "accounts": [
 			"Accounts Payable"
 		    ]
@@ -290,7 +293,9 @@
 	    "id": "creditors-after-1-year",
 	    "kind": "group",
 	    "description": "Creditors: falling due after one year",
-	    "FIXME": "after-year",
+	    "segments": {
+		"matures": "after-1-year"
+	    },
 	    "lines": [
 	    ]
 	},

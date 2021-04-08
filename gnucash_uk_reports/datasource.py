@@ -190,6 +190,10 @@ class DataSource:
             lambda val: d.add_date("report-date", val, rdc)
         )
 
+        self.cfg.get_date("metadata.report.authorised-date").use(
+            lambda val: d.add_date("authorised-date", val, rdc)
+        )
+
         self.cfg.get_date("metadata.report.balance-sheet-date").use(
             lambda val: d.add_date("balance-sheet-date", val, rdc)
         )

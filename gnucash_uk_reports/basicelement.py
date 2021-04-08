@@ -252,8 +252,8 @@ h2 {
 
         body.appendChild(elt)
 
-#        out.write(doc.toprettyxml())
-        out.write(doc.toxml())
+        out.write(doc.toprettyxml())
+#        out.write(doc.toxml())
 
 
     def to_ixbrl(self, taxonomy, out):
@@ -348,8 +348,8 @@ h2 {
         unit.appendChild(measure)
         resources.appendChild(unit)
        
-        out.write(doc.toprettyxml())
-#        out.write(doc.toxml())
+#        out.write(doc.toprettyxml())
+        out.write(doc.toxml())
 
     def create_contexts(self, taxonomy):
 
@@ -528,6 +528,7 @@ h2 {
 
         ri.get("report-title").use(add)
         ri.get("report-date").use(add)
+        ri.get("authorised-date").use(add)
         ri.get("period-start").use(add)
         ri.get("period-end").use(add)
         ci.get("company-name").use(add)

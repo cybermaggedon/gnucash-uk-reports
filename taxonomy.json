@@ -77,7 +77,7 @@
 
 		"report-title": "uk-bus:ReportTitle",
 		"report-date": "uk-bus:BusinessReportPublicationDate",
-		"issue-date": "uk-core:DateAuthorisationFinancialStatementsForIssue",
+		"authorised-date": "uk-core:DateAuthorisationFinancialStatementsForIssue",
 		"period-start": "uk-bus:StartDateForPeriodCoveredByReport",
 		"period-end": "uk-bus:EndDateForPeriodCoveredByReport",
 		"software": "uk-bus:NameProductionSoftware",
@@ -157,17 +157,14 @@
 		"corporation-tax-owed": true,
 		"accruals-and-deferred-income": true
 	    },
-	    "segments": {
-		"creditors-within-1-year": {
-		    "uk-core:MaturitiesOrExpirationPeriodsDimension":
-		    "uk-core:WithinOneYear"
-		},
-		"creditors-after-1-year": {
-		    "uk-core:MaturitiesOrExpirationPeriodsDimension":
-		    "uk-core:AfterOneYear"
-		}
-	    },
 	    "lookup": {
+		"matures": {
+		    "dimension": "uk-core:MaturitiesOrExpirationPeriodsDimension",
+		    "map": {
+			"within-1-year": "uk-core:WithinOneYear",
+			"after-1-year": "uk-core:AfterOneYear"
+		    }
+		},
 		"accounting-standards": {
 		    "dimension": "uk-bus:AccountingStandardsDimension",
 		    "map": {

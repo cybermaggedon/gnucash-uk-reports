@@ -38,6 +38,7 @@ class Context:
 
     def with_segment(self, k, v):
         return self.with_segments({k: v})
+
     def with_segments(self, segments):
 
         # entity, scheme, segments, period, instant

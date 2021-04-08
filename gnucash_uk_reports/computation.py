@@ -39,13 +39,32 @@ class Computable:
 class Line(Computable):
 
     def __init__(self, id, description, accounts, context, period=AT_END,
-                 reverse=False):
+                 reverse=False, segments={}):
         self.id = id
         self.description = description
         self.accounts = accounts
         self.context = context
         self.period = period
         self.reverse = reverse
+        self.segments = segments
+
+    @staticmethod
+    def load(cfg, comps, context):
+        id = cfg.get("id")
+        if id == None: id = create_uuid()
+
+        pspec = cfg.get("period")
+
+        pid = {
+            "in-year": IN_YEAR,
+            "at-start": AT_START,
+            "at-end": AT_END
+        }.get(pspec, AT_END)
+
+        segs = cfg.get("segments", {})
+
+        return Line(id, cfg.get("description"), cfg.get("accounts"), context,
+                    pid, cfg.get_bool("reverse-sign"), segs)
 
     def compute(self, session, start, end, result):
 
@@ -77,6 +96,9 @@ class Line(Computable):
 
         if self.reverse: total *= -1
 
+        if len(self.segments) != 0:
+            context = context.with_segments(self.segments)
+
         result.set(self.id, context.create_money_datum(self.id, total))
 
         return total
@@ -87,6 +109,15 @@ class Line(Computable):
 
         return output
 
+class Constant(Computable):
+    def __init__(self, id, description, values, context, period=AT_END,
+                 segments={}):
+        self.id = id
+        self.description = description
+        self.values = values
+        self.context = context
+        self.period = period
+        self.segments = segments
 
     @staticmethod
     def load(cfg, comps, context):
@@ -101,16 +132,10 @@ class Line(Computable):
             "at-end": AT_END
         }.get(pspec, AT_END)
 
-        return Line(id, cfg.get("description"), cfg.get("accounts"), context,
-                    pid, cfg.get_bool("reverse-sign"))
+        segs = cfg.get("segments", {})
 
-class Constant(Computable):
-    def __init__(self, id, description, values, context, period=AT_END):
-        self.id = id
-        self.description = description
-        self.values = values
-        self.context = context
-        self.period = period
+        return Constant(id, cfg.get("description"), cfg.get("values"), context,
+                        pid, segs)
 
     def compute(self, session, start, end, result):
 
@@ -124,7 +149,12 @@ class Constant(Computable):
             context = self.context.with_period(Period("", start, end))
 
         val = self.values[str(end)]
+
+        if len(self.segments) != 0:
+            context = context.with_segments(self.segments)
+
         result.set(self.id, context.create_money_datum(self.id, val))
+
         return val
 
     def get_output(self, result):
@@ -133,29 +163,14 @@ class Constant(Computable):
 
         return output
 
-    @staticmethod
-    def load(cfg, comps, context):
-        id = cfg.get("id")
-        if id == None: id = create_uuid()
-
-        pspec = cfg.get("period")
-
-        pid = {
-            "in-year": IN_YEAR,
-            "at-start": AT_START,
-            "at-end": AT_END
-        }.get(pspec, AT_END)
-
-        return Constant(id, cfg.get("description"), cfg.get("values"), context,
-                        pid)
-
 class Group(Computable):
-    def __init__(self, id, description, context, period=AT_END):
+    def __init__(self, id, description, context, period=AT_END, segments={}):
         self.id = id
         self.description = description
         self.lines = []
         self.context = context
         self.period = period
+        self.segments = segments
 
     @staticmethod
     def load(cfg, comps, context):
@@ -171,7 +186,9 @@ class Group(Computable):
             "at-end": AT_END
         }.get(pspec, AT_END)
 
-        g = Group(id, cfg.get("description"), context, pid)
+        segs = cfg.get("segments", {})
+
+        g = Group(id, cfg.get("description"), context, pid, segs)
 
         for l in cfg.get("lines"):
 
@@ -200,7 +217,12 @@ class Group(Computable):
         total = 0
         for line in self.lines:
             total += line.compute(accounts, start, end, result)
+
+        if len(self.segments) != 0:
+            context = context.with_segments(self.segments)
+
         result.set(self.id, context.create_money_datum(self.id, total))
+
         return total
 
     def get_output(self, result):
@@ -257,12 +279,36 @@ class Result:
         return self.values[id]
 
 class Computation(Computable):
-    def __init__(self, id, description, context, period):
+    def __init__(self, id, description, context, period, segments={}):
         self.id = id
         self.description = description
         self.steps = []
         self.context = context
         self.period = period
+        self.segments = segments
+
+    @staticmethod
+    def load(cfg, comps, context):
+
+        id = cfg.get("id")
+        if id == None: id = create_uuid()
+
+        pspec = cfg.get("period")
+
+        pid = {
+            "in-year": IN_YEAR,
+            "at-start": AT_START,
+            "at-end": AT_END
+        }.get(pspec, AT_END)
+
+        segs = cfg.get("segments", {})
+
+        comp = Computation(id, cfg.get("description"), context, pid, segs)
+
+        for item in cfg.get("inputs"):
+            comp.add(comps[item])
+
+        return comp
 
     def add(self, item):
         self.steps.append(AddOperation(item))
@@ -280,6 +326,9 @@ class Computation(Computable):
             context = self.context.with_instant(start)
         else:
             context = self.context.with_period(Period("", start, end))
+
+        if len(self.segments) != 0:
+            context = context.with_segments(self.segments)
 
         result.set(self.id, context.create_money_datum(self.id, total))
 
@@ -300,27 +349,6 @@ class Computation(Computable):
                        ])
 
         return output
-
-    @staticmethod
-    def load(cfg, comps, context):
-
-        id = cfg.get("id")
-        if id == None: id = create_uuid()
-
-        pspec = cfg.get("period")
-
-        pid = {
-            "in-year": IN_YEAR,
-            "at-start": AT_START,
-            "at-end": AT_END
-        }.get(pspec, AT_END)
-
-        comp = Computation(id, cfg.get("description"), context, pid)
-
-        for item in cfg.get("inputs"):
-            comp.add(comps[item])
-
-        return comp
 
 def get_computations(cfg, context):
 
