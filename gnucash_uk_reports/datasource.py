@@ -22,12 +22,31 @@ class DataSource:
 
     def get_contact_information(self):
 
-        c = self.business_context.with_segments({"country": "UK"})
+        country = self.cfg.get("metadata.business.contact.country")
 
-        d = ValueSet(c)
+        c = self.business_context.with_segments({"country": country})
+
+        d = ValueSet()
 
         val = self.cfg.get("metadata.business.contact.name")
-        d.add_string("contact-name", val)
+        d.add_string("contact-name", val, c)
+
+        val = self.cfg.get("metadata.business.contact.address")
+        for i in range(0, 3):
+            if len(val) > i:
+                d.add_string("contact-address" + str(i + 1), val[i], c)
+
+        val = self.cfg.get("metadata.business.contact.location")
+        d.add_string("contact-location", val, c)
+
+        val = self.cfg.get("metadata.business.contact.county")
+        d.add_string("contact-county", val, c)
+
+        val = self.cfg.get("metadata.business.contact.postcode")
+        d.add_string("contact-postcode", val, c)
+
+        val = self.cfg.get("metadata.business.contact.country")
+        d.add_string("contact-country", val, c)
 
         return d
 
@@ -88,22 +107,6 @@ class DataSource:
         self.cfg.get_date("metadata.report.date").use(
             lambda val: d.add_date("report-date", val, rdc)
         )
-
-        return d
-
-    #director??? : ???
-    # signer
-
-    # approved for publication, issue date
-
-    def get_contact_information(self):
-
-        c = self.business_context.with_segments({"country": "UK"})
-
-        d = ValueSet(c)
-
-        val = self.cfg.get("metadata.business.contact.name")
-        d.add_string("contact-name", val)
 
         return d
 

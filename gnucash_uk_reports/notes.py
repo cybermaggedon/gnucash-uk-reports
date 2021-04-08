@@ -27,23 +27,24 @@ class NotesElement(BasicElement):
         # Not putting out notes
         pass
 
-    def get_note_elts(self, n, par):
+    def get_note_elts(self, n, par, taxonomy):
 
-        report = self.cfg.get("metadata.report")
+        ci = self.data.get_company_information()
+        ri = self.data.get_report_information()
+        ni = self.data.get_contact_information()
 
-        report_date_context = par.get_report_date_context()
-        report_period_context = par.get_report_period_context()
+        period = self.data.get_report_period()
+        year_end = period.end
+        rpc = self.data.business_context.with_period(period)
         
         if n == "small-company-audit-exempt":
-
-            val = self.cfg.get("metadata.report.periods")[0].get("end")
-            year_end = datetime.fromisoformat(val).date()
 
             elt = par.doc.createElement("span")
 
             text = "For the accounting period ending {0} the company was entitled to exemption from audit under section 477 of the Companies Act 2006 relating to small companies.".format(year_end.strftime("%d %B %Y"))
 
-            fact = report_period_context.create_string_fact("small-company-exempt-from-audit", text)
+            datum = StringDatum("small-company-exempt-from-audit", text, rpc)
+            fact = taxonomy.create_fact(datum)
             fact.append(par.doc, elt)
 
             return elt
@@ -54,7 +55,8 @@ class NotesElement(BasicElement):
 
             text = "The members have not required the company to obtain an audit of its financial statements for the accounting period in accordance with section 476."
 
-            fact = report_period_context.create_string_fact("members-not-required-audit", text)
+            datum = StringDatum("members-not-required-audit", text, rpc)
+            fact = taxonomy.create_fact(datum)
             fact.append(par.doc, elt)
 
             return elt
@@ -64,61 +66,65 @@ class NotesElement(BasicElement):
             elt = par.doc.createElement("span")
             text = "These financial statements have been prepared in accordance with the micro-entity provisions."
             
-            fact = report_period_context.create_string_fact("accounts-prepared-small-company-regime", text)
+            datum = StringDatum("accounts-prepared-small-company-regime", text,
+                                rpc)
+            fact = taxonomy.create_fact(datum)
             fact.append(par.doc, elt)
 
             return elt
 
         if n == "company":
 
-            company_number = self.cfg.get("metadata.business.company-number")
-            addr = self.cfg.get("metadata.business.contact.address")
-
             elt = par.doc.createElement("span")
+
             elt.appendChild(par.doc.createTextNode("The company is a private company limited by shares and is registered in England and Wales number "))
 
-            fact = report_period_context.create_string_fact("company-number", company_number)
-            fact.append(par.doc, elt)
+            ci.get("company-number").use(
+                lambda val: taxonomy.create_fact(val).append(par.doc, elt)
+            )
 
             elt.appendChild(par.doc.createTextNode(". The registered address is: "))
 
-            contact_context = par.get_contact_context()
-            for i in range(0, 3):
-                if len(addr) > (i):
-                    if i > 0:
-                        elt.appendChild(par.doc.createTextNode(", "))
-                    nm = "contact-address{0}".format(i+1)
-                    fact = contact_context.create_string_fact(nm, addr[i])
-                    fact.append(par.doc, elt)
+            ni.get("contact-address1").use(
+                lambda val: taxonomy.create_fact(val).append(par.doc, elt)
+            )
 
-            def location(val):
-                elt.appendChild(par.doc.createTextNode(", "))
-                fact = contact_context.create_string_fact(
-                    "contact-location", val
+            ni.get("contact-address2").use(
+                lambda val: (
+                    elt.appendChild(par.doc.createTextNode(", ")),
+                    taxonomy.create_fact(val).append(par.doc, elt)
                 )
-                fact.append(par.doc, elt)
+            )
 
-            loc = self.cfg.get("metadata.business.contact.location").use(location)
-
-            def county(val):
-                elt.appendChild(par.doc.createTextNode(", "))
-                fact = contact_context.create_string_fact(
-                    "contact-county", val
+            ni.get("contact-address3").use(
+                lambda val: (
+                    elt.appendChild(par.doc.createTextNode(", ")),
+                    taxonomy.create_fact(val).append(par.doc, elt)
                 )
-                fact.append(par.doc, elt)
+            )
 
-            loc = self.cfg.get("metadata.business.contact.county").use(county)
-
-            def postcode(val):
-                elt.appendChild(par.doc.createTextNode(" "))
-                fact = contact_context.create_string_fact(
-                    "contact-postcode", val
+            ni.get("contact-location").use(
+                lambda val: (
+                    elt.appendChild(par.doc.createTextNode(", ")),
+                    taxonomy.create_fact(val).append(par.doc, elt)
                 )
-                fact.append(par.doc, elt)
+            )
 
-            loc = self.cfg.get("metadata.business.contact.postcode").use(postcode)
+            ni.get("contact-county").use(
+                lambda val: (
+                    elt.appendChild(par.doc.createTextNode(", ")),
+                    taxonomy.create_fact(val).append(par.doc, elt)
+                )
+            )
 
-            elt.appendChild(par.doc.createTextNode("."))
+            ni.get("contact-postcode").use(
+                lambda val: (
+                    elt.appendChild(par.doc.createTextNode(" ")),
+                    taxonomy.create_fact(val).append(par.doc, elt)
+                )
+            )
+
+            elt.appendChild(par.doc.createTextNode(".")),
 
             return elt
 
@@ -128,7 +134,8 @@ class NotesElement(BasicElement):
 
             text = "The directors acknowledge their responsibilities for complying with the requirements of the Act withrespect to accounting records and the preparation of financial statements."
 
-            fact = report_period_context.create_string_fact("directors-duty", text)
+            datum = StringDatum("directors-duty", text, rpc)
+            fact = taxonomy.create_fact(datum)
             fact.append(par.doc, elt)
 
             return elt
@@ -139,17 +146,14 @@ class NotesElement(BasicElement):
 
             elt.appendChild(par.doc.createTextNode("These accounts were generated using "))
 
-
-            fact = report_period_context.create_string_fact(
-                "software", software
-            )
+            datum = StringDatum("software", software, rpc)
+            fact = taxonomy.create_fact(datum)
             fact.append(par.doc, elt)
 
             elt.appendChild(par.doc.createTextNode(" version "))
 
-            fact = report_period_context.create_string_fact(
-                "software-version", software_version
-            )
+            datum = StringDatum("software-version", software_version, rpc)
+            fact = taxonomy.create_fact(datum)
             fact.append(par.doc, elt)
 
             elt.appendChild(par.doc.createTextNode("."))
@@ -157,12 +161,12 @@ class NotesElement(BasicElement):
             return elt
 
         if n.startswith("note:"):
-            text = n[5:]
-            return par.doc.createTextNode(text)
+             text = n[5:]
+             return par.doc.createTextNode(text)
         
         raise RuntimeError("Note '%s' not known." % n)
 
-    def to_ixbrl_elt(self, par):
+    def to_ixbrl_elt(self, par, taxonomy):
 
         div = par.doc.createElement("div")
         div.setAttribute("class", "notes page")
@@ -185,6 +189,6 @@ class NotesElement(BasicElement):
             p = par.doc.createElement("p")
             li.appendChild(p)
 
-            p.appendChild(self.get_note_elts(note, par))
+            p.appendChild(self.get_note_elts(note, par, taxonomy))
 
         return div
