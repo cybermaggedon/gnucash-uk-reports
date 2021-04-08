@@ -30,6 +30,74 @@ class DataSource:
 
         return d
 
+    def get_report_period(self):
+
+        return Period.load(self.cfg.get("metadata.report.periods.0"))
+
+    def get_report_date(self):
+
+        return self.cfg.get_date("metadata.report.date")
+
+    def get_company_information(self):
+
+        d = ValueSet()
+
+        period = self.get_report_period()
+        c = self.business_context.with_period(period)
+
+        self.cfg.get("metadata.business.company-name").use(
+            lambda val: d.add_string("company-name", val, c)
+        )
+
+        self.cfg.get("metadata.business.company-number").use(
+            lambda val: d.add_string("company-number", val, c)
+        )
+
+        return d
+
+    def get_report_information(self):
+
+        d = ValueSet()
+
+        period = self.get_report_period()
+        rpc = self.business_context.with_period(period)
+
+        date = self.get_report_date()
+        rdc = self.business_context.with_instant(date)
+
+        self.cfg.get("metadata.report.title").use(
+            lambda val: d.add_string("report-title", val, rpc)
+        )
+
+        self.cfg.get("metadata.report.periods.0").use(
+            lambda val: (
+                d.add_date("period-start", val.get_date("start"), rdc),
+                d.add_date("period-end", val.get_date("end"), rdc)
+            )
+        )
+
+        self.cfg.get_date("metadata.report.date").use(
+            lambda val: d.add_date("report-date", val, rdc)
+        )
+
+        return d
+
+    #director??? : ???
+    # signer
+
+    # approved for publication, issue date
+
+    def get_contact_information(self):
+
+        c = self.business_context.with_segments({"country": "UK"})
+
+        d = ValueSet(c)
+
+        val = self.cfg.get("metadata.business.contact.name")
+        d.add_string("contact-name", val)
+
+        return d
+
     def get_computation(self, id):
         if id in self.computations:
             return self.computations[id]
@@ -94,3 +162,4 @@ class DataSource:
 
     def get_config(self, key):
         return self.cfg.get(key)
+

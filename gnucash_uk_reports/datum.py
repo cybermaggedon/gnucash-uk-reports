@@ -26,3 +26,9 @@ class BoolDatum(Datum):
         self.id = id
         self.value = value
         self.context = context
+
+class DateDatum(Datum):
+    def __init__(self, id, value, context):
+        self.id = id
+        self.value = value
+        self.context = context

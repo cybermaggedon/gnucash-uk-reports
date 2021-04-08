@@ -24,32 +24,30 @@ class Title(BasicElement):
         return e
 
     def to_text(self, out):
-        
-        self.data.get_config("metadata.business.company-name").use(
-            lambda val:
-            out.write("{0}\n".format(val))
+
+        ci = self.data.get_company_information()
+
+        ci.get("company-name").use(
+            lambda val: out.write("{0}\n".format(val))
         )
 
-        self.data.get_config("metadata.business.company-number").use(
-            lambda val:
-            out.write("Registered number: {0}\n".format(val))
+        ci.get("company-number").use(
+            lambda val: out.write("Registered number: {0}\n".format(val))
         )
 
-        self.data.get_config("metadata.report.title").use(
-            lambda val:
-            out.write("{0}\n".format(val))
+        ri = self.data.get_report_information()
+
+        ri.get("report-title").use(
+            lambda val: out.write("{0}\n".format(val))
         )
 
-        self.data.get_config("metadata.report.periods")[0].use(
-            lambda val:
-            out.write("For the period: {0} - {1}\n".format(
-                val.get("start"), val.get("end")
-            ))
-        )
+        start = ri.get("period-start")
+        end = ri.get("period-start")
+        if start and end:
+            out.write("For the period: {0} - {1}\n".format(start, end))
 
-        self.data.get_config("metadata.report.date").use(
-            lambda val:
-            out.write("Approved for publication {0}\n".format(val))
+        ri.get("report-date").use(
+            lambda val: out.write("Approved for publication {0}\n".format(val))
         )
 
     def to_ixbrl_elt(self, par):
@@ -73,6 +71,8 @@ class Title(BasicElement):
             report.get("periods")[0].get_date("end")
         )
         report_period_context = self.taxonomy.create_context(report_period_cdef)
+
+        
         
         def company_name(val):
             div2 = doc.createElement("h1")
