@@ -58,7 +58,7 @@
 	    "statement-date": "2021-08-31",
 	    "date": "2021-08-31",
 	    "currency": "GBP",
-	    "signing-director": "B Smith",
+	    "signed-by": "B Smith",
 	    "average-employees": [
 		2,
 		1

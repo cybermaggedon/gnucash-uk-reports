@@ -28,161 +28,138 @@ class Title(BasicElement):
         ci = self.data.get_company_information()
 
         ci.get("company-name").use(
-            lambda val: out.write("{0}\n".format(val))
+            lambda val: out.write("{0}\n".format(val.value))
         )
 
         ci.get("company-number").use(
-            lambda val: out.write("Registered number: {0}\n".format(val))
+            lambda val: out.write("Registered number: {0}\n".format(val.value))
         )
 
         ri = self.data.get_report_information()
 
         ri.get("report-title").use(
-            lambda val: out.write("{0}\n".format(val))
+            lambda val: out.write("{0}\n".format(val.value))
         )
 
         start = ri.get("period-start")
         end = ri.get("period-start")
         if start and end:
-            out.write("For the period: {0} - {1}\n".format(start, end))
+            out.write("For the period: {0} - {1}\n".format(
+                start.value, end.value
+            ))
 
         ri.get("report-date").use(
-            lambda val: out.write("Approved for publication {0}\n".format(val))
+            lambda val:
+            out.write("Approved for publication {0}\n".format(val.value))
         )
 
-    def to_ixbrl_elt(self, par):
+    def to_ixbrl_elt(self, par, taxonomy):
 
         doc = par.doc
 
         div = doc.createElement("div")
         div.setAttribute("class", "title page")
 
-        report = self.data.get_config("metadata.report")
-        business = self.data.get_config("metadata.business")
-        date = report.get_date("date")
+        ci = self.data.get_company_information()
+        ri = self.data.get_report_information()
 
-        report_date_cdef = ContextDefinition()
-        report_date_cdef.set_instant(date)
-        report_date_context = self.taxonomy.create_context(report_date_cdef)
 
-        report_period_cdef = ContextDefinition()
-        report_period_cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        report_period_context = self.taxonomy.create_context(report_period_cdef)
-
-        
-        
-        def company_name(val):
+        def add_company_name(val):
             div2 = doc.createElement("h1")
             div2.setAttribute("class", "heading")
-
-            fact = report_period_context.create_string_fact("company-name", val)
+            fact = taxonomy.create_fact(val)
             fact.append(doc, div2)
             div.appendChild(div2)
 
-        def report_title(val):
+        ci.get("company-name").use(add_company_name)
+        
+        def add_report_title(val):
             div2 = doc.createElement("div")
             div2.setAttribute("class", "subheading")
-            fact = report_period_context.create_string_fact("report-title", val)
+            fact = taxonomy.create_fact(val)
             fact.append(doc, div2)
             div.appendChild(div2)
 
-        def company_number(val):
+        ri.get("report-title").use(add_report_title)
+
+        def add_company_number(val):
             div2 = par.doc.createElement("div")
             div2.setAttribute("class", "information")
             div2.appendChild(par.doc.createTextNode("Registered number: "))
-            fact = report_period_context.create_string_fact("company-number",
-                                                            val)
+            fact = taxonomy.create_fact(val)
             fact.append(doc, div2)
             div.appendChild(div2)
 
-        def report_date(val):
+        ci.get("company-number").use(add_company_number)
+
+        div2 = doc.createElement("div")
+        div.appendChild(div2)
+        div2.setAttribute("class", "information")
+        div2.appendChild(par.doc.createTextNode("For the period: "))
+        ri.get("period-start").use(
+            lambda val: taxonomy.create_fact(val).append(doc, div2)
+        )
+        div2.appendChild(par.doc.createTextNode(" to "))
+        ri.get("period-end").use(
+            lambda val: taxonomy.create_fact(val).append(doc, div2)
+        )
+
+        def add_report_date(val):
             div2 = doc.createElement("div")
             div2.setAttribute("class", "information")
             div2.appendChild(par.doc.createTextNode("Date: "))
-            fact = report_date_context.create_date_fact("report-date", val)
-            fact.append(doc, div2)
+            taxonomy.create_fact(val).append(doc, div2)
             div.appendChild(div2)
 
-        def report_period(p):
-            div2 = doc.createElement("div")
-            div2.setAttribute("class", "information")
-            div2.appendChild(par.doc.createTextNode("For the period: "))
-            fact = report_date_context.create_date_fact("period-start",
-                                                          p.get_date("start"))
-            fact.append(doc, div2)
-            div2.appendChild(par.doc.createTextNode(" to "))
-            fact = report_date_context.create_date_fact("period-end",
-                                                          p.get_date("end"))
-            fact.append(doc, div2)
-            div.appendChild(div2)
+        ri.get("report-date").use(add_report_date)
 
-        self.data.get_config("metadata.business.company-name").use(company_name)
-        self.data.get_config("metadata.report.title").use(report_title)
-        self.data.get_config("metadata.business.company-number").use(company_number)
-        self.data.get_config("metadata.report.periods")[0].use(report_period)
-        self.data.get_config_date("metadata.report.date").use(report_date)
-
-        # Directors
         div2 = doc.createElement("div")
         div.appendChild(div2)
         div2.setAttribute("class", "information")
         div2.appendChild(par.doc.createTextNode("Directors: "))
 
-        directors = self.data.get_config("metadata.business.directors")
+        def add_director(n):
+            def fn(val):
+                if n > 0:
+                    div2.appendChild(par.doc.createTextNode(", "))
+                taxonomy.create_fact(val).append(doc, div2)
+            return fn
+            
+        for i in range(0, 20):
 
-        for i in range(0, len(directors)):
+            ci.get("director" + str(i + 1)).use(add_director(i))
 
-            if i > 0:
-                div2.appendChild(par.doc.createTextNode(", "))
-
-            cdef = ContextDefinition()
-            cdef.set_period(
-                report.get("periods")[0].get_date("start"),
-                report.get("periods")[0].get_date("end")
-            )
-            cdef.lookup_segment("director", "director" + str(i + 1),
-                                self.taxonomy)
-            context = self.taxonomy.create_context(cdef)
-        
-            fact = context.create_string_fact("director", directors[i])
-            fact.append(par.doc, div2)
+        div2.appendChild(par.doc.createTextNode("."))
 
         sig = par.doc.createElement("div")
         sig.setAttribute("class", "signature")
+        div.appendChild(sig)
 
         p = par.doc.createElement("p")
         sig.appendChild(p)
 
         p.appendChild(par.doc.createTextNode("Approved by the board of directors and authorised for publication on "))
 
-        def report_date(val):
-            fact = report_date_context.create_date_fact("issue-date",
-                                                        val)
-            fact.append(par.doc, p)
-
-        self.data.get_config_date("metadata.report.date").use(report_date)
+        ri.get("report-date").use(
+            lambda val: taxonomy.create_fact(val).append(doc, p)
+        )
 
         p.appendChild(par.doc.createTextNode("."))
+        sig.appendChild(p)
 
         p = par.doc.createElement("p")
-        sig.appendChild(p)
 
         p.appendChild(par.doc.createTextNode("Signed on behalf of the directors by "))
 
         def signer(val):
-            for i in range(0, len(directors)):
-                if val == directors[i]:
-                    fact = context.create_string_fact("signer", "")
-                    fact.append(par.doc, p)
-                    p.appendChild(par.doc.createTextNode(val))
+            fact = taxonomy.create_fact(val)
+            fact.append(doc, p)
 
-        self.data.get_config("metadata.report.signing-director").use(signer)
+        ci.get("signed-by").use(signer)
 
         p.appendChild(par.doc.createTextNode("."))
 
+        sig.appendChild(p)
 
         if self.img and self.type:
             img = par.doc.createElement("img")

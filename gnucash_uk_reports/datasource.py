@@ -14,7 +14,8 @@ class DataSource:
 
         self.root_context = Context(None)
         self.business_context = self.root_context.with_entity(
-            "ch", "123"
+            "http://www.companieshouse.gov.uk/",
+            self.cfg.get("metadata.business.company-number")
         )
         self.computations = get_computations(cfg, self.business_context)
         self.results = {}
@@ -52,6 +53,14 @@ class DataSource:
         self.cfg.get("metadata.business.company-number").use(
             lambda val: d.add_string("company-number", val, c)
         )
+
+        directors = self.cfg.get("metadata.business.directors")
+        signed_by = self.cfg.get("metadata.report.signed-by")
+        for i in range(0, len(directors)):
+            dirc = c.with_segment("officer", "director" + str(i + 1))
+            d.add_string("director" + str(i + 1), directors[i], dirc)
+            if signed_by == directors[i]:
+                d.add_string("signed-by", signed_by, dirc)
 
         return d
 

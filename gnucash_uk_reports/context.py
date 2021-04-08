@@ -11,6 +11,33 @@ class Context:
         self.instant = None
         self.children = {}
 
+    def get_hash(self):
+        return "@@".join(
+            [
+                ",".join(v)
+                for v in self.get_dimensions()
+            ]
+        )
+
+    def get_dimensions(self):
+        if self.parent:
+            dims = self.parent.get_dimensions()
+        else:
+            dims  = []
+        if self.entity:
+            dims.append(("entity", self.scheme, self.entity))
+        if self.segments:
+            for k, v in self.segments.items():
+                dims.append(("segment", k, v))
+        if self.period:
+            dims.append(("period", str(self.period.start),
+                         str(self.period.end)))
+        if self.instant:
+            dims.append(("instant", self.instant))
+        return dims
+
+    def with_segment(self, k, v):
+        return self.with_segments({k: v})
     def with_segments(self, segments):
 
         # entity, scheme, segments, period, instant

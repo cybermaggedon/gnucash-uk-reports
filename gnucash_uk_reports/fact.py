@@ -2,6 +2,8 @@
 import json
 import copy
 from . period import Period
+from . datum import *
+from . context import Context
 
 class Fact:
     def use(self, fn):
@@ -99,13 +101,14 @@ class NumberFact(Fact):
             par.appendChild(doc.createTextNode(str(self.value)))
 
 class StringFact(Fact):
-    def __init__(self, value, context):
+    def __init__(self, context, name, value):
         self.value = value
         self.context = context
+        self.name = name
     def describe(self):
         if self.name:
             name = self.name
-            context = self.context.id
+            context = self.context
             print("        {0} {1} {2}".format(
                 self.value, name, context
             ))
@@ -115,7 +118,7 @@ class StringFact(Fact):
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
             elt.setAttribute("name", self.name)
-            elt.setAttribute("contextRef", self.context.id)
+            elt.setAttribute("contextRef", self.context)
             elt.appendChild(doc.createTextNode(self.value))
             par.appendChild(elt)
         else:
@@ -145,9 +148,10 @@ class BoolFact(Fact):
             par.appendChild(doc.createTextNode(json.dumps(self.value)))
 
 class DateFact(Fact):
-    def __init__(self, value, context):
-        self.value = value
+    def __init__(self, context, name, value):
         self.context = context
+        self.name = name
+        self.value = value
     def describe(self):
         if self.name:
             name = self.name
@@ -161,7 +165,7 @@ class DateFact(Fact):
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
             elt.setAttribute("name", self.name)
-            elt.setAttribute("contextRef", self.context.id)
+            elt.setAttribute("contextRef", self.context)
             elt.setAttribute("format", "ixt2:datedaymonthyearen")
             elt.appendChild(doc.createTextNode(self.value.strftime("%d %B %Y")))
             par.appendChild(elt)
@@ -174,6 +178,34 @@ class Taxonomy:
         self.name = name
         self.contexts = {}
         self.next_context_id = 0
+
+    def get_context_id(self, ctxt):
+        if ctxt in self.contexts:
+            return self.contexts[ctxt]
+
+        self.contexts[ctxt] = "ctxt-" + str(self.next_context_id)
+        self.next_context_id += 1
+        return self.contexts[ctxt]
+
+    def create_fact(self, val):
+
+        if isinstance(val, StringDatum):
+            fact =  StringFact(
+                self.get_context_id(val.context),
+                self.get_tag_name(val.id),
+                val.value
+            )
+            return fact
+
+        if isinstance(val, DateDatum):
+            fact =  DateFact(
+                self.get_context_id(val.context),
+                self.get_tag_name(val.id),
+                val.value
+            )
+            return fact
+
+        raise RuntimeError("Not implemented.")
 
     def get_tag_name(self, id):
         key = "taxonomy.{0}.tags.{1}".format(self.name, id)
@@ -314,7 +346,7 @@ class FRS101(Taxonomy):
     def __init__(self, cfg):
         super().__init__(cfg, "frs-101")
 
-class ContextDefinition:
+class UnusedContextDefinition:
     def __init__(self):
         self.period = None
         self.instant = None
@@ -344,7 +376,7 @@ class ContextDefinition:
         segs.sort()
         return (self.entity, self.period, self.instant, "//".join(segs))
 
-class Context:
+class UnusedContext:
     def __init__(self, taxonomy, cdef):
         self.period = None
         self.taxonomy = taxonomy

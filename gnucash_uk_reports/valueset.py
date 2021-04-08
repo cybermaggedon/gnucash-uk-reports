@@ -17,6 +17,6 @@ class ValueSet:
         self.values[id] = DateDatum(id, value, c)
     def get(self, id):
         if id in self.values:
-            return StringValue(str(self.values[id].value))
+            return self.values[id]
         else:
-            return NoneValue()
+            return NoneDatum(id)

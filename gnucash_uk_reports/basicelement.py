@@ -256,16 +256,12 @@ h2 {
         out.write(doc.toxml())
 
 
-    def to_ixbrl(self, out):
+    def to_ixbrl(self, taxonomy, out):
 
         impl = getDOMImplementation()
-
-        self.periods = [
-            Period.load(v)
-            for v in self.cfg.get("metadata.report.periods")
-        ]
         
         doc = impl.createDocument(None, "html", None)
+
         self.doc = doc
 
         html = self.doc.documentElement
@@ -281,7 +277,7 @@ h2 {
                           "http://www.xbrl.org/inlineXBRL/transformation/2011-07-31")
         html.setAttribute("xmlns:iso4217", "http://www.xbrl.org/2003/iso4217")
 
-        ns = self.taxonomy.get_namespaces()
+        ns = taxonomy.get_namespaces()
         for k in ns:
             html.setAttribute("xmlns:" + k, ns[k])
 
@@ -295,7 +291,7 @@ h2 {
             t.appendChild(doc.createTextNode(val));
             head.appendChild(t)
 
-        self.cfg.get("metadata.report.title").use(add_title)
+        self.data.get_config("metadata.report.title").use(add_title)
 
         self.add_style(head)
 
@@ -321,22 +317,22 @@ h2 {
         self.resources = resources
 
         # This creates some contexts, hence do this first.
-        self.create_metadata()
+#        self.create_metadata()
 
-        schema_url = self.taxonomy.get_schema()
+        schema_url = taxonomy.get_schema()
         schema = doc.createElement("link:schemaRef")
         schema.setAttribute("xlink:type", "simple")
         schema.setAttribute("xlink:href", schema_url)
         schema.appendChild(doc.createTextNode(""))
         refs.appendChild(schema)
 
-        elt = self.to_ixbrl_elt(self)
+        elt = self.to_ixbrl_elt(self, taxonomy)
         body.appendChild(elt)
 
         # Contexts get created above, hence do this last.
-        self.create_contexts()
+        self.create_contexts(taxonomy)
 
-        currency = self.cfg.get("metadata.report.currency")
+        currency = self.data.get_config("metadata.report.currency")
 
         unit = doc.createElement("xbrli:unit")
         unit.setAttribute("id", currency)
@@ -355,34 +351,46 @@ h2 {
         out.write(doc.toprettyxml())
 #        out.write(doc.toxml())
 
-    def create_contexts(self):
+    def create_contexts(self, taxonomy):
 
-        report = self.cfg.get("metadata.report")
-        business = self.cfg.get("metadata.business")
+        for ctxt, id in taxonomy.contexts.items():
 
-        company_number = business.get("company-number")
+            entity = None
+            scheme = None
+            segments = {}
+            period = None
+            instant = None
 
-        for key in self.taxonomy.contexts:
+            for dim in ctxt.get_dimensions():
 
-            ctxt = self.taxonomy.contexts[key]
-            cdef = ctxt.definition
+                if dim[0] == "entity":
+                    scheme = dim[1]
+                    entity = dim[2]
+                elif dim[0] == "segment":
+                    segments[dim[1]] = dim[2]
+                elif dim[0] == "period":
+                    period = (dim[1], dim[2])
+                elif dim[0] == "instant":
+                    instant = dim[1]
+                else:
+                    raise RuntimeError("Should not happen in create_contexts")
 
             segs = [
-                self.create_segment_member(k, cdef.segments[k])
-                for k in cdef.segments
+                self.create_segment_member(k, v)
+                for k, v in segments.items()
             ]
 
-            crit = [
-                self.create_entity(company_number, segs)
-            ]
+            crit = []
+            if entity:
+                crit.append(self.create_entity(entity, scheme, segs))
 
-            if cdef.period:
-                crit.append(self.create_period(cdef.period[0], cdef.period[1]))
+            if period:
+                crit.append(self.create_period(period[0], period[1]))
 
-            if cdef.instant:
-                crit.append(self.create_instant_period(cdef.instant))
+            if instant:
+                crit.append(self.create_instant(instant))
 
-            ce = self.create_context(ctxt.id, crit)
+            ce = self.create_context(id, crit)
 
             self.resources.appendChild(ce)
 
@@ -444,16 +452,14 @@ h2 {
             ctxt.appendChild(elt)
         return ctxt
 
-    def create_entity(self, id, elts=None):
+    def create_entity(self, id, scheme, elts=None):
 
         if elts == None:
             elts = []
 
-        companies_house_url="http://www.companieshouse.gov.uk/"
-
         ent = self.doc.createElement("xbrli:entity")
         cid = self.doc.createElement("xbrli:identifier")
-        cid.setAttribute("scheme", companies_house_url)
+        cid.setAttribute("scheme", scheme)
         cid.appendChild(self.doc.createTextNode(id))
         ent.appendChild(cid)
 
@@ -462,7 +468,7 @@ h2 {
 
         return ent
 
-    def create_instant_period(self, date):
+    def create_instant(self, date):
 
         cperiod = self.doc.createElement("xbrli:period")
 
@@ -505,28 +511,6 @@ h2 {
     def get_report_period(self):
 
         return Period.load(self.cfg.get("metadata.report.periods")[0])
-
-    def get_report_period_context(self):
-
-        context = self.taxonomy.get_context("report-period", self.cfg)
-        return context
-
-    def get_contact_context(self):
-
-        context = self.taxonomy.get_context("contact", self.cfg)
-        return context
-
-        # business = self.cfg.get("metadata.business")
-        # period = self.get_report_period()
-
-        # country = business.get("contact").get("country")
-
-        # cdef = ContextDefinition()
-        # cdef.set_period(period.start, period.end)
-        # cdef.lookup_segment("countries-regions", country, self.taxonomy)
-        # context = self.taxonomy.create_context(cdef)
-
-        # return context
 
     def create_metadata(self):
 
