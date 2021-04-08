@@ -5,49 +5,49 @@ from . fact import *
 import base64
 
 class Title(BasicElement):
-    def __init__(self, cfg, img, type, tx):
-        super().__init__(cfg, tx)
-        self.title = cfg.get("metadata.report.title")
-        self.date = cfg.get("metadata.report.date")
+    def __init__(self, img, type, data):
+        super().__init__(data)
+        self.title = data.get_config("metadata.report.title")
+        self.date = data.get_config("metadata.report.date")
         self.img = img
         self.type = type
+
     @staticmethod
-    def load(elt_def, cfg, tx):
+    def load(elt_def, data):
 
         e = Title(
-            cfg,
             elt_def.get("signature-image"),
             elt_def.get("signature-type"),
-            tx
+            data
         )
 
         return e
 
     def to_text(self, out):
         
-        self.cfg.get("metadata.business.company-name").use(
+        self.data.get_config("metadata.business.company-name").use(
             lambda val:
             out.write("{0}\n".format(val))
         )
 
-        self.cfg.get("metadata.business.company-number").use(
+        self.data.get_config("metadata.business.company-number").use(
             lambda val:
             out.write("Registered number: {0}\n".format(val))
         )
 
-        self.cfg.get("metadata.report.title").use(
+        self.data.get_config("metadata.report.title").use(
             lambda val:
             out.write("{0}\n".format(val))
         )
 
-        self.cfg.get("metadata.report.periods")[0].use(
+        self.data.get_config("metadata.report.periods")[0].use(
             lambda val:
             out.write("For the period: {0} - {1}\n".format(
                 val.get("start"), val.get("end")
             ))
         )
 
-        self.cfg.get("metadata.report.date").use(
+        self.data.get_config("metadata.report.date").use(
             lambda val:
             out.write("Approved for publication {0}\n".format(val))
         )
@@ -59,8 +59,8 @@ class Title(BasicElement):
         div = doc.createElement("div")
         div.setAttribute("class", "title page")
 
-        report = self.cfg.get("metadata.report")
-        business = self.cfg.get("metadata.business")
+        report = self.data.get_config("metadata.report")
+        business = self.data.get_config("metadata.business")
         date = report.get_date("date")
 
         report_date_cdef = ContextDefinition()
@@ -119,11 +119,11 @@ class Title(BasicElement):
             fact.append(doc, div2)
             div.appendChild(div2)
 
-        self.cfg.get("metadata.business.company-name").use(company_name)
-        self.cfg.get("metadata.report.title").use(report_title)
-        self.cfg.get("metadata.business.company-number").use(company_number)
-        self.cfg.get("metadata.report.periods")[0].use(report_period)
-        self.cfg.get_date("metadata.report.date").use(report_date)
+        self.data.get_config("metadata.business.company-name").use(company_name)
+        self.data.get_config("metadata.report.title").use(report_title)
+        self.data.get_config("metadata.business.company-number").use(company_number)
+        self.data.get_config("metadata.report.periods")[0].use(report_period)
+        self.data.get_config_date("metadata.report.date").use(report_date)
 
         # Directors
         div2 = doc.createElement("div")
@@ -131,7 +131,7 @@ class Title(BasicElement):
         div2.setAttribute("class", "information")
         div2.appendChild(par.doc.createTextNode("Directors: "))
 
-        directors = self.cfg.get("metadata.business.directors")
+        directors = self.data.get_config("metadata.business.directors")
 
         for i in range(0, len(directors)):
 
@@ -163,7 +163,7 @@ class Title(BasicElement):
                                                         val)
             fact.append(par.doc, p)
 
-        self.cfg.get_date("metadata.report.date").use(report_date)
+        self.data.get_config_date("metadata.report.date").use(report_date)
 
         p.appendChild(par.doc.createTextNode("."))
 
@@ -179,7 +179,7 @@ class Title(BasicElement):
                     fact.append(par.doc, p)
                     p.appendChild(par.doc.createTextNode(val))
 
-        self.cfg.get("metadata.report.signing-director").use(signer)
+        self.data.get_config("metadata.report.signing-director").use(signer)
 
         p.appendChild(par.doc.createTextNode("."))
 

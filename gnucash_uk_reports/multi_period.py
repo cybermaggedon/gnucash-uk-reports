@@ -6,49 +6,39 @@ from . fact import *
 
 class MultiPeriodWorksheet(Worksheet):
 
-    def __init__(self, inputs, periods):
-        self.inputs = inputs
+    def __init__(self, comps, periods):
+        self.computations = comps
         self.periods = periods
 
     @staticmethod
-    def create(cfg, report, comps, session):
+    def load(defn, data):
 
-        periods = []
-        for pdef in cfg.get("metadata.report.periods"):
-            periods.append(Period.load(pdef))
+        periods = data.get_periods()
+        mpr = MultiPeriodWorksheet(
+            defn.get("computations"), periods
+        )
 
-        mpr = MultiPeriodWorksheet.load(cfg, report, comps, periods)
-        mpr.process(session)
-
-        return mpr
-
-    @staticmethod
-    def load(cfg, report, comps, periods):
-
-        mpr = MultiPeriodWorksheet([], periods)
-
-        mpr.id = report.get("id")
-
-        for input in report.get("items"):
-            mpr.inputs.append(comps[input])
+        mpr.process(data)
 
         return mpr
 
-    def process(self, session):
+    def process(self, data):
 
+        self.inputs = [
+            data.get_computation(v)
+            for v in self.computations
+        ]
         self.outputs = {}
 
         for period in self.periods:
 
-            result = Result()
-
-            for input in self.inputs:
-                input.compute(session, period.start, period.end, result)
+            res = data.perform_computations(period)
 
             period_output = {}
 
             for input in self.inputs:
-                period_output[input] = input.get_output(result)
+
+                period_output[input.id] = input.get_output(res)
 
             self.outputs[period] = period_output
 
@@ -57,10 +47,10 @@ class MultiPeriodWorksheet(Worksheet):
         ds = Dataset()
         ds.periods = [v for v in self.periods]
         ds.sections = []
-        
+
         for input in self.inputs:
 
-            output0 = self.outputs[self.periods[0]][input]
+            output0 = self.outputs[self.periods[0]][input.id]
 
             if isinstance(output0, Breakdown):
 
@@ -68,7 +58,7 @@ class MultiPeriodWorksheet(Worksheet):
                 sec.id = input.id
                 sec.header = input.description
                 sec.total = Series("Total", [
-                    self.outputs[period][input].value
+                    self.outputs[period][input.id].value
                     for period in self.periods
                 ])
 
@@ -77,7 +67,7 @@ class MultiPeriodWorksheet(Worksheet):
                     srs  = Series(
                         output0.items[i].description,
                         [
-                            self.outputs[period][input].items[i].value
+                            self.outputs[period][input.id].items[i].value
                             for period in self.periods
                         ]
                     )
@@ -94,7 +84,7 @@ class MultiPeriodWorksheet(Worksheet):
                 sec.header = input.description
                 sec.items = None
                 sec.total = Series("Total", [
-                    self.outputs[period][input].value
+                    self.outputs[period][input.id].value
                     for period in self.periods
                 ])
                 ds.sections.append(sec)
@@ -106,7 +96,7 @@ class MultiPeriodWorksheet(Worksheet):
                 sec.header = input.description
                 sec.items = None
                 sec.total = Series("Total", [
-                    self.outputs[period][input].value
+                    self.outputs[period][input.id].value
                     for period in self.periods
                 ])
                 ds.sections.append(sec)

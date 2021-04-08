@@ -6,19 +6,18 @@ from . fact import *
 from datetime import datetime
 
 class NotesElement(BasicElement):
-    def __init__(self, cfg, title, notes, tx):
-        super().__init__(cfg, tx)
+    def __init__(self, title, notes, data):
+        super().__init__(data)
         self.title = title
         self.notes = notes
 
     @staticmethod
-    def load(elt_def, cfg, tx):
+    def load(elt_def, data):
 
         e = NotesElement(
-            cfg,
             elt_def.get("title"),
             elt_def.get("notes"),
-            tx
+            data
         )
 
         return e

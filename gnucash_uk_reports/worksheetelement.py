@@ -1,22 +1,22 @@
 
-from . worksheet import get_worksheet
 from . basicelement import BasicElement
 from . report import TextReporter
 from . ixbrl import IxbrlReporter
 
 class WorksheetElement(BasicElement):
-    def __init__(self, metadata, title, worksheet, tx):
-        super().__init__(metadata, tx)
+    def __init__(self, title, worksheet, data):
+        super().__init__(data)
         self.title = title
         self.worksheet = worksheet
+        self.data = data
+
     @staticmethod
-    def load(elt_def, cfg, session, tx):
+    def load(elt_def, data):
 
         e = WorksheetElement(
-            cfg.get("metadata"),
             elt_def.get("title"),
-            get_worksheet(elt_def.get("worksheet"), cfg, session, tx),
-            tx
+            data.get_worksheet(elt_def.get("worksheet")),
+            data
         )
 
         return e

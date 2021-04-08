@@ -4,7 +4,7 @@ import datetime
 import uuid
 
 from . worksheet_model import SimpleValue, Breakdown, NilValue, Total
-from . fact import *
+from . period import Period
 
 def create_uuid():
     return str(uuid.uuid4())
@@ -18,32 +18,32 @@ class Computable:
         raise RuntimeError("Not implemented")
 
     @staticmethod
-    def load(cfg, comps, taxonomy):
+    def load(cfg, comps, context):
 
         kind = cfg.get("kind")
 
         if kind == "group":
-            return Group.load(cfg, comps, taxonomy)
+            return Group.load(cfg, comps, context)
 
         if kind == "computation":
-            return Computation.load(cfg, comps, taxonomy)
+            return Computation.load(cfg, comps, context)
 
         if kind == "line":
-            return Line.load(cfg, comps, taxonomy)
+            return Line.load(cfg, comps, context)
 
         if kind == "constant":
-            return Constant.load(cfg, comps, taxonomy)
+            return Constant.load(cfg, comps, context)
 
         raise RuntimeError("Don't understand computable type '%s'" % kind)
 
 class Line(Computable):
 
-    def __init__(self, id, description, accounts, taxonomy, period=AT_END,
+    def __init__(self, id, description, accounts, context, period=AT_END,
                  reverse=False):
         self.id = id
         self.description = description
         self.accounts = accounts
-        self.taxonomy = taxonomy
+        self.context = context
         self.period = period
         self.reverse = reverse
 
@@ -51,19 +51,17 @@ class Line(Computable):
 
         total = 0
 
-        cdef = ContextDefinition()
-
         # FIXME: If there are transactions preceding 1970, this won't work.
         if self.period == AT_START:
-            cdef.set_instant(start)
+            context = self.context.with_instant(start)
             history = datetime.date(1970, 1, 1)
             start, end = history, start
         elif self.period == AT_END:
-            cdef.set_instant(end)
+            context = self.context.with_instant(end)
             history = datetime.date(1970, 1, 1)
             start, end = history, end
         else:
-            cdef.set_period(start, end)
+            context = self.context.with_period(Period("", start, end))
             
         for acct_name in self.accounts:
             acct = session.get_account(session.root, acct_name)
@@ -78,11 +76,8 @@ class Line(Computable):
             total += acct_total
 
         if self.reverse: total *= -1
-        
-        cdef.add_segments(self.id, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
 
-        result.set(self.id, context.create_money_fact(self.id, total))
+        result.set(self.id, context.create_money_datum(self.id, total))
 
         return total
 
@@ -94,7 +89,7 @@ class Line(Computable):
 
 
     @staticmethod
-    def load(cfg, comps, taxonomy):
+    def load(cfg, comps, context):
         id = cfg.get("id")
         if id == None: id = create_uuid()
 
@@ -106,31 +101,30 @@ class Line(Computable):
             "at-end": AT_END
         }.get(pspec, AT_END)
 
-        return Line(id, cfg.get("description"), cfg.get("accounts"),
-                    taxonomy, pid, cfg.get_bool("reverse-sign"))
+        return Line(id, cfg.get("description"), cfg.get("accounts"), context,
+                    pid, cfg.get_bool("reverse-sign"))
 
 class Constant(Computable):
-    def __init__(self, id, description, values, taxonomy, period=AT_END):
+    def __init__(self, id, description, values, context, period=AT_END):
         self.id = id
         self.description = description
         self.values = values
-        self.taxonomy = taxonomy
+        self.context = context
         self.period = period
 
     def compute(self, session, start, end, result):
 
-        cdef = ContextDefinition()
         if self.period == AT_START:
+            context = self.context.with_instant(start)
             cdef.set_instant(start, end)
         elif self.period == AT_END:
+            context = self.context.with_instant(end)
             cdef.set_period(end)
         else:
-            cdef.set_period(start, end)
-        cdef.add_segments(self.id, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
+            context = self.context.with_period(Period("", start, end))
 
         val = self.values[str(end)]
-        result.set(self.id, context.create_money_fact(self.id, val))
+        result.set(self.id, context.create_money_datum(self.id, val))
         return val
 
     def get_output(self, result):
@@ -140,7 +134,7 @@ class Constant(Computable):
         return output
 
     @staticmethod
-    def load(cfg, comps, taxonomy):
+    def load(cfg, comps, context):
         id = cfg.get("id")
         if id == None: id = create_uuid()
 
@@ -152,19 +146,19 @@ class Constant(Computable):
             "at-end": AT_END
         }.get(pspec, AT_END)
 
-        return Constant(id, cfg.get("description"), cfg.get("values"),
-                        taxonomy, pid)
+        return Constant(id, cfg.get("description"), cfg.get("values"), context,
+                        pid)
 
 class Group(Computable):
-    def __init__(self, id, description, taxonomy, period=AT_END):
+    def __init__(self, id, description, context, period=AT_END):
         self.id = id
         self.description = description
         self.lines = []
-        self.taxonomy = taxonomy
+        self.context = context
         self.period = period
 
     @staticmethod
-    def load(cfg, comps, taxonomy):
+    def load(cfg, comps, context):
 
         id = cfg.get("id")
         if id == None: id = create_uuid()
@@ -177,11 +171,11 @@ class Group(Computable):
             "at-end": AT_END
         }.get(pspec, AT_END)
 
-        g = Group(id, cfg.get("description"), taxonomy, pid)
+        g = Group(id, cfg.get("description"), context, pid)
 
         for l in cfg.get("lines"):
 
-            elt = Computable.load(l, comps, taxonomy)
+            elt = Computable.load(l, comps, context)
             g.add(elt)
 
         def set_hide(x):
@@ -196,20 +190,17 @@ class Group(Computable):
 
     def compute(self, accounts, start, end, result):
 
-        cdef = ContextDefinition()
         if self.period == AT_START:
-            cdef.set_instant(start, end)
+            context = self.context.with_instant(start)
         elif self.period == AT_END:
-            cdef.set_instant(end)
+            context = self.context.with_instant(end)
         else:
-            cdef.set_period(start, end)
-        cdef.add_segments(self.id, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
+            context = self.context.with_period(Period("", start, end))
 
         total = 0
         for line in self.lines:
             total += line.compute(accounts, start, end, result)
-        result.set(self.id, context.create_money_fact(self.id, total))
+        result.set(self.id, context.create_money_datum(self.id, total))
         return total
 
     def get_output(self, result):
@@ -266,11 +257,11 @@ class Result:
         return self.values[id]
 
 class Computation(Computable):
-    def __init__(self, id, description, taxonomy, period):
+    def __init__(self, id, description, context, period):
         self.id = id
         self.description = description
         self.steps = []
-        self.taxonomy = taxonomy
+        self.context = context
         self.period = period
 
     def add(self, item):
@@ -283,17 +274,14 @@ class Computation(Computable):
         for v in self.steps:
             total += v.compute(accounts, start, end, result)
 
-        cdef = ContextDefinition()
         if self.period == AT_START:
-            cdef.set_instant(start, end)
+            context = self.context.with_instant(start)
         elif self.period == AT_END:
-            cdef.set_instant(end)
+            context = self.context.with_instant(start)
         else:
-            cdef.set_period(start, end)
-        cdef.add_segments(self.id, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
+            context = self.context.with_period(Period("", start, end))
 
-        result.set(self.id, context.create_money_fact(self.id, total))
+        result.set(self.id, context.create_money_datum(self.id, total))
 
         return total
 
@@ -314,7 +302,7 @@ class Computation(Computable):
         return output
 
     @staticmethod
-    def load(cfg, comps, taxonomy):
+    def load(cfg, comps, context):
 
         id = cfg.get("id")
         if id == None: id = create_uuid()
@@ -327,10 +315,20 @@ class Computation(Computable):
             "at-end": AT_END
         }.get(pspec, AT_END)
 
-        comp = Computation(id, cfg.get("description"), taxonomy, pid)
+        comp = Computation(id, cfg.get("description"), context, pid)
 
         for item in cfg.get("inputs"):
             comp.add(comps[item])
 
         return comp
 
+def get_computations(cfg, context):
+
+    comp_defs = cfg.get("computations")
+
+    comps = {}
+    for comp_def in comp_defs:
+        comp =  Computable.load(comp_def, comps, context)
+        comps[comp.id] = comp
+    
+    return comps

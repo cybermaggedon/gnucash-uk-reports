@@ -1,16 +1,11 @@
 
 from . multi_period import MultiPeriodWorksheet
-from . computation import Computable
+from . computation import Computable, get_computations
 from . fact import FRS101
 
-def get_worksheet(id, cfg, session, taxonomy):
+def get_worksheet(id, cfg):
 
-    comp_defs = cfg.get("computations")
-
-    comps = {}
-    for comp_def in comp_defs:
-        comp =  Computable.load(comp_def, comps, taxonomy)
-        comps[comp.id] = comp
+    comps = get_computations(cfg)
 
     for ws_def in cfg.get("worksheets"):
 

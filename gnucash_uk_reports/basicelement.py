@@ -13,34 +13,33 @@ software_version = "0.0.1"
 
 class BasicElement:
 
-    def __init__(self, cfg, tx):
-        self.cfg = cfg
-        self.taxonomy = tx
+    def __init__(self, data):
+        self.data = data
 
     @staticmethod
-    def load(elt_def, cfg, session, tx):
+    def load(elt_def, data):
 
         kind = elt_def.get("kind")
 
         if kind == "composite":
             from . composite import Composite
-            return Composite.load(elt_def, cfg, session, tx)
+            return Composite.load(elt_def, data)
 
         if kind == "title":
             from . title import Title
-            return Title.load(elt_def, cfg, tx)
+            return Title.load(elt_def, data)
 
         if kind == "worksheet":
             from . worksheetelement import WorksheetElement
-            return WorksheetElement.load(elt_def, cfg, session, tx)
+            return WorksheetElement.load(elt_def, data)
 
         if kind == "notes":
             from . notes import NotesElement
-            return NotesElement.load(elt_def, cfg, tx)
+            return NotesElement.load(elt_def, data)
 
         if kind == "facttable":
             from . facttable import FactTable
-            return FactTable.load(elt_def, cfg, session, tx)
+            return FactTable.load(elt_def, data)
 
         raise RuntimeError("Don't know element kind '%s'" % kind)
 
@@ -854,16 +853,3 @@ h2 {
         val = business.get("website.description")
         fact = context.create_string_fact("website-description", val)
         fact.append(self.doc, self.hidden)
-
-    @staticmethod
-    def get_element(id, cfg, session, tx):
-
-        elt_defs = cfg.get("elements")
-
-        for elt_def in elt_defs:
-
-            if elt_def.get("id") == id:
-                return BasicElement.load(elt_def, cfg, session, tx)
-
-        raise RuntimeError("Could not find element '%s'" % id)
-

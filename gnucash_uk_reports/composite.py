@@ -2,20 +2,19 @@
 from . basicelement import BasicElement
 
 class Composite(BasicElement):
-    def __init__(self, cfg, elts, tx):
-        super().__init__(cfg, tx)
+    def __init__(self, elts, data):
+        super().__init__(data)
         self.elements = elts
 
     @staticmethod
-    def load(elt_def, cfg, session, tx):
+    def load(elt_def, data):
 
         c = Composite(
-            cfg,
             [
-                BasicElement.get_element(v, cfg, session, tx)
+                data.get_element(v)
                 for v in elt_def.get("elements")
             ],
-            tx
+            data
         )
         return c
 

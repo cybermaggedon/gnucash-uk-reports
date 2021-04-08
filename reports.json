@@ -552,7 +552,7 @@
 	{
 	    "id": "balance-sheet",
 	    "kind": "multi-period",
-	    "items": [
+	    "computations": [
 		"fixed-assets",
 		"current-assets",
 		"prepayments-and-accrued-income",
@@ -574,7 +574,7 @@
 	    "kind": "multi-period",
 	    "description": "Profit and Loss",
 
-	    "items": [
+	    "computations": [
 		"turnover",
 		"cost-of-sales",
 		"gross-profit",
@@ -589,7 +589,7 @@
 	    "kind": "multi-period",
 	    "description": "Fixed Assets",
 
-	    "items": [
+	    "computations": [
 		"fixed-assets-analysis",
 		"depreciation-analysis",
 		"carrying-final"
@@ -602,7 +602,7 @@
 	    "kind": "multi-period",
 	    "description": "Share Capital",
 
-	    "items": [
+	    "computations": [
 		"share-capital"
 	    ]
 
@@ -613,7 +613,7 @@
 	    "kind": "multi-period",
 	    "description": "Detailed Profit and Loss",
 
-	    "items": [
+	    "computations": [
 		"turnover",
 		"cost-of-sales",
 		"dpl-net-profit",
