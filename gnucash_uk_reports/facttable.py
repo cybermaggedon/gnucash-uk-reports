@@ -33,8 +33,8 @@ business_type = {
 
 class FactTable(BasicElement):
 
-    def __init__(self, metadata, elts, session, cfg, tx):
-        super().__init__(metadata, tx)
+    def __init__(self, cfg, elts, session, tx):
+        super().__init__(cfg, tx)
         self.elements = elts
         self.session = session
         self.cfg = cfg
@@ -43,10 +43,9 @@ class FactTable(BasicElement):
     def load(elt_def, cfg, session, tx):
 
         c = FactTable(
-            cfg.get("metadata"),
+            cfg,
             elt_def.get("facts"),
             session,
-            cfg,
             tx
         )
         return c
@@ -109,7 +108,7 @@ BODY {
 
     def get_context(self, id):
 
-        period = Period.load(self.metadata.get("report.periods")[0])
+        period = Period.load(self.cfg.get("metadata.report.periods")[0])
 
         cdef = ContextDefinition()
 
@@ -136,7 +135,7 @@ BODY {
         title.appendChild(par.doc.createTextNode("FACTS FIXME"))
         div.appendChild(title)
 
-        period = Period.load(self.metadata.get("report.periods")[0])
+        period = Period.load(self.cfg.get("metadata.report.periods")[0])
 
         for v in self.elements:
 
@@ -145,7 +144,7 @@ BODY {
                 id = v.get("id")
                 context = self.get_context(id)
                 fact = context.create_string_fact(
-                    id, self.metadata.get(v.get("key"))
+                    id, self.cfg.get(v.get("key"))
                 )
 
                 elt = self.make_data(par, v.get("field"),
@@ -157,7 +156,7 @@ BODY {
                 id = v.get("id")
                 context = self.get_context(id)
                 fact = context.create_date_fact(
-                    id, self.metadata.get_date(v.get("key"))
+                    id, self.cfg.get_date(v.get("key"))
                 )
 
                 elt = self.make_data(par, v.get("field"),
@@ -277,7 +276,7 @@ BODY {
 
     def get_report_date_context(self):
 
-        report_date = self.metadata.get("report.date")
+        report_date = self.cfg.get("metadata.report.date")
 
         cdef = ContextDefinition()
         cdef.set_instant(report_date)

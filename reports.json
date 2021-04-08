@@ -706,14 +706,14 @@
 		    "id": "company-name",
 		    "description": "Company name",
 		    "kind": "config",
-		    "key": "business.company-name"
+		    "key": "metadata.business.company-name"
 		},
 		{
 		    "field": "3",
 		    "id": "tax-reference",
 		    "description": "Tax reference",
 		    "kind": "config",
-		    "key": "tax.utr"
+		    "key": "metadata.tax.utr"
 		},
 	
 		{
@@ -721,28 +721,28 @@
 		    "id": "return-period-start",
 		    "description": "Return period start",
 		    "kind": "config-date",
-		    "key": "tax.period.start"
+		    "key": "metadata.tax.period.start"
 		},
 		{
 		    "field": "35",
 		    "id": "return-period-end",
 		    "description": "Return period end",
 		    "kind": "config-date",
-		    "key": "tax.period.end"
+		    "key": "metadata.tax.period.end"
 		},
 		{
 		    "field": "?",
 		    "id": "account-period-start",
 		    "description": "Start of accounts period",
 		    "kind": "config-date",
-		    "key": "tax.period.start"
+		    "key": "metadata.tax.period.start"
 		},
 		{
 		    "field": "?",
 		    "id": "account-period-end",
 		    "description": "End of accounts period",
 		    "kind": "config-date",
-		    "key": "tax.period.end"
+		    "key": "metadata.tax.period.end"
 		},
 		{
 		    "field": "?",
