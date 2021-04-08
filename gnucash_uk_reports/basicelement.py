@@ -561,44 +561,12 @@ h2 {
         ri.get("accounts-type").use(add)
         ri.get("accounts-status").use(add)
 
+        ci.get("entity-legal-form").use(add)
+        ci.get("entity-legal-country").use(add)
+        ci.get("entity-legal-date").use(add)q
+
         return
 
-
-        # entity-legal-form
-        val = business.get("company-formation.form")
-        cdef = ContextDefinition()
-        cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        cdef.lookup_segment("entity-legal-form", val, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
-
-        fact = context.create_string_fact("entity-legal-form", "")
-        fact.append(self.doc, self.hidden)
-
-        # entity-legal-country
-        val = business.get("company-formation.country")
-        cdef = ContextDefinition()
-        cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        cdef.lookup_segment("countries-regions", val, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
-
-        fact = context.create_string_fact("entity-legal-country", "")
-        fact.append(self.doc, self.hidden)
-
-        # entity-legal-date
-        date = business.get("company-formation").get_date("date")
-        cdef = ContextDefinition()
-        cdef.set_instant(date)
-        context = self.taxonomy.create_context(cdef)
-
-        fact = context.create_date_fact("entity-legal-date", date)
-        fact.append(self.doc, self.hidden)
-        
         # average-employees
         def add_avg_employee_counts(val):
             for i in range(0, len(val)):

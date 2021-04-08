@@ -68,6 +68,9 @@ class DataSource:
         period = self.get_report_period()
         c = self.business_context.with_period(period)
 
+        date = self.get_report_date()
+        rdc = self.business_context.with_instant(date)
+
         self.cfg.get("metadata.business.company-name").use(
             lambda val: d.add_string("company-name", val, c)
         )
@@ -106,6 +109,27 @@ class DataSource:
 
         self.cfg.get_bool("metadata.business.is-dormant").use(
             lambda val: d.add_bool("is-dormant", val, c)
+        )
+
+        self.cfg.get("metadata.business.company-formation.form").use(
+            lambda val:
+            d.add_string(
+                "entity-legal-form", "",
+                c.with_segment("entity-legal-form", val)
+            )
+        )
+
+        self.cfg.get("metadata.business.company-formation.country").use(
+            lambda val:
+            d.add_string(
+                "entity-legal-country", "",
+                c.with_segment("countries-regions", val)
+            )
+        )
+
+        self.cfg.get_date("metadata.business.company-formation.date").use(
+            lambda val:
+            d.add_date("entity-legal-date", val, rdc)
         )
 
         return d
