@@ -6,17 +6,14 @@ from datetime import datetime, date
 
 class IxbrlReporter:
 
-    def __init__(self, par=None):
-        self.par = par
-
-    def get_elt(self, worksheet):
+    def get_elt(self, worksheet, par, taxonomy):
 
         fmt = NegativeParenFormatter()
 
         def format_number(n):
             return fmt.format("{0:,.2f}", n)
 
-        doc = self.par.doc
+        doc = par.doc
 
         def add_header(grid, periods):
 
@@ -48,12 +45,14 @@ class IxbrlReporter:
                 elt.setAttribute("class", "period currency")
                 elt.appendChild(doc.createTextNode("£"))
 
-        def maybe_tag(value, section, pid):
+        def maybe_tag(datum, section, pid):
+
+            value = taxonomy.create_fact(datum)
 
             if value.name:
 
                 name = value.name
-                context = value.context.id
+                context = value.context
 
                 elt = doc.createElement("ix:nonFraction")
                 elt.setAttribute("name", name)
@@ -220,7 +219,6 @@ class IxbrlReporter:
             sections = ds.sections
 
             grid = doc.createElement("div")
-            grid.setAttribute("id", worksheet.id)
             grid.setAttribute("class", "sheet")
 
             add_header(grid, periods)

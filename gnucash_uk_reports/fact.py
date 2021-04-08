@@ -10,7 +10,8 @@ class Fact:
         return fn(self)
 
 class MoneyFact(Fact):
-    def __init__(self, value, context, reverse=False, unit="GBP"):
+    def __init__(self, context, name, value, reverse=False, unit="GBP"):
+        self.name = name
         self.value = value
         self.context = context
         self.unit = unit
@@ -18,7 +19,7 @@ class MoneyFact(Fact):
     def describe(self):
         if self.name:
             name = self.name
-            context = self.context.id
+            context = self.context
             print("        {0} {1} {2}".format(
                 str(self.value), name, context
             ))
@@ -30,7 +31,7 @@ class MoneyFact(Fact):
         if hasattr(self, "name"):
             elt = doc.createElement("ix:nonFraction")
             elt.setAttribute("name", self.name)
-            elt.setAttribute("contextRef", self.context.id)
+            elt.setAttribute("contextRef", self.context)
             elt.setAttribute("unitRef", self.unit)
             elt.setAttribute("decimals", "2")
             if value < 0:
@@ -205,7 +206,15 @@ class Taxonomy:
             )
             return fact
 
-        raise RuntimeError("Not implemented.")
+        if isinstance(val, MoneyDatum):
+            fact =  MoneyFact(
+                self.get_context_id(val.context),
+                self.get_tag_name(val.id),
+                val.value
+            )
+            return fact
+
+        raise RuntimeError("Not implemented: " + str(type(val)))
 
     def get_tag_name(self, id):
         key = "taxonomy.{0}.tags.{1}".format(self.name, id)

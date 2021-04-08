@@ -31,11 +31,10 @@ class WorksheetElement(BasicElement):
 
         out.write("\n")
 
-    def to_ixbrl_elt(self, par):
+    def to_ixbrl_elt(self, par, taxonomy):
 
-        rep = IxbrlReporter(par)
-
-        elt = rep.get_elt(self.worksheet)
+        rep = IxbrlReporter()
+        elt = rep.get_elt(self.worksheet, par, taxonomy)
 
         div = par.doc.createElement("div")
         div.setAttribute("class", "worksheet page")
