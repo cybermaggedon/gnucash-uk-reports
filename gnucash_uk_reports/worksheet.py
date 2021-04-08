@@ -1,7 +1,6 @@
 
 from . multi_period import MultiPeriodWorksheet
 from . computation import Computable, get_computations
-from . fact import FRS101
 
 def get_worksheet(id, cfg):
 

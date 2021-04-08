@@ -22,9 +22,14 @@ class DataSource:
 
     def get_contact_information(self):
 
+        period = self.get_report_period()
+        rpc = self.business_context.with_period(period)
+#        date = self.get_report_date()
+#        rdc = self.business_context.with_instant(date)
+
         country = self.cfg.get("metadata.business.contact.country")
 
-        c = self.business_context.with_segments({"country": country})
+        c = rpc.with_segments({"countries-regions": country})
 
         d = ValueSet()
 

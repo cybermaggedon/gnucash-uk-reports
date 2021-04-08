@@ -250,7 +250,7 @@
 			"england-and-wales": "uk-geo:EnglandWales"
 		    }
 		},
-		"director": {
+		"officer": {
 		    "dimension": "uk-bus:EntityOfficersDimension",
 		    "map": {
 			"director1": "uk-bus:Director1",

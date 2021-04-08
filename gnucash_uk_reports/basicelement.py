@@ -317,7 +317,7 @@ h2 {
         self.resources = resources
 
         # This creates some contexts, hence do this first.
-#        self.create_metadata()
+        self.create_metadata(taxonomy)
 
         schema_url = taxonomy.get_schema()
         schema = doc.createElement("link:schemaRef")
@@ -348,8 +348,8 @@ h2 {
         unit.appendChild(measure)
         resources.appendChild(unit)
        
-#        out.write(doc.toprettyxml())
-        out.write(doc.toxml())
+        out.write(doc.toprettyxml())
+#        out.write(doc.toxml())
 
     def create_contexts(self, taxonomy):
 
@@ -375,10 +375,12 @@ h2 {
                 else:
                     raise RuntimeError("Should not happen in create_contexts")
 
-            segs = [
-                self.create_segment_member(k, v)
-                for k, v in segments.items()
-            ]
+            segs = []
+
+            for k, v in segments.items():
+
+                k2, v2 = taxonomy.lookup_dimension(k, v)
+                segs.append(self.create_segment_member(k2, v2))
 
             crit = []
             if entity:
@@ -512,36 +514,35 @@ h2 {
 
         return Period.load(self.cfg.get("metadata.report.periods")[0])
 
-    def create_metadata(self):
+    def create_metadata(self, taxonomy):
 
-        report = self.cfg.get("metadata.report")
-        business = self.cfg.get("metadata.business")
-        report_period = self.get_report_period()
+        ci = self.data.get_company_information()
+        ri = self.data.get_report_information()
 
-        company_number = business.get("company-number")
-        report_date = report.get_date("date")
+        period = self.data.get_report_period()
+        rpc = self.data.business_context.with_period(period)
 
-        report_date_context = self.get_report_date_context()
-        report_period_context = self.get_report_period_context()
-        
-        report_title_fact = report_period_context.create_string_fact(
-            "report-title",
-            report.get("title")
-        )
+        def add(val):
+            fact = taxonomy.create_fact(val)
+            fact.append(self.doc, self.hidden)
 
-        report_title_fact.append(self.doc, self.hidden)
+        ri.get("report-title").use(add)
+        ri.get("report-date").use(add)
+        ri.get("period-start").use(add)
+        ri.get("period-end").use(add)
 
-        report_date_context.create_date_fact("report-date", report_date).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        fact = report_date_context.create_date_fact("period-start",
-                                                    report_period.start)
+        datum = StringDatum("software", software, rpc)
+        fact = taxonomy.create_fact(datum)
         fact.append(self.doc, self.hidden)
 
-        fact = report_date_context.create_date_fact("period-end",
-                                                    report_period.end)
+        datum = StringDatum("software-version", software_version, rpc)
+        fact = taxonomy.create_fact(datum)
         fact.append(self.doc, self.hidden)
+
+        return
+
+
+
 
         report_period_context.create_string_fact("software", software).use(
             lambda x: x.append(self.doc, self.hidden)

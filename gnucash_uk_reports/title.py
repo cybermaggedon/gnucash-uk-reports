@@ -63,7 +63,6 @@ class Title(BasicElement):
         ci = self.data.get_company_information()
         ri = self.data.get_report_information()
 
-
         def add_company_name(val):
             div2 = doc.createElement("h1")
             div2.setAttribute("class", "heading")

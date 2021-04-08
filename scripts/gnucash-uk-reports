@@ -3,7 +3,7 @@
 from gnucash_uk_reports.config import Config
 
 import gnucash_uk_reports.accounts as accounts
-from gnucash_uk_reports.fact import FRS101
+from gnucash_uk_reports.taxonomy import FRS101
 import sys
 from gnucash_uk_reports.datasource import DataSource
 
