@@ -13,8 +13,8 @@ software_version = "0.0.1"
 
 class BasicElement:
 
-    def __init__(self, metadata, tx):
-        self.metadata = metadata
+    def __init__(self, cfg, tx):
+        self.cfg = cfg
         self.taxonomy = tx
 
     @staticmethod
@@ -202,7 +202,7 @@ h2 {
 
         self.periods = [
             Period.load(v)
-            for v in self.metadata.get("report").get("periods")
+            for v in self.cfg.get("metadata.report.periods")
         ]
         
         doc = impl.createDocument(None, "html", None)
@@ -263,7 +263,7 @@ h2 {
 
         self.periods = [
             Period.load(v)
-            for v in self.metadata.get("report").get("periods")
+            for v in self.cfg.get("metadata.report.periods")
         ]
         
         doc = impl.createDocument(None, "html", None)
@@ -296,7 +296,7 @@ h2 {
             t.appendChild(doc.createTextNode(val));
             head.appendChild(t)
 
-        self.metadata.get("report").get("title").use(add_title)
+        self.cfg.get("metadata.report.title").use(add_title)
 
         self.add_style(head)
 
@@ -337,7 +337,7 @@ h2 {
         # Contexts get created above, hence do this last.
         self.create_contexts()
 
-        currency = self.metadata.get("report").get("currency")
+        currency = self.cfg.get("metadata.report.currency")
 
         unit = doc.createElement("xbrli:unit")
         unit.setAttribute("id", currency)
@@ -358,8 +358,8 @@ h2 {
 
     def create_contexts(self):
 
-        report = self.metadata.get("report")
-        business = self.metadata.get("business")
+        report = self.cfg.get("metadata.report")
+        business = self.cfg.get("metadata.business")
 
         company_number = business.get("company-number")
 
@@ -500,47 +500,39 @@ h2 {
 
     def get_report_date_context(self):
 
-        report_date = self.metadata.get("report.date")
-
-        cdef = ContextDefinition()
-        cdef.set_instant(report_date)
-        context = self.taxonomy.get_context(cdef)
-
+        context = self.taxonomy.get_context("report-date", self.cfg)
         return context
 
     def get_report_period(self):
 
-        return Period.load(self.metadata.get("report.periods")[0])
+        return Period.load(self.cfg.get("metadata.report.periods")[0])
 
     def get_report_period_context(self):
 
-        report_period = self.get_report_period()
-
-        cdef = ContextDefinition()
-        cdef.set_period(
-            report_period.start, report_period.end
-        )
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.get_context("report-period", self.cfg)
         return context
 
     def get_contact_context(self):
 
-        business = self.metadata.get("business")
-        period = self.get_report_period()
-
-        country = business.get("contact").get("country")
-
-        cdef = ContextDefinition()
-        cdef.set_period(period.start, period.end)
-        cdef.lookup_segment("countries-regions", country, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
-
+        context = self.taxonomy.get_context("contact", self.cfg)
         return context
+
+        # business = self.cfg.get("metadata.business")
+        # period = self.get_report_period()
+
+        # country = business.get("contact").get("country")
+
+        # cdef = ContextDefinition()
+        # cdef.set_period(period.start, period.end)
+        # cdef.lookup_segment("countries-regions", country, self.taxonomy)
+        # context = self.taxonomy.create_context(cdef)
+
+        # return context
 
     def create_metadata(self):
 
-        report = self.metadata.get("report")
-        business = self.metadata.get("business")
+        report = self.cfg.get("metadata.report")
+        business = self.cfg.get("metadata.business")
         report_period = self.get_report_period()
 
         company_number = business.get("company-number")
@@ -637,7 +629,7 @@ h2 {
         )
         sector_cdef.lookup_segment("industry-sector", sector,
                                       self.taxonomy)
-        sector_context = self.taxonomy.get_context(sector_cdef)
+        sector_context = self.taxonomy.create_context(sector_cdef)
 
         fact = sector_context.create_string_fact("industry-sector", "")
         fact.append(self.doc, self.hidden)
@@ -662,7 +654,7 @@ h2 {
         )
         standards_cdef.lookup_segment("accounting-standards", stds,
                                       self.taxonomy)
-        standards_context = self.taxonomy.get_context(standards_cdef)
+        standards_context = self.taxonomy.create_context(standards_cdef)
 
         fact = standards_context.create_string_fact("accounting-standards", "")
         fact.append(self.doc, self.hidden)
@@ -675,7 +667,7 @@ h2 {
             report.get("periods")[0].get_date("end")
         )
         cdef.lookup_segment("accounts-type", val, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         fact = context.create_string_fact("accounts-type", "")
         fact.append(self.doc, self.hidden)
@@ -688,7 +680,7 @@ h2 {
             report.get("periods")[0].get_date("end")
         )
         cdef.lookup_segment("accounts-status", val, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         fact = context.create_string_fact("accounts-status", "")
         fact.append(self.doc, self.hidden)
@@ -701,7 +693,7 @@ h2 {
             report.get("periods")[0].get_date("end")
         )
         cdef.lookup_segment("entity-legal-form", val, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         fact = context.create_string_fact("entity-legal-form", "")
         fact.append(self.doc, self.hidden)
@@ -714,7 +706,7 @@ h2 {
             report.get("periods")[0].get_date("end")
         )
         cdef.lookup_segment("countries-regions", val, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         fact = context.create_string_fact("entity-legal-country", "")
         fact.append(self.doc, self.hidden)
@@ -723,7 +715,7 @@ h2 {
         date = business.get("company-formation").get_date("date")
         cdef = ContextDefinition()
         cdef.set_instant(date)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         fact = context.create_date_fact("entity-legal-date", date)
         fact.append(self.doc, self.hidden)
@@ -737,7 +729,7 @@ h2 {
                     report.get("periods")[i].get_date("start"),
                     report.get("periods")[i].get_date("end")
                 )
-                context = self.taxonomy.get_context(cdef)
+                context = self.taxonomy.create_context(cdef)
 
                 fact = context.create_count_fact("average-employees", val[i])
                 fact.append(self.doc, self.hidden)
@@ -757,7 +749,7 @@ h2 {
             )
             cdef.lookup_segment("director", "director" + str(i + 1),
                                 self.taxonomy)
-            context = self.taxonomy.get_context(cdef)
+            context = self.taxonomy.create_context(cdef)
         
             fact = context.create_string_fact("director", directors[i])
             fact.append(self.doc, self.hidden)
@@ -815,7 +807,7 @@ h2 {
             report.get("periods")[0].get_date("end")
         )
         cdef.lookup_segment("phone-number-type", val, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         # phone
 
@@ -851,7 +843,7 @@ h2 {
             report.get("periods")[0].get_date("end")
         )
         cdef.lookup_segment("countries-regions", val, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         # website URL
         val = business.get("website.url")

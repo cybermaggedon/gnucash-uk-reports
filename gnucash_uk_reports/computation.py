@@ -80,7 +80,7 @@ class Line(Computable):
         if self.reverse: total *= -1
         
         cdef.add_segments(self.id, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         result.set(self.id, context.create_money_fact(self.id, total))
 
@@ -127,7 +127,7 @@ class Constant(Computable):
         else:
             cdef.set_period(start, end)
         cdef.add_segments(self.id, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         val = self.values[str(end)]
         result.set(self.id, context.create_money_fact(self.id, val))
@@ -204,7 +204,7 @@ class Group(Computable):
         else:
             cdef.set_period(start, end)
         cdef.add_segments(self.id, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         total = 0
         for line in self.lines:
@@ -291,7 +291,7 @@ class Computation(Computable):
         else:
             cdef.set_period(start, end)
         cdef.add_segments(self.id, self.taxonomy)
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         result.set(self.id, context.create_money_fact(self.id, total))
 

@@ -8,6 +8,48 @@
 		"uk-core": "http://xbrl.frc.org.uk/fr/2021-01-01/core",
 		"uk-direp": "http://xbrl.frc.org.uk/reports/2021-01-01/direp"
 	    },
+	    "contexts": {
+		"report-date": {
+		    "instant": {
+			"from": "config",
+			"key": "metadata.report.date"
+		    },
+		    "entity": {
+			"from": "config",
+			"scheme": "http://www.companieshouse.gov.uk/",
+			"key": "metadata.business.company-number"
+		    }
+		},
+		"report-period": {
+		    "period": {
+			"from": "config",
+			"key": "metadata.report.periods.0"
+		    },
+		    "entity": {
+			"from": "config",
+			"scheme": "http://www.companieshouse.gov.uk/",
+			"key": "metadata.business.company-number"
+		    }
+		},
+		"contact": {
+		    "period": {
+			"from": "config",
+			"key": "metadata.report.periods.0"
+		    },
+		    "entity": {
+			"from": "config",
+			"scheme": "http://www.companieshouse.gov.uk/",
+			"key": "metadata.business.company-number"
+		    },
+		    "segments": [
+			{
+			    "from": "config",
+			    "scheme": "http://www.companieshouse.gov.uk/",
+			    "key": "metadata.business.company-number"
+			}
+		    ]
+		}
+	    },
 	    "tags": {
 		"turnover": "uk-core:TurnoverRevenue",
 		"cost-of-sales": "uk-core:CostSales",

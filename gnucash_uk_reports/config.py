@@ -49,6 +49,8 @@ class Config(dict):
             for key in keys:
                 if key in nav:
                     nav = nav[key]
+                elif isinstance(nav, list):
+                    nav = nav[int(key)]
                 else:
                     return Config.makevalue(deflt)
         return Config.makevalue(nav)

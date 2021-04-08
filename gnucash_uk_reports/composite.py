@@ -2,15 +2,15 @@
 from . basicelement import BasicElement
 
 class Composite(BasicElement):
-    def __init__(self, metadata, elts, tx):
-        super().__init__(metadata, tx)
+    def __init__(self, cfg, elts, tx):
+        super().__init__(cfg, tx)
         self.elements = elts
 
     @staticmethod
     def load(elt_def, cfg, session, tx):
 
         c = Composite(
-            cfg.get("metadata"),
+            cfg,
             [
                 BasicElement.get_element(v, cfg, session, tx)
                 for v in elt_def.get("elements")

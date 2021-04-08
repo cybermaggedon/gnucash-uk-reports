@@ -6,8 +6,8 @@ from . fact import *
 from datetime import datetime
 
 class NotesElement(BasicElement):
-    def __init__(self, metadata, title, notes, tx):
-        super().__init__(metadata, tx)
+    def __init__(self, cfg, title, notes, tx):
+        super().__init__(cfg, tx)
         self.title = title
         self.notes = notes
 
@@ -15,7 +15,7 @@ class NotesElement(BasicElement):
     def load(elt_def, cfg, tx):
 
         e = NotesElement(
-            cfg.get("metadata"),
+            cfg,
             elt_def.get("title"),
             elt_def.get("notes"),
             tx
@@ -30,14 +30,14 @@ class NotesElement(BasicElement):
 
     def get_note_elts(self, n, par):
 
-        report = self.metadata.get("report")
+        report = self.cfg.get("metadata.report")
 
         report_date_context = par.get_report_date_context()
         report_period_context = par.get_report_period_context()
         
         if n == "small-company-audit-exempt":
 
-            val = self.metadata.get("report").get("periods")[0].get("end")
+            val = self.cfg.get("metadata.report.periods")[0].get("end")
             year_end = datetime.fromisoformat(val).date()
 
             elt = par.doc.createElement("span")
@@ -72,8 +72,8 @@ class NotesElement(BasicElement):
 
         if n == "company":
 
-            company_number = self.metadata.get("business.company-number")
-            addr = self.metadata.get("business.contact.address")
+            company_number = self.cfg.get("metadata.business.company-number")
+            addr = self.cfg.get("metadata.business.contact.address")
 
             elt = par.doc.createElement("span")
             elt.appendChild(par.doc.createTextNode("The company is a private company limited by shares and is registered in England and Wales number "))
@@ -99,7 +99,7 @@ class NotesElement(BasicElement):
                 )
                 fact.append(par.doc, elt)
 
-            loc = self.metadata.get("business.contact.location").use(location)
+            loc = self.cfg.get("metadata.business.contact.location").use(location)
 
             def county(val):
                 elt.appendChild(par.doc.createTextNode(", "))
@@ -108,7 +108,7 @@ class NotesElement(BasicElement):
                 )
                 fact.append(par.doc, elt)
 
-            loc = self.metadata.get("business.contact.county").use(county)
+            loc = self.cfg.get("metadata.business.contact.county").use(county)
 
             def postcode(val):
                 elt.appendChild(par.doc.createTextNode(" "))
@@ -117,7 +117,7 @@ class NotesElement(BasicElement):
                 )
                 fact.append(par.doc, elt)
 
-            loc = self.metadata.get("business.contact.postcode").use(postcode)
+            loc = self.cfg.get("metadata.business.contact.postcode").use(postcode)
 
             elt.appendChild(par.doc.createTextNode("."))
 

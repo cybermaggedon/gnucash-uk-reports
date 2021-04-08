@@ -123,7 +123,7 @@ BODY {
         cdef.add_segment("ct-comp:BusinessTypeDimension",
                          "ct-comp:Company")
 
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         return context
 
@@ -283,7 +283,7 @@ BODY {
         cdef.set_instant(report_date)
         cdef.add_segment("ct-comp:BusinessTypeDimension",
                          "ct-comp:Company")
-        context = self.taxonomy.get_context(cdef)
+        context = self.taxonomy.create_context(cdef)
 
         return context
 
