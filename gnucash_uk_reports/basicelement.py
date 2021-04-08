@@ -378,7 +378,6 @@ h2 {
             segs = []
 
             for k, v in segments.items():
-
                 k2, v2 = taxonomy.lookup_dimension(k, v)
                 segs.append(self.create_segment_member(k2, v2))
 
@@ -530,6 +529,9 @@ h2 {
         ri.get("report-date").use(add)
         ri.get("period-start").use(add)
         ri.get("period-end").use(add)
+        ci.get("company-name").use(add)
+        ci.get("company-number").use(add)
+        ci.get("vat-registration").use(add)
 
         datum = StringDatum("software", software, rpc)
         fact = taxonomy.create_fact(datum)
@@ -539,135 +541,28 @@ h2 {
         fact = taxonomy.create_fact(datum)
         fact.append(self.doc, self.hidden)
 
+        ri.get("balance-sheet-date").use(add)
+        ci.get("activities").use(add)
+
+        for i in range(0, 3):
+            ci.get("sic" + str(i + 1)).use(
+                lambda val:
+                taxonomy.create_fact(val).append(self.doc, self.hidden)
+            )
+
+        ci.get("industry-sector").use(add)
+        ci.get("is-dormant").use(add)
+
+        datum = StringDatum("trading-status", "", rpc)
+        fact = taxonomy.create_fact(datum)
+        fact.append(self.doc, self.hidden)
+
+        ri.get("accounting-standards").use(add)
+        ri.get("accounts-type").use(add)
+        ri.get("accounts-status").use(add)
+
         return
 
-
-
-
-        report_period_context.create_string_fact("software", software).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        report_period_context.create_string_fact("software-version",
-                                                 software_version).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        business.get("company-name").use(
-            lambda val: report_period_context.create_string_fact(
-                "company-name", val
-            )
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        business.get("company-number").use(
-            lambda val: report_period_context.create_string_fact(
-                "company-number", val
-            )
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        business.get("vat-registration").use(
-            lambda val: report_period_context.create_string_fact(
-                "vat-registration", val
-            )
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        report.get_date("statement-date").use(
-            lambda val: report_date_context.create_date_fact(
-                "balance-sheet-date", val
-            )
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        business.get("activities").use(
-            lambda val: report_period_context.create_string_fact(
-                "activities", val
-            )
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        def add_sic_codes(val):
-            for i in range(0, 3):
-                if len(val) > (i):
-                    nm = "sic{0}".format(i+1)
-                    fact = report_period_context.create_string_fact(nm, val[i])
-                    fact.append(self.doc, self.hidden)
-                
-        business.get("sic-codes").use(
-            lambda val: add_sic_codes(val)
-        )
-
-        # industry-sector
-        sector = business.get("industry-sector")
-        sector_cdef = ContextDefinition()
-        sector_cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        sector_cdef.lookup_segment("industry-sector", sector,
-                                      self.taxonomy)
-        sector_context = self.taxonomy.create_context(sector_cdef)
-
-        fact = sector_context.create_string_fact("industry-sector", "")
-        fact.append(self.doc, self.hidden)
-
-        business.get_bool("is-dormant").use(
-            lambda val: report_period_context.create_string_fact(
-                "is-dormant", json.dumps(val)
-            )
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
-        fact = report_period_context.create_string_fact("trading-status", "")
-        fact.append(self.doc, self.hidden)
-
-        # accounting-standards
-        stds = report.get("accounting-standards")
-        standards_cdef = ContextDefinition()
-        standards_cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        standards_cdef.lookup_segment("accounting-standards", stds,
-                                      self.taxonomy)
-        standards_context = self.taxonomy.create_context(standards_cdef)
-
-        fact = standards_context.create_string_fact("accounting-standards", "")
-        fact.append(self.doc, self.hidden)
-
-        # accounts-type
-        val = report.get("accounts-type")
-        cdef = ContextDefinition()
-        cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        cdef.lookup_segment("accounts-type", val, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
-
-        fact = context.create_string_fact("accounts-type", "")
-        fact.append(self.doc, self.hidden)
-
-        # accounts-status
-        val = report.get("accounts-status")
-        cdef = ContextDefinition()
-        cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        cdef.lookup_segment("accounts-status", val, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
-
-        fact = context.create_string_fact("accounts-status", "")
-        fact.append(self.doc, self.hidden)
 
         # entity-legal-form
         val = business.get("company-formation.form")

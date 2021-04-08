@@ -24,8 +24,6 @@ class DataSource:
 
         period = self.get_report_period()
         rpc = self.business_context.with_period(period)
-#        date = self.get_report_date()
-#        rdc = self.business_context.with_instant(date)
 
         country = self.cfg.get("metadata.business.contact.country")
 
@@ -78,6 +76,10 @@ class DataSource:
             lambda val: d.add_string("company-number", val, c)
         )
 
+        self.cfg.get("metadata.business.vat-registration").use(
+            lambda val: d.add_string("vat-registration", val, c)
+        )
+
         directors = self.cfg.get("metadata.business.directors")
         signed_by = self.cfg.get("metadata.report.signed-by")
         for i in range(0, len(directors)):
@@ -86,11 +88,34 @@ class DataSource:
             if signed_by == directors[i]:
                 d.add_string("signed-by", signed_by, dirc)
 
+        self.cfg.get("metadata.business.activities").use(
+            lambda val: d.add_string("activities", val, c)
+        )
+
+        val = self.cfg.get("metadata.business.sic-codes")
+        for i in range(0, 3):
+            if len(val) > i:
+                d.add_string("sic" + str(i + 1), val[i], c)
+
+        self.cfg.get("metadata.business.industry-sector").use(
+            lambda val:
+            d.add_string(
+                "industry-sector", "", c.with_segment("industry-sector", val)
+            )
+        )
+
+        self.cfg.get_bool("metadata.business.is-dormant").use(
+            lambda val: d.add_bool("is-dormant", val, c)
+        )
+
         return d
 
     def get_report_information(self):
 
         d = ValueSet()
+
+        period = self.get_report_period()
+        c = self.business_context.with_period(period)
 
         period = self.get_report_period()
         rpc = self.business_context.with_period(period)
@@ -111,6 +136,34 @@ class DataSource:
 
         self.cfg.get_date("metadata.report.date").use(
             lambda val: d.add_date("report-date", val, rdc)
+        )
+
+        self.cfg.get_date("metadata.report.balance-sheet-date").use(
+            lambda val: d.add_date("balance-sheet-date", val, rdc)
+        )
+
+        self.cfg.get("metadata.report.accounting-standards").use(
+            lambda val:
+            d.add_string(
+                "accounting-standards", "",
+                c.with_segment("accounting-standards", val)
+            )
+        )
+
+        self.cfg.get("metadata.report.accounts-type").use(
+            lambda val:
+            d.add_string(
+                "accounts-type", "",
+                c.with_segment("accounts-type", val)
+            )
+        )
+
+        self.cfg.get("metadata.report.accounts-status").use(
+            lambda val:
+            d.add_string(
+                "accounts-status", "",
+                c.with_segment("accounts-status", val)
+            )
         )
 
         return d

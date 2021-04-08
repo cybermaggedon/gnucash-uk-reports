@@ -55,7 +55,7 @@
 	    "accounts-status": "audit-exempt-no-accountants-report",
 	    "accounts-type": "abridged-accounts",
 	    "accounting-standards": "micro-entities",
-	    "statement-date": "2021-08-31",
+	    "balance-sheet-date": "2021-08-31",
 	    "date": "2021-08-31",
 	    "currency": "GBP",
 	    "signed-by": "B Smith",

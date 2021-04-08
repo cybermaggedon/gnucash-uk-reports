@@ -1,6 +1,6 @@
 
-from . datum import StringDatum, DateDatum, MoneyDatum
-from . fact import StringFact, DateFact, MoneyFact
+from . datum import StringDatum, DateDatum, MoneyDatum, BoolDatum
+from . fact import StringFact, DateFact, MoneyFact, BoolFact
 
 class Taxonomy:
     def __init__(self, cfg, name):
@@ -37,6 +37,14 @@ class Taxonomy:
 
         if isinstance(val, MoneyDatum):
             fact =  MoneyFact(
+                self.get_context_id(val.context),
+                self.get_tag_name(val.id),
+                val.value
+            )
+            return fact
+
+        if isinstance(val, BoolDatum):
+            fact =  BoolFact(
                 self.get_context_id(val.context),
                 self.get_tag_name(val.id),
                 val.value

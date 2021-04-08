@@ -126,13 +126,14 @@ class StringFact(Fact):
             par.appendChild(doc.createTextNode(self.value))
 
 class BoolFact(Fact):
-    def __init__(self, value, context):
+    def __init__(self, context, name, value):
         self.value = bool(value)
+        self.name = name
         self.context = context
     def describe(self):
         if self.name:
             name = self.name
-            context = self.context.id
+            context = self.context
             print("        {0} {1} {2}".format(
                 self.value, name, context
             ))
@@ -142,7 +143,7 @@ class BoolFact(Fact):
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
             elt.setAttribute("name", self.name)
-            elt.setAttribute("contextRef", self.context.id)
+            elt.setAttribute("contextRef", self.context)
             elt.appendChild(doc.createTextNode(json.dumps(self.value)))
             par.appendChild(elt)
         else:
