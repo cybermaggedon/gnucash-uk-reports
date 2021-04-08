@@ -76,15 +76,16 @@ class CountFact(Fact):
             par.appendChild(doc.createTextNode(str(self.value)))
 
 class NumberFact(Fact):
-    def __init__(self, value, context, unit="pure"):
-        self.value = value
+    def __init__(self, context, name, value, unit="pure"):
         self.context = context
+        self.name = name
+        self.value = value
         self.reverse = False
         self.unit = unit
     def describe(self):
         if self.name:
             name = self.name
-            context = self.context.id
+            context = self.context
             print("        {0} {1} {2}".format(
                 str(self.value), name, context
             ))
@@ -94,7 +95,7 @@ class NumberFact(Fact):
         if self.name:
             elt = doc.createElement("ix:nonFraction")
             elt.setAttribute("name", self.name)
-            elt.setAttribute("contextRef", self.context.id)
+            elt.setAttribute("contextRef", self.context)
             elt.setAttribute("unitRef", self.unit)
             elt.setAttribute("decimals", "2")
             elt.appendChild(doc.createTextNode(str(self.value)))

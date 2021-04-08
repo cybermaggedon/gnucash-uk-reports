@@ -244,13 +244,11 @@ class DataSource:
 
     def get_results(self, ids, period):
 
-        res = perform_computations(period)
+        res = self.perform_computations(period)
 
-        res = self.results[c]
-
-        d = ValueSet(c)
+        d = ValueSet()
         for id in ids:
-            d.add_money(id, res.get(id).value)
+            d.add_datum(res.get(id))
 
         return d
 
@@ -288,4 +286,7 @@ class DataSource:
 
     def get_config(self, key):
         return self.cfg.get(key)
+
+    def get_config_date(self, key):
+        return self.cfg.get_date(key)
 

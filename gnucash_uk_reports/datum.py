@@ -29,6 +29,12 @@ class CountDatum(Datum):
         self.value = value
         self.context = context
 
+class NumberDatum(Datum):
+    def __init__(self, id, value, context):
+        self.id = id
+        self.value = value
+        self.context = context
+
 class BoolDatum(Datum):
     def __init__(self, id, value, context):
         self.id = id

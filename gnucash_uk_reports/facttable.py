@@ -2,7 +2,9 @@
 from . period import Period
 from . basicelement import BasicElement
 from . fact import *
+from . datum import *
 from . worksheet import get_worksheet
+import copy
 
 from xml.dom.minidom import getDOMImplementation
 from xml.dom import XHTML_NAMESPACE
@@ -33,20 +35,16 @@ business_type = {
 
 class FactTable(BasicElement):
 
-    def __init__(self, cfg, elts, session, tx):
-        super().__init__(cfg, tx)
+    def __init__(self, elts, data):
+        super().__init__(data)
         self.elements = elts
-        self.session = session
-        self.cfg = cfg
 
     @staticmethod
-    def load(elt_def, cfg, session, tx):
+    def load(elt_def, data):
 
         c = FactTable(
-            cfg,
             elt_def.get("facts"),
-            session,
-            tx
+            data
         )
         return c
 
@@ -106,47 +104,43 @@ BODY {
 
         style.appendChild(doc.createTextNode(style_text))
 
-    def get_context(self, id):
+#     def get_context(self, id):
 
-        period = Period.load(self.cfg.get("metadata.report.periods")[0])
+#         period = Period.load(self.cfg.get("metadata.report.periods")[0])
 
-        cdef = ContextDefinition()
+#         cdef = ContextDefinition()
 
-        td = self.taxonomy.get_time_dimension(id)
+#         td = self.taxonomy.get_time_dimension(id)
 
-        if td == "instant":
-            cdef.set_instant(period.end)
-        else:
-            cdef.set_period(period.start, period.end)
-#        cdef.add_segments(id, self.taxonomy)
-        cdef.add_segment("ct-comp:BusinessTypeDimension",
-                         "ct-comp:Company")
+#         if td == "instant":
+#             cdef.set_instant(period.end)
+#         else:
+#             cdef.set_period(period.start, period.end)
+# #        cdef.add_segments(id, self.taxonomy)
+#         cdef.add_segment("ct-comp:BusinessTypeDimension",
+#                          "ct-comp:Company")
 
-        context = self.taxonomy.create_context(cdef)
+#         context = self.taxonomy.create_context(cdef)
 
-        return context
+#         return context
 
-    def to_ixbrl_elt(self, par):
+    def to_ixbrl_elt(self, par, taxonomy):
 
         div = par.doc.createElement("div")
         div.setAttribute("class", "facts document")
 
-        title = par.doc.createElement("h2")
-        title.appendChild(par.doc.createTextNode("FACTS FIXME"))
-        div.appendChild(title)
+        period = self.data.get_report_period()
 
-        period = Period.load(self.cfg.get("metadata.report.periods")[0])
+        context = self.data.root_context
 
         for v in self.elements:
 
             if v.get("kind") == "config":
 
                 id = v.get("id")
-                context = self.get_context(id)
-                fact = context.create_string_fact(
-                    id, self.cfg.get(v.get("key"))
-                )
-
+                value = self.data.get_config(v.get("key"))
+                datum = StringDatum(id, value, context)
+                fact = taxonomy.create_fact(datum)
                 elt = self.make_data(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
@@ -154,11 +148,9 @@ BODY {
             if v.get("kind") == "config-date":
 
                 id = v.get("id")
-                context = self.get_context(id)
-                fact = context.create_date_fact(
-                    id, self.cfg.get_date(v.get("key"))
-                )
-
+                value = self.data.get_config_date(v.get("key"))
+                datum = DateDatum(id, value, context)
+                fact = taxonomy.create_fact(datum)
                 elt = self.make_data(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
@@ -166,11 +158,9 @@ BODY {
             if v.get("kind") == "bool":
 
                 id = v.get("id")
-                context = self.get_context(id)
-                fact = context.create_bool_fact(
-                    id, v.get_bool("value")
-                )
-
+                value = v.get_bool("value")
+                datum = BoolDatum(id, value, context)
+                fact = taxonomy.create_fact(datum)
                 elt = self.make_data(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
@@ -178,11 +168,9 @@ BODY {
             if v.get("kind") == "string":
 
                 id = v.get("id")
-                context = self.get_context(id)
-                fact = context.create_string_fact(
-                    id, v.get("value")
-                )
-
+                value = v.get("value")
+                datum = StringDatum(id, value, context)
+                fact = taxonomy.create_fact(datum)
                 elt = self.make_data(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
@@ -190,11 +178,9 @@ BODY {
             if v.get("kind") == "money":
 
                 id = v.get("id")
-                context = self.get_context(id)
-                fact = context.create_money_fact(
-                    id, v.get("value")
-                )
-
+                value = v.get("value")
+                datum = MoneyDatum(id, value, context)
+                fact = taxonomy.create_fact(datum)
                 elt = self.make_data(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
@@ -202,48 +188,32 @@ BODY {
             if v.get("kind") == "number":
 
                 id = v.get("id")
-                context = self.get_context(id)
-                fact = context.create_number_fact(
-                    id, v.get("value")
-                )
-
+                value = v.get("value")
+                datum = NumberDatum(id, value, context)
+                fact = taxonomy.create_fact(datum)
                 elt = self.make_data(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
 
             if v.get("kind") == "worksheet-value":
+                continue
+
+            if v.get("kind") == "computation":
 
                 id = v.get("id")
+                comp_id = v.get("computation")
+                key = v.get("period-config")
+                period = Period.load(self.data.get_config(
+                    key
+                ))
 
-                worksheet_id = v.get("worksheet")
+                res = self.data.get_results([comp_id], period)
+                value = res.get(comp_id)
 
-                wsht = get_worksheet(worksheet_id, self.cfg, self.session,
-                                     self.taxonomy)
+                value = copy.copy(value)
+                value.id = id
 
-                value_id = v.get("value")
-
-                ds = wsht.get_dataset()
-
-                # FIXME: Assumed first period.
-                found = False
-                for section in ds.sections:
-                    if section.id == value_id:
-                        fact = section.total.values[0]
-                        found = True
-                    if section.items:
-                        for item in section.items:
-                            if item.id == value_id:
-                                fact = item.values[0]
-                                found = True
-
-                if found == False:
-                    raise RuntimeError("Couldn't find value '%s'" % value_id)
-
-                # New context
-                context = self.get_context(id)
-
-                fact = fact.copy()
-                fact.rename(id, context, self.taxonomy)
+                fact = taxonomy.create_fact(value)
 
                 elt = self.make_data(par, str(v.get("field")),
                                      v.get("description"),
@@ -274,27 +244,27 @@ BODY {
 
         return row
 
-    def get_report_date_context(self):
+    # def get_report_date_context(self):
 
-        report_date = self.cfg.get("metadata.report.date")
+    #     report_date = self.cfg.get("metadata.report.date")
 
-        cdef = ContextDefinition()
-        cdef.set_instant(report_date)
-        cdef.add_segment("ct-comp:BusinessTypeDimension",
-                         "ct-comp:Company")
-        context = self.taxonomy.create_context(cdef)
+    #     cdef = ContextDefinition()
+    #     cdef.set_instant(report_date)
+    #     cdef.add_segment("ct-comp:BusinessTypeDimension",
+    #                      "ct-comp:Company")
+    #     context = self.taxonomy.create_context(cdef)
 
-        return context
+    #     return context
 
-    def create_metadata(self):
+    def create_metadata(self, taxonomy):
 
-        context = self.get_report_date_context()
+        period = self.data.get_report_period()
+        rpc = self.data.business_context.with_period(period)
 
-        context.create_string_fact("software", software).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
+        datum = StringDatum("software", software, rpc)
+        fact = taxonomy.create_fact(datum)
+        fact.append(self.doc, self.hidden)
 
-        context.create_string_fact("software-version", software_version).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
-
+        datum = StringDatum("software-version", software_version, rpc)
+        fact = taxonomy.create_fact(datum)
+        fact.append(self.doc, self.hidden)

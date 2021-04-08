@@ -761,20 +761,18 @@
 		    "field": "155",
 		    "id": "adjusted-trading-profit-of-this-period",
 		    "description": "Trading profits",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-net-profit"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-net-profit"
 		},
 
 		{
 		    "field": "165",
 		    "id": "net-trading-profits",
 		    "description": "Net trading profits",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-net-profit"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-net-profit"
 		},
 
 		{
@@ -789,40 +787,36 @@
 		    "field": "235",
 		    "id": "profits-before-other-deductions-and-reliefs",
 		    "description": "Profits before other deductions and reliefs",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-net-profit"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-net-profit"
 		},
 
 		{
 		    "field": "245",
 		    "id": "management-expenses-relief",
 		    "description": "Management expenses",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-management-expenses"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-management-expenses"
 		},
 
 		{
 		    "field": "295",
 		    "id": "total-deductions-and-reliefs",
 		    "description": "Total deductions and reliefs",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-management-expenses"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-management-expenses"
 		},
 
 		{
 		    "field": "300",
 		    "id": "profits-before-charges-and-group-relief",
 		    "description": "Profits before qualifying donations and group relief",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-profit"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-profit"
 		},
 
 		{
@@ -853,10 +847,9 @@
 		    "field": "315",
 		    "id": "total-profits-chargeable-to-corporation-tax",
 		    "description": "Profits chargeable to Corporation Tax",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-profit"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-profit"
 		},
 		
 		{
@@ -871,10 +864,9 @@
 		    "field": "335",
 		    "id": "fy1-amount-of-profit-chargeable-at-first-rate",
 		    "description": "FY1 amount of profit chargable at first rate",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-profit"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-profit"
 		},
 		    
 		{
@@ -889,20 +881,18 @@
 		    "field": "345",
 		    "id": "fy1-tax-at-first-rate",
 		    "description": "FY1 tax at first rate",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-tax-owed"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-tax-owed"
 		},
 		  
 		{
 		    "field": "430",
 		    "id": "corporation-tax-chargeable",
 		    "description": "Corporation tax",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-tax-owed"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-tax-owed"
 		},
 		  
 		{
@@ -917,10 +907,9 @@
 		    "field": "440",
 		    "id": "corporation-tax-chargeable-payable",
 		    "description": "Corporation tax chargeable",
-		    "kind": "worksheet-value",
-		    "worksheet": "detailed-profit-and-loss",
-		    "period-config": "tax.period",
-		    "value": "dpl-tax-owed"
+		    "kind": "computation",
+		    "period-config": "metadata.tax.period",
+		    "computation": "dpl-tax-owed"
 		}
 		     
 	    ]

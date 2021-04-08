@@ -1,6 +1,10 @@
 
-from . datum import StringDatum, DateDatum, MoneyDatum, BoolDatum, CountDatum
-from . fact import StringFact, DateFact, MoneyFact, BoolFact, CountFact
+from . datum import (
+    StringDatum, DateDatum, MoneyDatum, BoolDatum, CountDatum, NumberDatum
+)
+from . fact import (
+    StringFact, DateFact, MoneyFact, BoolFact, CountFact, NumberFact
+)
 
 class Taxonomy:
     def __init__(self, cfg, name):
@@ -56,6 +60,15 @@ class Taxonomy:
 
         if isinstance(val, CountDatum):
             fact =  CountFact(
+                self.get_context_id(val.context),
+                self.get_tag_name(val.id),
+                val.value
+            )
+            fact.dimensions = self.get_tag_dimensions(val.id)
+            return fact
+
+        if isinstance(val, NumberDatum):
+            fact =  NumberFact(
                 self.get_context_id(val.context),
                 self.get_tag_name(val.id),
                 val.value
