@@ -129,6 +129,7 @@
 		"contact-location": "uk-bus:PrincipalLocation-CityOrTown",
 		"contact-county": "uk-bus:CountyRegion",
 		"contact-postcode": "uk-bus:PostalCodeZip",
+		"contact-email": "uk-bus:E-mailAddress",
 		"contact-phone-country": "uk-bus:CountryCode",
 		"contact-phone-area": "uk-bus:AreaCode",
 		"contact-phone-number": "uk-bus:LocalNumber",
@@ -268,7 +269,9 @@
 		"phone-number-type": {
 		    "dimension": "uk-bus:PhoneNumberTypeDimension",
 		    "map": {
-			"landline": "uk-bus:Landline"
+			"landline": "uk-bus:Landline",
+			"mobile": "uk-bus:Mobile",
+			"fax": "uk-bus:Fax"
 		    }
 		}
 	    }

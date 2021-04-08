@@ -18,6 +18,10 @@
 		"country": "england-and-wales",
 		"date": "2019-03-01"
 	    },
+	    "average-employees": [
+		2,
+		1
+	    ],
 	    "sic-codes": [
 		"62020", "62021"
 	    ],
@@ -59,10 +63,6 @@
 	    "date": "2021-08-31",
 	    "currency": "GBP",
 	    "signed-by": "B Smith",
-	    "average-employees": [
-		2,
-		1
-	    ],
  	    "periods": [
  		{
  		    "name": "2021",

@@ -34,6 +34,7 @@ class DataSource:
         val = self.cfg.get("metadata.business.contact.name")
         d.add_string("contact-name", val, c)
 
+        # FIXME: Address type missing???
         val = self.cfg.get("metadata.business.contact.address")
         for i in range(0, 3):
             if len(val) > i:
@@ -51,11 +52,38 @@ class DataSource:
         val = self.cfg.get("metadata.business.contact.country")
         d.add_string("contact-country", val, c)
 
+        val = self.cfg.get("metadata.business.contact.email")
+        d.add_string("contact-email", val, rpc)
+
+        pc = rpc
+
+        phone_type = self.cfg.get("metadata.business.contact.phone.type")
+        if phone_type:
+            pc = rpc.with_segments({"phone-number-type": phone_type})
+
+        self.cfg.get("metadata.business.contact.phone.country").use(
+            lambda val: d.add_string("contact-phone-country", val, pc)
+        )
+        self.cfg.get("metadata.business.contact.phone.area").use(
+            lambda val: d.add_string("contact-phone-area", val, pc)
+        )
+        self.cfg.get("metadata.business.contact.phone.number").use(
+            lambda val: d.add_string("contact-phone-number", val, pc)
+        )
+
+        self.cfg.get("metadata.business.website.url").use(
+            lambda val: d.add_string("website-url", val, c)
+        )
+
+        self.cfg.get("metadata.business.website.description").use(
+            lambda val: d.add_string("website-description", val, c)
+        )
+
         return d
 
-    def get_report_period(self):
+    def get_report_period(self, i=0):
 
-        return Period.load(self.cfg.get("metadata.report.periods.0"))
+        return Period.load(self.cfg.get("metadata.report.periods." + str(i)))
 
     def get_report_date(self):
 
@@ -89,7 +117,7 @@ class DataSource:
             dirc = c.with_segment("officer", "director" + str(i + 1))
             d.add_string("director" + str(i + 1), directors[i], dirc)
             if signed_by == directors[i]:
-                d.add_string("signed-by", signed_by, dirc)
+                d.add_string("signed-by", "", dirc)
 
         self.cfg.get("metadata.business.activities").use(
             lambda val: d.add_string("activities", val, c)

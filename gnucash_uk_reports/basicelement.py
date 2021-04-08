@@ -517,6 +517,7 @@ h2 {
 
         ci = self.data.get_company_information()
         ri = self.data.get_report_information()
+        ni = self.data.get_contact_information()
 
         period = self.data.get_report_period()
         rpc = self.data.business_context.with_period(period)
@@ -563,141 +564,50 @@ h2 {
 
         ci.get("entity-legal-form").use(add)
         ci.get("entity-legal-country").use(add)
-        ci.get("entity-legal-date").use(add)q
+        ci.get("entity-legal-date").use(add)
 
-        return
-
+        # FIXME: Should be in get_company_information.  Should be able to
+        # return multiple values for different dimensions.
         # average-employees
         def add_avg_employee_counts(val):
             for i in range(0, len(val)):
 
-                cdef = ContextDefinition()
-                cdef.set_period(
-                    report.get("periods")[i].get_date("start"),
-                    report.get("periods")[i].get_date("end")
-                )
-                context = self.taxonomy.create_context(cdef)
-
-                fact = context.create_count_fact("average-employees", val[i])
+                datum = CountDatum("average-employees", val[i],
+                                   rpc.with_period(
+                                       self.data.get_report_period(i)
+                                   ))
+                fact = taxonomy.create_fact(datum)
                 fact.append(self.doc, self.hidden)
 
-        report.get("average-employees").use(add_avg_employee_counts)
-
-        # director and signer
-        directors = business.get("directors")
-        signer = report.get("signing-director")
-
-        for i in range(0, len(directors)):
-
-            cdef = ContextDefinition()
-            cdef.set_period(
-                report.get("periods")[0].get_date("start"),
-                report.get("periods")[0].get_date("end")
-            )
-            cdef.lookup_segment("director", "director" + str(i + 1),
-                                self.taxonomy)
-            context = self.taxonomy.create_context(cdef)
-        
-            fact = context.create_string_fact("director", directors[i])
-            fact.append(self.doc, self.hidden)
-
-            if signer == directors[i]:
-                fact = context.create_string_fact("signer", "")
-                fact.append(self.doc, self.hidden)
-
-        # country context
-        context = self.get_contact_context()
-
-        # contact name
-        business.get("contact").get("name").use(
-            lambda val: context.create_string_fact("contact-name", val)
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
+        self.data.cfg.get("metadata.business.average-employees").use(
+            add_avg_employee_counts
         )
 
-        # address
-        def add_address(val):
-            for i in range(0, 2):
-                if len(val) > (i):
-                    nm = "contact-address{0}".format(i+1)
-                    fact = context.create_string_fact(nm, val[i])
-                    fact.append(self.doc, self.hidden)
-                
-        business.get("contact").get("address").use(
-            lambda val: add_address(val)
-        )
+        def add_director(n):
+            def fn(val):
+                taxonomy.create_fact(val).append(self.doc, self.hidden)
+            return fn
+            
+        for i in range(0, 20):
+            ci.get("director" + str(i + 1)).use(add_director(i))
 
-        # location
-        business.get("contact").get("location").use(
-            lambda val: context.create_string_fact("contact-location", val)
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
+        ci.get("signed-by").use(add)
 
-        business.get("contact").get("county").use(
-            lambda val: context.create_string_fact("contact-county", val)
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
+        ni.get("contact-name").use(add)
+        ni.get("contact-address1").use(add)
+        ni.get("contact-address2").use(add)
+        ni.get("contact-address3").use(add)
+        ni.get("contact-location").use(add)
+        ni.get("contact-county").use(add)
+        ni.get("contact-postcode").use(add)
+        ni.get("contact-email").use(add)
 
-        business.get("contact").get("postcode").use(
-            lambda val: context.create_string_fact("contact-postcode", val)
-        ).use(
-            lambda x: x.append(self.doc, self.hidden)
-        )
+        ni.get("contact-phone-country").use(add)
+        ni.get("contact-phone-area").use(add)
+        ni.get("contact-phone-number").use(add)
 
-        # phone context
-        val = business.get("contact.phone.type")
-        cdef = ContextDefinition()
-        cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        cdef.lookup_segment("phone-number-type", val, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
+        ni.get("website-url").use(add)
+        ni.get("website-description").use(add)
 
-        # phone
+        return
 
-        def add_phone(val):
-            val.get("country").use(
-                lambda val: context.create_string_fact("contact-phone-country",
-                                                       val)
-            ).use(
-                lambda x: x.append(self.doc, self.hidden)
-            )
-            val.get("area").use(
-                lambda val: context.create_string_fact("contact-phone-area",
-                                                       val)
-            ).use(
-                lambda x: x.append(self.doc, self.hidden)
-            )
-            val.get("number").use(
-                lambda val: context.create_string_fact("contact-phone-number",
-                                                       val)
-            ).use(
-                lambda x: x.append(self.doc, self.hidden)
-            )
-
-        business.get("contact").get("phone").use(
-            lambda val: add_phone(val)
-        )
-
-        # website context
-        val = business.get("contact.country")
-        cdef = ContextDefinition()
-        cdef.set_period(
-            report.get("periods")[0].get_date("start"),
-            report.get("periods")[0].get_date("end")
-        )
-        cdef.lookup_segment("countries-regions", val, self.taxonomy)
-        context = self.taxonomy.create_context(cdef)
-
-        # website URL
-        val = business.get("website.url")
-        fact = context.create_string_fact("website-url", val)
-        fact.append(self.doc, self.hidden)
-        
-        # website description
-        val = business.get("website.description")
-        fact = context.create_string_fact("website-description", val)
-        fact.append(self.doc, self.hidden)

@@ -156,6 +156,10 @@ class Title(BasicElement):
 
         ci.get("signed-by").use(signer)
 
+        p.appendChild(par.doc.createTextNode(
+            self.data.get_config("metadata.report.signed-by")
+        ))
+
         p.appendChild(par.doc.createTextNode("."))
 
         sig.appendChild(p)
