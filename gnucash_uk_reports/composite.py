@@ -24,14 +24,14 @@ class Composite(BasicElement):
             v.to_text(out)
             out.write("\n")
 
-    def to_ixbrl_elt(self, par):
+    def to_ixbrl_elt(self, par, taxonomy):
 
         elt = par.doc.createElement("div")
         elt.setAttribute("class", "composite")
 
         for v in self.elements:
 
-            sub = v.to_ixbrl_elt(par)
+            sub = v.to_ixbrl_elt(par, taxonomy)
             elt.appendChild(sub)
         
         return elt
