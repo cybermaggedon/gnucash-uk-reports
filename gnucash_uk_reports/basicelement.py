@@ -193,37 +193,38 @@ h2 {
 
 
 
-.data {
+.fact {
   display: flex;
   flex-direction: row;
-  margin: 4px;
+  margin: 2px;
 }
 
-.data DIV {
-  padding: 0.5rem;
+.fact DIV {
+  margin: 0rem 1rem 0rem 1rem;
+  padding: 4px;
 }
 
-.data .number {
-  width: 2em;
+.fact .ref {
+  width: 5rem;
   text-align: center;
   color: white;
-  background-color: #c4b95c;
-  border: 2px solid black;
+  background-color: #2ca469;
+  border: 2px solid #104020;
   font-weight: bold;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 0.2rem;
+  padding-right: 0.2rem;
 }
 
-.data .description {
+.fact .description {
   width: 25em;
 }
 
-.data .value {
+.fact .value {
   border: 2px solid black;
   background-color: white;
 }
 
-.data .value.false {
+.fact .value.false {
   color: #a0a0a0;
 }
         """

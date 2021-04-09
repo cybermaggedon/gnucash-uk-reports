@@ -78,7 +78,7 @@ class FactTable(BasicElement):
                 value = self.data.get_config(v.get("key"))
                 datum = StringDatum(id, value, context)
                 fact = taxonomy.create_fact(datum)
-                elt = self.make_data(par, v.get("field"),
+                elt = self.make_fact(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
 
@@ -88,7 +88,7 @@ class FactTable(BasicElement):
                 value = self.data.get_config_date(v.get("key"))
                 datum = DateDatum(id, value, context)
                 fact = taxonomy.create_fact(datum)
-                elt = self.make_data(par, v.get("field"),
+                elt = self.make_fact(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
 
@@ -98,7 +98,7 @@ class FactTable(BasicElement):
                 value = v.get_bool("value")
                 datum = BoolDatum(id, value, context)
                 fact = taxonomy.create_fact(datum)
-                elt = self.make_data(par, v.get("field"),
+                elt = self.make_fact(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
 
@@ -108,7 +108,7 @@ class FactTable(BasicElement):
                 value = v.get("value")
                 datum = StringDatum(id, value, context)
                 fact = taxonomy.create_fact(datum)
-                elt = self.make_data(par, v.get("field"),
+                elt = self.make_fact(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
 
@@ -118,7 +118,7 @@ class FactTable(BasicElement):
                 value = v.get("value")
                 datum = MoneyDatum(id, value, context)
                 fact = taxonomy.create_fact(datum)
-                elt = self.make_data(par, v.get("field"),
+                elt = self.make_fact(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
 
@@ -128,7 +128,7 @@ class FactTable(BasicElement):
                 value = v.get("value")
                 datum = NumberDatum(id, value, context)
                 fact = taxonomy.create_fact(datum)
-                elt = self.make_data(par, v.get("field"),
+                elt = self.make_fact(par, v.get("field"),
                                      v.get("description"), fact)
                 div.appendChild(elt)
 
@@ -153,20 +153,20 @@ class FactTable(BasicElement):
 
                 fact = taxonomy.create_fact(value)
 
-                elt = self.make_data(par, str(v.get("field")),
+                elt = self.make_fact(par, str(v.get("field")),
                                      v.get("description"),
                                      fact)
                 div.appendChild(elt)
 
         return div
 
-    def make_data(self, par, field, desc, fact):
+    def make_fact(self, par, field, desc, fact):
 
         row = par.doc.createElement("div")
-        row.setAttribute("class", "data")
+        row.setAttribute("class", "fact")
 
         num = par.doc.createElement("div")
-        num.setAttribute("class", "number")
+        num.setAttribute("class", "ref")
         row.appendChild(num)
         num.appendChild(par.doc.createTextNode(field))
 
