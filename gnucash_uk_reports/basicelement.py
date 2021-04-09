@@ -191,6 +191,41 @@ h2 {
   display: none;
 }
 
+
+
+.data {
+  display: flex;
+  flex-direction: row;
+  margin: 4px;
+}
+
+.data DIV {
+  padding: 0.5rem;
+}
+
+.data .number {
+  width: 2em;
+  text-align: center;
+  color: white;
+  background-color: #c4b95c;
+  border: 2px solid black;
+  font-weight: bold;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.data .description {
+  width: 25em;
+}
+
+.data .value {
+  border: 2px solid black;
+  background-color: white;
+}
+
+.data .value.false {
+  color: #a0a0a0;
+}
         """
 
         style.appendChild(doc.createTextNode(style_text))
@@ -379,7 +414,8 @@ h2 {
 
             for k, v in segments.items():
                 k2, v2 = taxonomy.lookup_dimension(k, v)
-                segs.append(self.create_segment_member(k2, v2))
+                if k2 and v2:
+                    segs.append(self.create_segment_member(k2, v2))
 
             crit = []
             if entity:
@@ -477,7 +513,10 @@ h2 {
 
         def add(val):
             fact = taxonomy.create_fact(val)
-            fact.append(self.doc, self.hidden)
+
+            # Don't add facts if there's no fact to add
+            if fact.name:
+                fact.append(self.doc, self.hidden)
 
         ri.get("report-title").use(add)
         ri.get("report-date").use(add)
@@ -494,7 +533,7 @@ h2 {
 
         datum = StringDatum("software-version", software_version, rpc)
         fact = taxonomy.create_fact(datum)
-        fact.append(self.doc, self.hidden)
+        fact.append(self.doc, self.hidden, onlyifnamed=True)
 
         ri.get("balance-sheet-date").use(add)
         ci.get("activities").use(add)
@@ -502,7 +541,9 @@ h2 {
         for i in range(0, 3):
             ci.get("sic" + str(i + 1)).use(
                 lambda val:
-                taxonomy.create_fact(val).append(self.doc, self.hidden)
+                taxonomy.create_fact(val).append(
+                    self.doc, self.hidden, onlyifnamed=True
+                )
             )
 
         ci.get("industry-sector").use(add)
@@ -510,7 +551,7 @@ h2 {
 
         datum = StringDatum("trading-status", "", rpc)
         fact = taxonomy.create_fact(datum)
-        fact.append(self.doc, self.hidden)
+        fact.append(self.doc, self.hidden, onlyifnamed=True)
 
         ri.get("accounting-standards").use(add)
         ri.get("accounts-type").use(add)
@@ -531,7 +572,7 @@ h2 {
                                        self.data.get_report_period(i)
                                    ))
                 fact = taxonomy.create_fact(datum)
-                fact.append(self.doc, self.hidden)
+                fact.append(self.doc, self.hidden, onlyifnamed=True)
 
         self.data.cfg.get("metadata.business.average-employees").use(
             add_avg_employee_counts
@@ -539,7 +580,9 @@ h2 {
 
         def add_director(n):
             def fn(val):
-                taxonomy.create_fact(val).append(self.doc, self.hidden)
+                taxonomy.create_fact(val).append(
+                    self.doc, self.hidden, onlyifnamed=True
+                )
             return fn
             
         for i in range(0, 20):

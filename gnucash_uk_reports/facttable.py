@@ -35,79 +35,29 @@ business_type = {
 
 class FactTable(BasicElement):
 
-    def __init__(self, elts, data):
+    def __init__(self, elts, title, data):
         super().__init__(data)
         self.elements = elts
+        self.title = title
 
     @staticmethod
     def load(elt_def, data):
 
         c = FactTable(
             elt_def.get("facts"),
+            elt_def.get("title"),
             data
         )
         return c
 
-    def add_style(self, elt):
-
-        doc = self.doc
-        
-        style = doc.createElement("style")
-        style.setAttribute("type", "text/css")
-        elt.appendChild(style)
-            
-        style_text = """
-
-BODY {
-  background-color: #d0f8f8;
-}
-
-.hidden {
-  display: none;
-}
-
-.data {
-  display: flex;
-  flex-direction: row;
-  margin: 4px;
-}
-
-.data DIV {
-  padding: 0.5rem;
-}
-
-.data .number {
-  width: 2em;
-  text-align: center;
-  color: white;
-  background-color: #30a090;
-  border: 2px solid #004030;
-  font-weight: bold;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.data .description {
-  width: 25em;
-}
-
-.data .value {
-  border: 2px solid black;
-  background-color: white;
-}
-
-.data .value.false {
-  color: #a0a0a0;
-}
-
-        """
-
-        style.appendChild(doc.createTextNode(style_text))
-
     def to_ixbrl_elt(self, par, taxonomy):
 
         div = par.doc.createElement("div")
-        div.setAttribute("class", "facts document")
+        div.setAttribute("class", "facts page")
+
+        title = par.doc.createElement("h2")
+        title.appendChild(par.doc.createTextNode(self.title))
+        div.appendChild(title)
 
         period = self.data.get_report_period()
 

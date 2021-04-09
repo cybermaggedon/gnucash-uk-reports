@@ -16,7 +16,8 @@ class MoneyFact(Fact):
         self.context = context
         self.unit = unit
         self.reverse = reverse
-    def append(self, doc, par):
+    def append(self, doc, par, onlyifnamed=False):
+        if onlyifnamed and not self.name: return
         value = self.value
         if self.reverse: value *= -1
         if self.name:
@@ -45,7 +46,8 @@ class CountFact(Fact):
         self.value = value
         self.reverse = False
         self.unit = unit
-    def append(self, doc, par):
+    def append(self, doc, par, onlyifnamed=False):
+        if onlyifnamed and not self.name: return
         if self.name:
             elt = doc.createElement("ix:nonFraction")
             elt.setAttribute("name", self.name)
@@ -64,7 +66,8 @@ class NumberFact(Fact):
         self.value = value
         self.reverse = False
         self.unit = unit
-    def append(self, doc, par):
+    def append(self, doc, par, onlyifnamed=False):
+        if onlyifnamed and not self.name: return
         if self.name:
             elt = doc.createElement("ix:nonFraction")
             elt.setAttribute("name", self.name)
@@ -81,10 +84,8 @@ class StringFact(Fact):
         self.value = value
         self.context = context
         self.name = name
-    def append(self, doc, par):
-        print(self.name)
-        if self.name:
-            print("BUNCHY", self.name)
+    def append(self, doc, par, onlyifnamed=False):
+        if onlyifnamed and not self.name: return
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
             elt.setAttribute("name", self.name)
@@ -99,7 +100,8 @@ class BoolFact(Fact):
         self.value = bool(value)
         self.name = name
         self.context = context
-    def append(self, doc, par):
+    def append(self, doc, par, onlyifnamed=False):
+        if onlyifnamed and not self.name: return
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
             elt.setAttribute("name", self.name)
@@ -114,7 +116,8 @@ class DateFact(Fact):
         self.context = context
         self.name = name
         self.value = value
-    def append(self, doc, par):
+    def append(self, doc, par, onlyifnamed=False):
+        if onlyifnamed and not self.name: return
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
             elt.setAttribute("name", self.name)
@@ -132,5 +135,6 @@ class Section:
     pass
 
 class Series:
-    pass
-
+    def __init__(self, desc, values):
+        self.description = desc
+        self.values = values
