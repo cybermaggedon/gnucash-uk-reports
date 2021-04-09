@@ -5,7 +5,7 @@
     },
 
     "taxonomy": {
-	"file": "taxonomy/dpl.json",
+	"file": "taxonomy/detailed-profit-and-loss.json",
 	"id": "dpl"
     },
 
