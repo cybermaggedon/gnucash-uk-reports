@@ -958,14 +958,6 @@
 		"corporation-tax-chargeable": true,
 		"corporation-tax-chargeable-payable": true
 	    },
-	    "time-dimension": {
-		"company-name": "instant",
-		"tax-reference": "instant",
-		"return-period-start": "instant",
-		"return-period-end": "instant",
-		"account-period-start": "instant",
-		"account-period-end": "instant"
-	    },
 	    "segments": {
 		"company-name": {
 		    "ct-comp:BusinessTypeDimension": "ct-comp:Company"

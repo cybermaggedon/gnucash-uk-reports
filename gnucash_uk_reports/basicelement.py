@@ -390,6 +390,9 @@ h2 {
 
         for ctxt, id in taxonomy.contexts.items():
 
+            if id not in taxonomy.contexts_used:
+                continue
+
             entity = None
             scheme = None
             segments = {}

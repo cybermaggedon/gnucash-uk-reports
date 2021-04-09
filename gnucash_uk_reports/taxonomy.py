@@ -12,6 +12,7 @@ class Taxonomy:
         self.name = name
         self.contexts = {}
         self.next_context_id = 0
+        self.contexts_used = set()
 
     def get_context_id(self, ctxt):
         if ctxt in self.contexts:
@@ -60,17 +61,26 @@ class Taxonomy:
         k2 = "taxonomy.{0}.lookup.{1}.map.{2}".format(self.name, id, val)
         return self.cfg.get(k1), self.cfg.get(k2)
 
+    def observe_fact(self, fact):
+        # Keep track of which contexts are used.  Contexts which are
+        # used by facts with no names don't need to be describe in the
+        # output.
+        if fact.name:
+            self.contexts_used.add(fact.context)
+
     def create_money_fact(self, val):
         fact = MoneyFact(self.get_context_id(val.context),
                          self.get_tag_name(val.id), val.value,
                          self.get_sign_reversed(val.id))
         fact.dimensions = self.get_tag_dimensions(val.id)
+        self.observe_fact(fact)
         return fact
 
     def create_count_fact(self, val):
         fact = CountFact(self.get_context_id(val.context),
                          self.get_tag_name(val.id), val.value)
         fact.dimensions = self.get_tag_dimensions(val.id)
+        self.observe_fact(fact)
         return fact
 
     def create_number_fact(self, val):
@@ -78,24 +88,28 @@ class Taxonomy:
                           self.get_tag_name(val.id), val.value,
                           self.get_sign_reversed(val.id))
         fact.dimensions = self.get_tag_dimensions(val.id)
+        self.observe_fact(fact)
         return fact
 
     def create_string_fact(self, val):
         fact = StringFact(self.get_context_id(val.context),
                           self.get_tag_name(val.id), val.value)
         fact.dimensions = self.get_tag_dimensions(val.id)
+        self.observe_fact(fact)
         return fact
 
     def create_bool_fact(self, val):
         fact = BoolFact(self.get_context_id(val.context),
                         self.get_tag_name(val.id), val.value)
         fact.dimensions = self.get_tag_dimensions(val.id)
+        self.observe_fact(fact)
         return fact
 
     def create_date_fact(self, val):
         fact = DateFact(self.get_context_id(val.context),
                         self.get_tag_name(val.id), val.value)
         fact.dimensions = self.get_tag_dimensions(val.id)
+        self.observe_fact(fact)
         return fact
 
     def create_context(self, cdef):
