@@ -3,7 +3,7 @@
 from gnucash_uk_reports.config import Config
 
 import gnucash_uk_reports.accounts as accounts
-from gnucash_uk_reports.taxonomy import FRS101
+from gnucash_uk_reports.taxonomy import Taxonomy
 import sys
 from gnucash_uk_reports.datasource import DataSource
 
@@ -12,8 +12,6 @@ if len(sys.argv) < 4:
     sys.exit(1)
 
 cfg = Config.load(sys.argv[1])
-
-tx_cfg = Config.load("taxonomy.json")
 
 file = cfg.get("accounts.file")
 
@@ -24,7 +22,9 @@ d = DataSource(cfg, session)
 elt = d.get_element(sys.argv[2])
 
 if sys.argv[3] == "ixbrl":
-    tx = FRS101(tx_cfg)
+    tx_cfg = Config.load(cfg.get("taxonomy.file"))
+    tx_id = cfg.get("taxonomy.id")
+    tx = Taxonomy(tx_cfg, tx_id)
     elt.to_ixbrl(tx, sys.stdout)
 elif sys.argv[3] == "html":
     elt.to_html(sys.stdout)

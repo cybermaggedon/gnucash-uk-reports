@@ -209,6 +209,6 @@ class Taxonomy:
 
         return ctxt
         
-class FRS101(Taxonomy):
-    def __init__(self, cfg):
-        super().__init__(cfg, "frs-101")
+#class FRS101(Taxonomy):
+#    def __init__(self, cfg):
+#        super().__init__(cfg, "frs-101")

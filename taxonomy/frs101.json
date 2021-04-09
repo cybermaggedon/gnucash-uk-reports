@@ -1,6 +1,6 @@
 {
     "taxonomy": {
-	"frs-101": {
+	"frs101": {
 	    "schema": "https://xbrl.frc.org.uk/FRS-102/2021-01-01/FRS-102-2021-01-01.xsd",
 	    "namespaces": {
 		"uk-bus": "http://xbrl.frc.org.uk/cd/2021-01-01/business",

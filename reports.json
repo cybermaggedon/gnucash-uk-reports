@@ -4,6 +4,11 @@
         "file": "example.gnucash"
     },
 
+    "taxonomy": {
+	"file": "taxonomy/frs101.json",
+	"id": "frs101"
+    },
+
     "metadata": {
     
 	"business": {

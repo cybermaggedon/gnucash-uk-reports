@@ -1,6 +1,6 @@
 {
     "taxonomy": {
-	"ct": {
+	"corptax": {
 	    "schema": "http://www.hmrc.gov.uk/schemas/ct/comp/2020-04-01/ct-comp-2020.xsd",
 	    "namespaces": {
 		"ct-comp": "http://www.hmrc.gov.uk/schemas/ct/comp/2020-04-01"

@@ -16,19 +16,10 @@ class MoneyFact(Fact):
         self.context = context
         self.unit = unit
         self.reverse = reverse
-    def describe(self):
-        if self.name:
-            name = self.name
-            context = self.context
-            print("        {0} {1} {2}".format(
-                str(self.value), name, context
-            ))
-        else:
-            print("        {0}".format(str(self.value)))
     def append(self, doc, par):
         value = self.value
         if self.reverse: value *= -1
-        if hasattr(self, "name"):
+        if self.name:
             elt = doc.createElement("ix:nonFraction")
             elt.setAttribute("name", self.name)
             elt.setAttribute("contextRef", self.context)
@@ -54,15 +45,6 @@ class CountFact(Fact):
         self.value = value
         self.reverse = False
         self.unit = unit
-    def describe(self):
-        if self.name:
-            name = self.name
-            context = self.context
-            print("        {0} {1} {2}".format(
-                str(self.value), name, context
-            ))
-        else:
-            print("        {0}".format(str(self.value)))
     def append(self, doc, par):
         if self.name:
             elt = doc.createElement("ix:nonFraction")
@@ -82,15 +64,6 @@ class NumberFact(Fact):
         self.value = value
         self.reverse = False
         self.unit = unit
-    def describe(self):
-        if self.name:
-            name = self.name
-            context = self.context
-            print("        {0} {1} {2}".format(
-                str(self.value), name, context
-            ))
-        else:
-            print("        {0}".format(str(self.value)))
     def append(self, doc, par):
         if self.name:
             elt = doc.createElement("ix:nonFraction")
@@ -108,16 +81,10 @@ class StringFact(Fact):
         self.value = value
         self.context = context
         self.name = name
-    def describe(self):
-        if self.name:
-            name = self.name
-            context = self.context
-            print("        {0} {1} {2}".format(
-                self.value, name, context
-            ))
-        else:
-            print("        {0}".format(str(self.value)))
     def append(self, doc, par):
+        print(self.name)
+        if self.name:
+            print("BUNCHY", self.name)
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
             elt.setAttribute("name", self.name)
@@ -132,15 +99,6 @@ class BoolFact(Fact):
         self.value = bool(value)
         self.name = name
         self.context = context
-    def describe(self):
-        if self.name:
-            name = self.name
-            context = self.context
-            print("        {0} {1} {2}".format(
-                self.value, name, context
-            ))
-        else:
-            print("        {0}".format(str(self.value)))
     def append(self, doc, par):
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
@@ -156,15 +114,6 @@ class DateFact(Fact):
         self.context = context
         self.name = name
         self.value = value
-    def describe(self):
-        if self.name:
-            name = self.name
-            context = self.context.id
-            print("        {0} {1} {2}".format(
-                self.value, name, context
-            ))
-        else:
-            print("        {0}".format(str(self.value)))
     def append(self, doc, par):
         if self.name:
             elt = doc.createElement("ix:nonNumeric")
@@ -177,28 +126,11 @@ class DateFact(Fact):
             par.appendChild(doc.createTextNode(self.value.strftime("%d %B %Y")))
 
 class Dataset:
-    def describe(self):
-        print("Dataset:")
-        print("Periods: ", ", ".join([str(p) for p in self.periods]))
-        for sec in self.sections:
-            sec.describe()
+    pass
 
 class Section:
-    def describe(self):
-        print("  Series:")
-        print("    Heading:", self.header)
-        if self.items:
-            for it in self.items:
-                it.describe()
-        if self.total:
-            self.total.describe()
+    pass
 
 class Series:
-    def __init__(self, desc, values):
-        self.description = desc
-        self.values = values
-    def describe(self):
-        print("      {0}:".format(self.description))
-        for v in self.values:
-            v.describe()
+    pass
 
