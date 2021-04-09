@@ -22,9 +22,10 @@ class Taxonomy:
     def get_context_id(self, ctxt):
         if ctxt in self.contexts:
             return self.contexts[ctxt]
-
+        
         self.contexts[ctxt] = "ctxt-" + str(self.next_context_id)
         self.next_context_id += 1
+
         return self.contexts[ctxt]
 
     def create_fact(self, val):
@@ -90,8 +91,7 @@ class Taxonomy:
 
     def create_number_fact(self, val):
         fact = NumberFact(self.get_context_id(val.context),
-                          self.get_tag_name(val.id), val.value,
-                          self.get_sign_reversed(val.id))
+                          self.get_tag_name(val.id), val.value)
         fact.dimensions = self.get_tag_dimensions(val.id)
         self.observe_fact(fact)
         return fact
@@ -142,44 +142,57 @@ class Taxonomy:
 
         contexts = {}
 
-        for c in self.cfg.get("taxonomy.{0}.contexts".format(self.name)):
+        for defn in self.cfg.get("taxonomy.{0}.contexts".format(self.name)):
 
-            ctxt = None
-
-            if c.get("from"):
-                ctxt = contexts[c.get("from")]
-            else:
-                ctxt = data.get_root_context()
-
-            if c.get("entity"):
-                scheme_def = c.get("scheme")
-                scheme = data.get_config(scheme_def, scheme_def)
-                entity_def = c.get("entity")
-                entity = data.get_config(entity_def, entity_def)
-                ctxt = ctxt.with_entity(scheme, entity)
-
-            if c.get("period"):
-                period_def = c.get("period")
-                period = Period.load(data.get_config(period_def))
-                ctxt = ctxt.with_period(period)
-
-            if c.get("instant"):
-                instant_def = c.get("instant")
-                instant = data.get_config_date(instant_def)
-                ctxt = ctxt.with_instant(instant)
-
-            if c.get("segments"):
-                segments = c.get("segments")
-
-                for k, v in segments.items():
-                    v = data.get_config(v, v)
-                    segments[k] = v
-                    
-                ctxt = ctxt.with_segments(segments)
-
-            contexts[c.get("id")] = ctxt
+            ctxt = self.load_context(defn, data, contexts)
+            contexts[defn.get("id")] = ctxt
 
         return contexts
+
+    def get_context(self, id, data):
+
+        contexts = self.get_predefined_contexts(data)
+
+        if id in contexts: return contexts[id]
+
+        raise RuntimeError("No such context: %s" % id)
+
+    def load_context(self, defn, data, contexts):
+
+        ctxt = None
+
+        if defn.get("from"):
+            ctxt = contexts[defn.get("from")]
+        else:
+            ctxt = data.get_root_context()
+
+        if defn.get("entity"):
+            scheme_def = defn.get("scheme")
+            scheme = data.get_config(scheme_def, scheme_def)
+            entity_def = defn.get("entity")
+            entity = data.get_config(entity_def, entity_def)
+            ctxt = ctxt.with_entity(scheme, entity)
+
+        if defn.get("period"):
+            period_def = defn.get("period")
+            period = Period.load(data.get_config(period_def))
+            ctxt = ctxt.with_period(period)
+
+        if defn.get("instant"):
+            instant_def = defn.get("instant")
+            instant = data.get_config_date(instant_def)
+            ctxt = ctxt.with_instant(instant)
+
+        if defn.get("segments"):
+            segments = defn.get("segments")
+
+            for k, v in segments.items():
+                v = data.get_config(v, v)
+                segments[k] = v
+
+            ctxt = ctxt.with_segments(segments)
+
+        return ctxt
 
     def get_document_metadata(self, data):
 

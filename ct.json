@@ -250,14 +250,16 @@
 		    "id": "company-name",
 		    "description": "Company name",
 		    "kind": "config",
-		    "key": "metadata.business.company-name"
+		    "key": "metadata.business.company-name",
+		    "context": "report-date"
 		},
 		{
 		    "field": "3",
 		    "id": "tax-reference",
 		    "description": "Tax reference",
 		    "kind": "config",
-		    "key": "metadata.tax.utr"
+		    "key": "metadata.tax.utr",
+		    "context": "report-date"
 		},
 	
 		{
@@ -265,35 +267,40 @@
 		    "id": "return-period-start",
 		    "description": "Return period start",
 		    "kind": "config-date",
-		    "key": "metadata.tax.period.start"
+		    "key": "metadata.tax.period.start",
+		    "context": "report-date"
 		},
 		{
 		    "field": "35",
 		    "id": "return-period-end",
 		    "description": "Return period end",
 		    "kind": "config-date",
-		    "key": "metadata.tax.period.end"
+		    "key": "metadata.tax.period.end",
+		    "context": "report-date"
 		},
 		{
 		    "field": "-",
 		    "id": "account-period-start",
 		    "description": "Start of accounts period",
 		    "kind": "config-date",
-		    "key": "metadata.tax.period.start"
+		    "key": "metadata.tax.period.start",
+		    "context": "report-date"
 		},
 		{
 		    "field": "-",
 		    "id": "account-period-end",
 		    "description": "End of accounts period",
 		    "kind": "config-date",
-		    "key": "metadata.tax.period.end"
+		    "key": "metadata.tax.period.end",
+		    "context": "report-date"
 		},
 		{
 		    "field": "-",
 		    "id": "partner-in-a-firm",
 		    "description": "Company is a partner in a firm",
 		    "kind": "bool",
-		    "value": "false"
+		    "value": "false",
+		    "context": "report-period"
 		}
 
 	    ]
@@ -312,7 +319,8 @@
 		    "description": "Trading profits",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-net-profit"
+		    "computation": "dpl-net-profit",
+		    "context": "report-period"
 		},
 
 		{
@@ -321,7 +329,8 @@
 		    "description": "Net trading profits",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-net-profit"
+		    "computation": "dpl-net-profit",
+		    "context": "report-period"
 		},
 
 		{
@@ -329,7 +338,8 @@
 		    "id": "net-chargeable-gains",
 		    "description": "Net chargeable gains",
 		    "kind": "money",
-		    "value": 0
+		    "value": 0,
+		    "context": "report-period"
 		},
 
 		{
@@ -338,7 +348,8 @@
 		    "description": "Profits before other deductions and reliefs",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-net-profit"
+		    "computation": "dpl-net-profit",
+		    "context": "report-period"
 		},
 
 		{
@@ -347,7 +358,8 @@
 		    "description": "Management expenses",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-management-expenses"
+		    "computation": "dpl-management-expenses",
+		    "context": "management-expenses-period"
 		},
 
 		{
@@ -356,7 +368,8 @@
 		    "description": "Total deductions and reliefs",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-management-expenses"
+		    "computation": "dpl-management-expenses",
+		    "context": "report-period"
 		},
 
 		{
@@ -365,7 +378,8 @@
 		    "description": "Profits before qualifying donations and group relief",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-profit"
+		    "computation": "dpl-profit",
+		    "context": "report-period"
 		},
 
 		{
@@ -373,7 +387,8 @@
 		    "id": "qualifying-donations",
 		    "description": "Qualifying donations",
 		    "kind": "money",
-		    "value": 0
+		    "value": 0,
+		    "context": "report-period"
 		},
 
 		{
@@ -381,7 +396,8 @@
 		    "id": "group-relief-claimed",
 		    "description": "Group relief",
 		    "kind": "money",
-		    "value": 0
+		    "value": 0,
+		    "context": "report-period"
 		},
 
 		{
@@ -389,7 +405,8 @@
 		    "id": "group-relief-claimed-for-carried-forward-losses",
 		    "description": "Group relief for carried forward losses",
 		    "kind": "money",
-		    "value": 0
+		    "value": 0,
+		    "context": "report-period"
 		},
 
 		{
@@ -398,7 +415,8 @@
 		    "description": "Profits chargeable to Corporation Tax",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-profit"
+		    "computation": "dpl-profit",
+		    "context": "report-period"
 		},
 		
 		{
@@ -406,7 +424,8 @@
 		    "id": "financial-year1-covered-by-the-return",
 		    "description": "Financial year 1 covered by the return",
 		    "kind": "string",
-		    "value": "2020"
+		    "value": "2020",
+		    "context": "report-period"
 		},
 
 		{
@@ -415,7 +434,8 @@
 		    "description": "FY1 amount of profit chargable at first rate",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-profit"
+		    "computation": "dpl-profit",
+		    "context": "report-period"
 		},
 		    
 		{
@@ -423,7 +443,8 @@
 		    "id": "fy1-first-rate-of-tax",
 		    "description": "FY1 first rate of tax",
 		    "kind": "number",
-		    "value": 19
+		    "value": 19,
+		    "context": "report-period"
 		},
 		  
 		{
@@ -432,7 +453,8 @@
 		    "description": "FY1 tax at first rate",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-tax-owed"
+		    "computation": "dpl-tax-owed",
+		    "context": "report-period"
 		},
 		  
 		{
@@ -441,7 +463,8 @@
 		    "description": "Corporation tax",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-tax-owed"
+		    "computation": "dpl-tax-owed",
+		    "context": "report-period"
 		},
 		  
 		{
@@ -449,7 +472,8 @@
 		    "id": "marginal-rate-relief-for-ring-fence-trades-payable",
 		    "description": "Marginal relief for ring fence trades",
 		    "kind": "money",
-		    "value": 0
+		    "value": 0,
+		    "context": "report-period"
 		},
 		   
 		{
@@ -458,7 +482,8 @@
 		    "description": "Corporation tax chargeable",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-tax-owed"
+		    "computation": "dpl-tax-owed",
+		    "context": "report-period"
 		}
 		     
 	    ]

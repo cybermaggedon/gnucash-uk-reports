@@ -5,6 +5,49 @@
 	    "namespaces": {
 		"ct-comp": "http://www.hmrc.gov.uk/schemas/ct/comp/2020-04-01"
 	    },
+	    "contexts": [
+		{
+		    "id": "business",
+		    "entity": "metadata.business.company-number",
+		    "scheme": "http://www.companieshouse.gov.uk/"
+		},
+		{
+		    "id": "report-period",
+		    "period": "metadata.report.periods.0",
+		    "segments": {
+			"business-type": "company"
+		    },
+		    "from": "business"
+		},
+		{
+		    "id": "management-expenses-period",
+		    "period": "metadata.report.periods.0",
+		    "segments": {
+			"business-type": "management-expenses"
+		    },
+		    "from": "business"
+		},
+		{
+		    "id": "report-date",
+		    "instant": "metadata.report.date",
+		    "segments": {
+			"business-type": "company"
+		    },
+		    "from": "business"
+		}
+	    ],
+	    "document-metadata": [
+		{
+		    "id": "software",
+		    "context": "report-date",
+		    "value": "FIXME"
+		},
+		{
+		    "id": "software-version",
+		    "context": "report-date",
+		    "value": "FIXME"
+		}
+	    ],
 	    "tags": {
 		"company-name": "ct-comp:CompanyName",
 		"tax-reference": "ct-comp:TaxReference",
@@ -958,17 +1001,19 @@
 		"corporation-tax-chargeable": true,
 		"corporation-tax-chargeable-payable": true
 	    },
-	    "segments": {
-		"company-name": {
-		    "ct-comp:BusinessTypeDimension": "ct-comp:Company"
-		}
-	    },
 	    "lookup": {
 		"countries-regions": {
 		    "dimension": "uk-geo:CountriesRegionsDimension",
 		    "map": {
 			"UK": "uk-geo:UnitedKingdom",
 			"england-and-wales": "uk-geo:EnglandWales"
+		    }
+		},
+		"business-type": {
+		    "dimension": "ct-comp:BusinessTypeDimension",
+		    "map": {
+			"company": "ct-comp:Company",
+			"management-expenses": "ct-comp:ManagementExpenses"
 		    }
 		}
 	    }

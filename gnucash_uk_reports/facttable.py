@@ -60,10 +60,17 @@ class FactTable(BasicElement):
         div.appendChild(title)
 
         period = self.data.get_report_period()
-
-        context = self.data.root_context
+        period_context = self.data.get_business_context().with_period(period)
+        date_context = self.data.get_business_context().with_instant(
+            self.data.get_report_date()
+        )
 
         for v in self.elements:
+
+            if v.get("context"):
+                context = taxonomy.get_context(v.get("context"), self.data)
+            else:
+                context = period_context
 
             if v.get("kind") == "config":
 
@@ -142,6 +149,7 @@ class FactTable(BasicElement):
 
                 value = copy.copy(value)
                 value.id = id
+                value.context = context
 
                 fact = taxonomy.create_fact(value)
 
