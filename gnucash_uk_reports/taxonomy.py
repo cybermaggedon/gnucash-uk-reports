@@ -220,62 +220,10 @@ class Taxonomy:
                 datum = StringDatum(id, value, context)
             fact = self.create_fact(datum)
 
-            print(fact.name, fact.value, fact.context)
-
             meta.append(fact)
 
         return meta
 
-    def get_context(self, id, cfg, instant=None, period=None):
-        key = "taxonomy.{0}.contexts.{1}".format(self.name, id)
-        ccfg = self.cfg.get(key)
-
-        cdef = ContextDefinition()
-
-        def use_instant(val):
-            f = val.get("from")
-            if f == "config":
-                key = val.get("key")
-                cdef.set_instant(cfg.get_date(val.get("key")))
-            elif f == "defined":
-                if instant == None:
-                    raise RuntimeError("Required instant not supplied")
-                cdef.set_instant(instant)
-            else:
-                raise RuntimeError("Instant from '%s' means nothing" % f)
-            
-        ccfg.get("instant").use(use_instant)
-
-        def use_period(val):
-            f = val.get("from")
-            if f == "config":
-                key = val.get("key")
-                period = Period.load(cfg.get(val.get("key")))
-                cdef.set_period(period.start, period.end)
-            elif f == "defined":
-                if period == None:
-                    raise RuntimeError("Required period not supplied")
-                cdef.set_instant(period.start, period.end)
-            else:
-                raise RuntimeError("Period from '%s' means nothing" % f)
-            
-        ccfg.get("period").use(use_period)
-
-        def use_entity(val):
-            f = val.get("from")
-            if f == "config":
-                key = val.get("key")
-                scheme = val.get("scheme")
-                cdef.set_entity(cfg.get(val.get("key")))
-            else:
-                raise RuntimeError("Entity from '%s' means nothing" % f)
-            
-        ccfg.get("entity").use(use_entity)
-
-        ctxt = self.create_context(cdef)
-
-        return ctxt
-        
 #class FRS101(Taxonomy):
 #    def __init__(self, cfg):
 #        super().__init__(cfg, "frs-101")
