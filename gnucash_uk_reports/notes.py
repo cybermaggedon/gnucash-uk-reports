@@ -29,10 +29,6 @@ class NotesElement(BasicElement):
 
     def get_note_elts(self, n, par, taxonomy):
 
-        ci = self.data.get_company_information()
-        ri = self.data.get_report_information()
-        ni = self.data.get_contact_information()
-
         period = self.data.get_report_period()
         year_end = period.end
         rpc = self.data.business_context.with_period(period)
@@ -79,48 +75,48 @@ class NotesElement(BasicElement):
 
             elt.appendChild(par.doc.createTextNode("The company is a private company limited by shares and is registered in England and Wales number "))
 
-            ci.get("company-number").use(
-                lambda val: taxonomy.create_fact(val).append(par.doc, elt)
+            taxonomy.get_metadata(self.data, "company-number").use(
+                lambda fact: fact.append(par.doc, elt)
             )
 
             elt.appendChild(par.doc.createTextNode(". The registered address is: "))
 
-            ni.get("contact-address1").use(
-                lambda val: taxonomy.create_fact(val).append(par.doc, elt)
+            taxonomy.get_metadata(self.data, "contact-address1").use(
+                lambda fact: fact.append(par.doc, elt)
             )
 
-            ni.get("contact-address2").use(
-                lambda val: (
+            taxonomy.get_metadata(self.data, "contact-address2").use(
+                lambda fact: (
                     elt.appendChild(par.doc.createTextNode(", ")),
-                    taxonomy.create_fact(val).append(par.doc, elt)
+                    fact.append(par.doc, elt)
                 )
             )
 
-            ni.get("contact-address3").use(
-                lambda val: (
+            taxonomy.get_metadata(self.data, "contact-address3").use(
+                lambda fact: (
                     elt.appendChild(par.doc.createTextNode(", ")),
-                    taxonomy.create_fact(val).append(par.doc, elt)
+                    fact.append(par.doc, elt)
                 )
             )
 
-            ni.get("contact-location").use(
-                lambda val: (
+            taxonomy.get_metadata(self.data, "contact-location").use(
+                lambda fact: (
                     elt.appendChild(par.doc.createTextNode(", ")),
-                    taxonomy.create_fact(val).append(par.doc, elt)
+                    fact.append(par.doc, elt)
                 )
             )
 
-            ni.get("contact-county").use(
-                lambda val: (
+            taxonomy.get_metadata(self.data, "contact-county").use(
+                lambda fact: (
                     elt.appendChild(par.doc.createTextNode(", ")),
-                    taxonomy.create_fact(val).append(par.doc, elt)
+                    fact.append(par.doc, elt)
                 )
             )
 
-            ni.get("contact-postcode").use(
-                lambda val: (
+            taxonomy.get_metadata(self.data, "contact-postcode").use(
+                lambda fact: (
                     elt.appendChild(par.doc.createTextNode(" ")),
-                    taxonomy.create_fact(val).append(par.doc, elt)
+                    fact.append(par.doc, elt)
                 )
             )
 
@@ -146,15 +142,15 @@ class NotesElement(BasicElement):
 
             elt.appendChild(par.doc.createTextNode("These accounts were generated using "))
 
-            datum = StringDatum("software", software, rpc)
-            fact = taxonomy.create_fact(datum)
-            fact.append(par.doc, elt)
+            taxonomy.get_metadata(self.data, "software").use(
+                lambda fact: fact.append(par.doc, elt)
+            )
 
             elt.appendChild(par.doc.createTextNode(" version "))
 
-            datum = StringDatum("software-version", software_version, rpc)
-            fact = taxonomy.create_fact(datum)
-            fact.append(par.doc, elt)
+            taxonomy.get_metadata(self.data, "software-version").use(
+                lambda fact: fact.append(par.doc, elt)
+            )
 
             elt.appendChild(par.doc.createTextNode("."))
 

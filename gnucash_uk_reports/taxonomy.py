@@ -181,48 +181,85 @@ class Taxonomy:
 
         return contexts
 
-    def get_metadata(self, data):
+    def get_document_metadata(self, data):
 
         ctxts = self.get_predefined_contexts(data)
 
         meta = []
 
         key = "taxonomy.{0}.document-metadata".format(self.name)
-        for c in self.cfg.get(key):
+        for defn in self.cfg.get(key):
 
-            id = c.get("id")
-            context = ctxts[c.get("context")]
+            fact = self.load_metadata(data, defn, ctxts)
 
-            if c.get("config"):
-                value_def = c.get("config")
-                value = data.get_config(value_def)
-            else:
-                value = c.get("value")
-
-            # Ignore missing values
-            if isinstance(value, NoneValue):
-                continue
-
-            kind = c.get("kind")
-            if kind == "date":
-                value = datetime.fromisoformat(value).date()
-                datum = DateDatum(id, value, context)
-            elif kind == "bool":
-                value = bool(value)
-                datum = BoolDatum(id, value, context)
-            elif kind == "money":
-                datum = MoneyDatum(id, value, context)
-            elif kind == "count":
-                datum = CountDatum(id, value, context)
-            elif kind == "number":
-                datum = NumberDatum(id, value, context)
-            else:
-                datum = StringDatum(id, value, context)
-            fact = self.create_fact(datum)
-
-            meta.append(fact)
+            # Ignore missing
+            if fact:
+                meta.append(fact)
 
         return meta
+
+    def get_metadata(self, data, id):
+
+        ctxts = self.get_predefined_contexts(data)
+
+        key = "taxonomy.{0}.document-metadata".format(self.name)
+        for defn in self.cfg.get(key):
+
+            if defn.get("id") == id:
+
+                return self.load_metadata(data, defn, ctxts)
+
+        return NoneValue()
+
+    def get_all_metadata(self, data, id):
+
+        ctxts = self.get_predefined_contexts(data)
+
+        meta = []
+
+        key = "taxonomy.{0}.document-metadata".format(self.name)
+        for defn in self.cfg.get(key):
+
+            if defn.get("id") == id:
+                fact = self.load_metadata(data, defn, ctxts)
+                if fact:
+                    meta.append(fact)
+
+        return meta
+
+    def load_metadata(self, data, defn, ctxts):
+
+        id = defn.get("id")
+        context = ctxts[defn.get("context")]
+
+        if defn.get("config"):
+            value_def = defn.get("config")
+            value = data.get_config(value_def)
+        else:
+            value = defn.get("value")
+
+        # Missing values
+        if isinstance(value, NoneValue):
+            return NoneValue()
+
+        kind = defn.get("kind")
+        if kind == "date":
+            value = datetime.fromisoformat(value).date()
+            datum = DateDatum(id, value, context)
+        elif kind == "bool":
+            value = bool(value)
+            datum = BoolDatum(id, value, context)
+        elif kind == "money":
+            datum = MoneyDatum(id, value, context)
+        elif kind == "count":
+            datum = CountDatum(id, value, context)
+        elif kind == "number":
+            datum = NumberDatum(id, value, context)
+        else:
+            datum = StringDatum(id, value, context)
+        fact = self.create_fact(datum)
+
+        return fact
 
 #class FRS101(Taxonomy):
 #    def __init__(self, cfg):

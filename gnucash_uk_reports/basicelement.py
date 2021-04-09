@@ -287,8 +287,8 @@ h2 {
 
         body.appendChild(elt)
 
-        out.write(doc.toprettyxml())
-#        out.write(doc.toxml())
+#        out.write(doc.toprettyxml())
+        out.write(doc.toxml())
 
 
     def to_ixbrl(self, taxonomy, out):
@@ -383,8 +383,8 @@ h2 {
         unit.appendChild(measure)
         resources.appendChild(unit)
        
-        out.write(doc.toprettyxml())
-#        out.write(doc.toxml())
+#        out.write(doc.toprettyxml())
+        out.write(doc.toxml())
 
     def create_contexts(self, taxonomy):
 
@@ -507,7 +507,7 @@ h2 {
 
     def create_metadata(self, taxonomy):
 
-        metadata = taxonomy.get_metadata(self.data)
+        metadata = taxonomy.get_document_metadata(self.data)
 
         for fact in metadata:
             if fact.name:

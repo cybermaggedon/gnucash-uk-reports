@@ -215,6 +215,7 @@
 		{
 		    "id": "report-date",
 		    "context": "report-date",
+		    "kind": "date",
 		    "config": "metadata.report.date"
 		},
 		{

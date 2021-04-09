@@ -35,26 +35,6 @@ class DataSource:
 
         return self.cfg.get_date("metadata.report.date")
 
-    # FIXME: Superceded
-    def get_company_information(self):
-
-        d = ValueSet()
-
-        return d
-
-    # FIXME: Superceded
-    def get_report_information(self):
-
-        d = ValueSet()
-
-        return d
-
-    # FIXME: Superceded
-    def get_contact_information(self):
-
-        d = ValueSet()
-        return d
-
     def get_computation(self, id):
         if id in self.computations:
             return self.computations[id]
