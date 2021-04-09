@@ -24,57 +24,22 @@ class Taxonomy:
     def create_fact(self, val):
 
         if isinstance(val, StringDatum):
-            fact =  StringFact(
-                self.get_context_id(val.context),
-                self.get_tag_name(val.id),
-                val.value
-            )
-            fact.dimensions = self.get_tag_dimensions(val.id)
-            return fact
+            return self.create_string_fact(val)
 
         if isinstance(val, DateDatum):
-            fact =  DateFact(
-                self.get_context_id(val.context),
-                self.get_tag_name(val.id),
-                val.value
-            )
-            fact.dimensions = self.get_tag_dimensions(val.id)
-            return fact
+            return self.create_date_fact(val)
 
         if isinstance(val, MoneyDatum):
-            fact =  MoneyFact(
-                self.get_context_id(val.context),
-                self.get_tag_name(val.id),
-                val.value
-            )
-            return fact
+            return self.create_money_fact(val)
 
         if isinstance(val, BoolDatum):
-            fact =  BoolFact(
-                self.get_context_id(val.context),
-                self.get_tag_name(val.id),
-                val.value
-            )
-            fact.dimensions = self.get_tag_dimensions(val.id)
-            return fact
+            return self.create_bool_fact(val)
 
         if isinstance(val, CountDatum):
-            fact =  CountFact(
-                self.get_context_id(val.context),
-                self.get_tag_name(val.id),
-                val.value
-            )
-            fact.dimensions = self.get_tag_dimensions(val.id)
-            return fact
+            return self.create_count_fact(val)
 
         if isinstance(val, NumberDatum):
-            fact =  NumberFact(
-                self.get_context_id(val.context),
-                self.get_tag_name(val.id),
-                val.value
-            )
-            fact.dimensions = self.get_tag_dimensions(val.id)
-            return fact
+            return self.create_number_fact(val)
 
         raise RuntimeError("Not implemented: " + str(type(val)))
 
@@ -95,48 +60,43 @@ class Taxonomy:
         k2 = "taxonomy.{0}.lookup.{1}.map.{2}".format(self.name, id, val)
         return self.cfg.get(k1), self.cfg.get(k2)
 
-    def create_money_fact(self, id, value, context):
+    def create_money_fact(self, val):
+        fact = MoneyFact(self.get_context_id(val.context),
+                         self.get_tag_name(val.id), val.value,
+                         self.get_sign_reversed(val.id))
+        fact.dimensions = self.get_tag_dimensions(val.id)
+        return fact
 
-        m = MoneyFact(value, context)
-        m.name = self.get_tag_name(id)
-        m.reverse = self.get_sign_reversed(id)
-        m.context = context
-        return m
+    def create_count_fact(self, val):
+        fact = CountFact(self.get_context_id(val.context),
+                         self.get_tag_name(val.id), val.value)
+        fact.dimensions = self.get_tag_dimensions(val.id)
+        return fact
 
-    def create_count_fact(self, id, value, context):
-        m = CountFact(value, context)
-        m.name = self.get_tag_name(id)
-        m.reverse = self.get_sign_reversed(id)
-        m.context = context
-        return m
+    def create_number_fact(self, val):
+        fact = NumberFact(self.get_context_id(val.context),
+                          self.get_tag_name(val.id), val.value,
+                          self.get_sign_reversed(val.id))
+        fact.dimensions = self.get_tag_dimensions(val.id)
+        return fact
 
-    def create_number_fact(self, id, value, context):
-        m = NumberFact(value, context)
-        m.name = self.get_tag_name(id)
-        m.reverse = self.get_sign_reversed(id)
-        m.context = context
-        return m
+    def create_string_fact(self, val):
+        fact = StringFact(self.get_context_id(val.context),
+                          self.get_tag_name(val.id), val.value)
+        fact.dimensions = self.get_tag_dimensions(val.id)
+        return fact
 
-    def create_string_fact(self, id, value, context):
+    def create_bool_fact(self, val):
+        fact = BoolFact(self.get_context_id(val.context),
+                        self.get_tag_name(val.id), val.value)
+        fact.dimensions = self.get_tag_dimensions(val.id)
+        return fact
 
-        m = StringFact(value, context)
-        m.name = self.get_tag_name(id)
-        m.context = context
-        return m
-
-    def create_bool_fact(self, id, value, context):
-
-        m = BoolFact(value, context)
-        m.name = self.get_tag_name(id)
-        m.context = context
-        return m
-
-    def create_date_fact(self, id, value, context):
-
-        m = DateFact(value, context)
-        m.name = self.get_tag_name(id)
-        m.context = context
-        return m
+    def create_date_fact(self, val):
+        fact = DateFact(self.get_context_id(val.context),
+                        self.get_tag_name(val.id), val.value)
+        fact.dimensions = self.get_tag_dimensions(val.id)
+        return fact
 
     def create_context(self, cdef):
 
