@@ -395,44 +395,6 @@ h2 {
 
             self.resources.appendChild(ce)
 
-    def add_nn(self, par, name, ctxt, val):
-        par.appendChild(self.make_nn(name, ctxt, val))
-
-    def make_nn(self, name, ctxt, val):
-        elt = self.doc.createElement("ix:nonNumeric")
-        elt.setAttribute("name", name)
-        elt.setAttribute("contextRef", ctxt)
-        elt.appendChild(self.doc.createTextNode(val))
-        return elt
-
-    def add_date(self, par, name, ctxt, val):
-        par.appendChild(self.make_date(name, ctxt, val))
-
-    def make_date(self, name, ctxt, val):
-        elt = self.doc.createElement("ix:nonNumeric")
-        elt.setAttribute("name", name)
-        elt.setAttribute("contextRef", ctxt)
-        elt.setAttribute("format", "ixt2:datedaymonthyearen")
-        elt.appendChild(self.doc.createTextNode(val.strftime("%d %B %Y")))
-        return elt
-
-    def add_number(self, par, name, ctxt, val, unit="GBP"):
-        par.appendChild(self.make_number(name, ctxt, val, unit))
-
-    def make_number(self, name, ctxt, val, unit="GBP"):
-
-        elt = self.doc.createElement("ix:nonFraction")
-        elt.setAttribute("name", name)
-
-        elt.setAttribute("contextRef", ctxt)
-        elt.setAttribute("format", "ixt2:numdotdecimal")
-        elt.setAttribute("unitRef", unit)
-        elt.setAttribute("decimals", "2")
-
-        elt.appendChild(self.doc.createTextNode(str(val)))
-
-        return elt
-
     def make_div(self, par, elts):
         div = self.doc.createElement("div")
         self.add_elts(div, elts)
@@ -503,15 +465,6 @@ h2 {
         seg.appendChild(expmem)
 
         return seg
-
-    def get_report_date_context(self):
-
-        context = self.taxonomy.get_context("report-date", self.cfg)
-        return context
-
-    def get_report_period(self):
-
-        return Period.load(self.cfg.get("metadata.report.periods")[0])
 
     def create_metadata(self, taxonomy):
 

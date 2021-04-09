@@ -104,26 +104,6 @@ BODY {
 
         style.appendChild(doc.createTextNode(style_text))
 
-#     def get_context(self, id):
-
-#         period = Period.load(self.cfg.get("metadata.report.periods")[0])
-
-#         cdef = ContextDefinition()
-
-#         td = self.taxonomy.get_time_dimension(id)
-
-#         if td == "instant":
-#             cdef.set_instant(period.end)
-#         else:
-#             cdef.set_period(period.start, period.end)
-# #        cdef.add_segments(id, self.taxonomy)
-#         cdef.add_segment("ct-comp:BusinessTypeDimension",
-#                          "ct-comp:Company")
-
-#         context = self.taxonomy.create_context(cdef)
-
-#         return context
-
     def to_ixbrl_elt(self, par, taxonomy):
 
         div = par.doc.createElement("div")
@@ -243,18 +223,6 @@ BODY {
         fact.append(par.doc, valelt)
 
         return row
-
-    # def get_report_date_context(self):
-
-    #     report_date = self.cfg.get("metadata.report.date")
-
-    #     cdef = ContextDefinition()
-    #     cdef.set_instant(report_date)
-    #     cdef.add_segment("ct-comp:BusinessTypeDimension",
-    #                      "ct-comp:Company")
-    #     context = self.taxonomy.create_context(cdef)
-
-    #     return context
 
     def create_metadata(self, taxonomy):
 

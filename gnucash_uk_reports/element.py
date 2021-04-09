@@ -6,6 +6,7 @@ from . composite import Composite
 from . title import Title
 from . notes import NotesElement
 
+# FIXME: BasicElement and Element have this duped code.
 class Element:
 
     @staticmethod
