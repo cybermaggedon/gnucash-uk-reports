@@ -150,15 +150,16 @@ class Title(BasicElement):
 
         p.appendChild(par.doc.createTextNode("Signed on behalf of the directors by "))
 
-        def signer(val):
-            fact = taxonomy.create_fact(val)
-            fact.append(doc, p)
+        # FIXME
+        # def signer(val):
+        #     fact = taxonomy.create_fact(val)
+        #     fact.append(doc, p)
 
-        ci.get("signed-by").use(signer)
+        # ci.get("signed-by").use(signer)
 
-        p.appendChild(par.doc.createTextNode(
-            self.data.get_config("metadata.report.signed-by")
-        ))
+        # p.appendChild(par.doc.createTextNode(
+        #     self.data.get_config("metadata.report.signed-by")
+        # ))
 
         p.appendChild(par.doc.createTextNode("."))
 

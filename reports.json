@@ -68,7 +68,7 @@
 	    "date": "2021-08-31",
 	    "authorised-date": "2021-08-31",
 	    "currency": "GBP",
-	    "signed-by": "B Smith",
+	    "signing-officer": "director2",
  	    "periods": [
  		{
  		    "name": "2021",

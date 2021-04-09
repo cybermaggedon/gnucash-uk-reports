@@ -75,6 +75,135 @@
 			"countries-regions":
 			"metadata.business.company-formation.country"
 		    }
+		},
+		{
+		    "id": "officer1",
+		    "from": "report-period",
+		    "segments": { "officer": "director1" }
+		},
+		{
+		    "id": "officer2",
+		    "from": "report-period",
+		    "segments": { "officer": "director2" }
+		},
+		{
+		    "id": "officer3",
+		    "from": "report-period",
+		    "segments": { "officer": "director3" }
+		},
+		{
+		    "id": "officer4",
+		    "from": "report-period",
+		    "segments": { "officer": "director4" }
+		},
+		{
+		    "id": "officer5",
+		    "from": "report-period",
+		    "segments": { "officer": "director5" }
+		},
+		{
+		    "id": "officer6",
+		    "from": "report-period",
+		    "segments": { "officer": "director6" }
+		},
+		{
+		    "id": "officer7",
+		    "from": "report-period",
+		    "segments": { "officer": "director7" }
+		},
+		{
+		    "id": "officer8",
+		    "from": "report-period",
+		    "segments": { "officer": "director8" }
+		},
+		{
+		    "id": "officer9",
+		    "from": "report-period",
+		    "segments": { "officer": "director9" }
+		},
+		{
+		    "id": "officer10",
+		    "from": "report-period",
+		    "segments": { "officer": "director10" }
+		},
+		{
+		    "id": "officer11",
+		    "from": "report-period",
+		    "segments": { "officer": "director11" }
+		},
+		{
+		    "id": "officer12",
+		    "from": "report-period",
+		    "segments": { "officer": "director12" }
+		},
+		{
+		    "id": "officer13",
+		    "from": "report-period",
+		    "segments": { "officer": "director13" }
+		},
+		{
+		    "id": "officer14",
+		    "from": "report-period",
+		    "segments": { "officer": "director14" }
+		},
+		{
+		    "id": "officer15",
+		    "from": "report-period",
+		    "segments": { "officer": "director15" }
+		},
+		{
+		    "id": "officer16",
+		    "from": "report-period",
+		    "segments": { "officer": "director16" }
+		},
+		{
+		    "id": "officer17",
+		    "from": "report-period",
+		    "segments": { "officer": "director17" }
+		},
+		{
+		    "id": "officer18",
+		    "from": "report-period",
+		    "segments": { "officer": "director18" }
+		},
+		{
+		    "id": "officer19",
+		    "from": "report-period",
+		    "segments": { "officer": "director19" }
+		},
+		{
+		    "id": "officer20",
+		    "from": "report-period",
+		    "segments": { "officer": "director20" }
+		},
+		{
+		    "id": "signing-officer",
+		    "from": "report-period",
+		    "segments": { "officer": "metadata.report.signing-officer" }
+		},
+		{
+		    "id": "contact-country",
+		    "from": "report-period",
+		    "segments": {
+			"countries-regions":
+			"metadata.business.contact.country"
+		    }
+		},
+		{
+		    "id": "phone",
+		    "from": "report-period",
+		    "segments": {
+			"phone-number-type":
+			"metadata.business.contact.phone.type"
+		    }
+		},
+		{
+		    "id": "website",
+		    "from": "report-period",
+		    "segments": {
+			"countries-regions":
+			"metadata.business.contact.country"
+		    }
 		}
 	    ],
 	    "document-metadata": [
@@ -218,6 +347,176 @@
 		    "context": "previous-period",
 		    "config": "metadata.business.average-employees.1",
 		    "kind": "count"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer1",
+		    "config": "metadata.business.directors.0"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer2",
+		    "config": "metadata.business.directors.1"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer3",
+		    "config": "metadata.business.directors.2"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer4",
+		    "config": "metadata.business.directors.3"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer5",
+		    "config": "metadata.business.directors.4"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer6",
+		    "config": "metadata.business.directors.5"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer7",
+		    "config": "metadata.business.directors.6"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer8",
+		    "config": "metadata.business.directors.7"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer9",
+		    "config": "metadata.business.directors.8"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer10",
+		    "config": "metadata.business.directors.9"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer11",
+		    "config": "metadata.business.directors.10"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer12",
+		    "config": "metadata.business.directors.11"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer13",
+		    "config": "metadata.business.directors.12"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer14",
+		    "config": "metadata.business.directors.13"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer15",
+		    "config": "metadata.business.directors.14"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer16",
+		    "config": "metadata.business.directors.15"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer17",
+		    "config": "metadata.business.directors.16"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer18",
+		    "config": "metadata.business.directors.17"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer19",
+		    "config": "metadata.business.directors.18"
+		},
+		{
+		    "id": "officer",
+		    "context": "officer20",
+		    "config": "metadata.business.directors.19"
+		},
+		{
+		    "id": "signing-officer",
+		    "context": "signing-officer",
+		    "value": ""
+		},
+		{
+		    "id": "contact-name",
+		    "context": "contact-country",
+		    "config": "metadata.business.contact.name"
+		},
+		{
+		    "id": "contact-address1",
+		    "context": "contact-country",
+		    "config": "metadata.business.contact.address.0"
+		},
+		{
+		    "id": "contact-address2",
+		    "context": "contact-country",
+		    "config": "metadata.business.contact.address.1"
+		},
+		{
+		    "id": "contact-address3",
+		    "context": "contact-country",
+		    "config": "metadata.business.contact.address.2"
+		},
+		{
+		    "id": "contact-location",
+		    "context": "contact-country",
+		    "config": "metadata.business.contact.location"
+		},
+		{
+		    "id": "contact-county",
+		    "context": "contact-country",
+		    "config": "metadata.business.contact.county"
+		},
+		{
+		    "id": "contact-postcode",
+		    "context": "contact-country",
+		    "config": "metadata.business.contact.postcode"
+		},
+		{
+		    "id": "contact-email",
+		    "context": "contact-country",
+		    "config": "metadata.business.contact.email"
+		},
+		{
+		    "id": "contact-phone-country",
+		    "context": "phone",
+		    "config": "metadata.business.contact.phone.country"
+		},
+		{
+		    "id": "contact-phone-area",
+		    "context": "phone",
+		    "config": "metadata.business.contact.phone.area"
+		},
+		{
+		    "id": "contact-phone-number",
+		    "context": "phone",
+		    "config": "metadata.business.contact.phone.number"
+		},
+		{
+		    "id": "website-url",
+		    "context": "website",
+		    "config": "metadata.business.website.url"
+		},
+		{
+		    "id": "website-description",
+		    "context": "website",
+		    "config": "metadata.business.website.description"
 		}
 	    ],
 	    "tags": {
@@ -271,27 +570,8 @@
 		"entity-legal-country": "uk-bus:CountryFormationOrIncorporation",
 		"entity-legal-date": "uk-bus:DateFormationOrIncorporation",
 		"average-employees": "uk-core:AverageNumberEmployeesDuringPeriod",
-		"director1": "uk-bus:NameEntityOfficer",
-		"director2": "uk-bus:NameEntityOfficer",
-		"director3": "uk-bus:NameEntityOfficer",
-		"director4": "uk-bus:NameEntityOfficer",
-		"director5": "uk-bus:NameEntityOfficer",
-		"director6": "uk-bus:NameEntityOfficer",
-		"director7": "uk-bus:NameEntityOfficer",
-		"director8": "uk-bus:NameEntityOfficer",
-		"director9": "uk-bus:NameEntityOfficer",
-		"director10": "uk-bus:NameEntityOfficer",
-		"director11": "uk-bus:NameEntityOfficer",
-		"director12": "uk-bus:NameEntityOfficer",
-		"director13": "uk-bus:NameEntityOfficer",
-		"director14": "uk-bus:NameEntityOfficer",
-		"director15": "uk-bus:NameEntityOfficer",
-		"director16": "uk-bus:NameEntityOfficer",
-		"director17": "uk-bus:NameEntityOfficer",
-		"director18": "uk-bus:NameEntityOfficer",
-		"director19": "uk-bus:NameEntityOfficer",
-		"director20": "uk-bus:NameEntityOfficer",
-		"signed-by": "uk-core:DirectorSigningFinancialStatements",
+		"officer": "uk-bus:NameEntityOfficer",
+		"signing-officer": "uk-core:DirectorSigningFinancialStatements",
 		"contact-name": "uk-bus:NameContactDepartmentOrPerson",
 		"contact-address1": "uk-bus:AddressLine1",
 		"contact-address2": "uk-bus:AddressLine2",

@@ -220,6 +220,8 @@ class Taxonomy:
                 datum = StringDatum(id, value, context)
             fact = self.create_fact(datum)
 
+            print(fact.name, fact.value, fact.context)
+
             meta.append(fact)
 
         return meta
