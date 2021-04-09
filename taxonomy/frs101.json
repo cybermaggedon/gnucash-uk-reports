@@ -8,6 +8,218 @@
 		"uk-core": "http://xbrl.frc.org.uk/fr/2021-01-01/core",
 		"uk-direp": "http://xbrl.frc.org.uk/reports/2021-01-01/direp"
 	    },
+	    "contexts": [
+		{
+		    "id": "business",
+		    "entity": "metadata.business.company-number",
+		    "scheme": "http://www.companieshouse.gov.uk/"
+		},
+		{
+		    "id": "report-period",
+		    "period": "metadata.report.periods.0",
+		    "from": "business"
+		},
+		{
+		    "id": "previous-period",
+		    "period": "metadata.report.periods.1",
+		    "from": "business"
+		},
+		{
+		    "id": "report-date",
+		    "instant": "metadata.report.date",
+		    "from": "business"
+		},
+		{
+		    "id": "industry-sector",
+		    "from": "report-period",
+		    "segments": {
+			"industry-sector": "metadata.business.industry-sector"
+		    }
+		},
+		{
+		    "id": "accounting-standards",
+		    "from": "report-period",
+		    "segments": {
+			"accounting-standards":
+			"metadata.report.accounting-standards"
+		    }
+		},
+		{
+		    "id": "accounts-type",
+		    "from": "report-period",
+		    "segments": {
+			"accounts-type":
+			"metadata.report.accounts-type"
+		    }
+		},
+		{
+		    "id": "accounts-status",
+		    "from": "report-period",
+		    "segments": {
+			"accounts-status":
+			"metadata.report.accounts-status"
+		    }
+		},
+		{
+		    "id": "entity-legal-form",
+		    "from": "report-period",
+		    "segments": {
+			"entity-legal-form":
+			"metadata.business.company-formation.form"
+		    }
+		},
+		{
+		    "id": "entity-legal-country",
+		    "from": "report-period",
+		    "segments": {
+			"countries-regions":
+			"metadata.business.company-formation.country"
+		    }
+		}
+	    ],
+	    "document-metadata": [
+		{
+		    "id": "report-title",
+		    "context": "report-period",
+		    "config": "metadata.report.title"
+		},
+		{
+		    "id": "report-date",
+		    "context": "report-date",
+		    "config": "metadata.report.date"
+		},
+		{
+		    "id": "authorised-date",
+		    "context": "report-date",
+		    "config": "metadata.report.authorised-date"
+		},
+		{
+		    "id": "period-start",
+		    "context": "report-date",
+		    "kind": "date",
+		    "config": "metadata.report.periods.0.start"
+		},
+		{
+		    "id": "period-end",
+		    "context": "report-date",
+		    "kind": "date",
+		    "config": "metadata.report.periods.0.end"
+		},
+		{
+		    "id": "company-name",
+		    "context": "report-period",
+		    "config": "metadata.business.company-name"
+		},
+		{
+		    "id": "company-number",
+		    "context": "report-period",
+		    "config": "metadata.business.company-number"
+		},
+		{
+		    "id": "vat-registration",
+		    "context": "report-period",
+		    "config": "metadata.business.vat-registration"
+		},
+		{
+		    "id": "software",
+		    "context": "report-period",
+		    "value": "FIXME"
+		},
+		{
+		    "id": "software-version",
+		    "context": "report-period",
+		    "value": "FIXME"
+		},
+		{
+		    "id": "balance-sheet-date",
+		    "context": "report-date",
+		    "config": "metadata.report.balance-sheet-date"
+		},
+		{
+		    "id": "activities",
+		    "context": "report-period",
+		    "config": "metadata.business.activities"
+		},
+		{
+		    "id": "sic1",
+		    "context": "report-period",
+		    "config": "metadata.business.sic-codes.0"
+		},
+		{
+		    "id": "sic2",
+		    "context": "report-period",
+		    "config": "metadata.business.sic-codes.1"
+		},
+		{
+		    "id": "sic3",
+		    "context": "report-period",
+		    "config": "metadata.business.sic-codes.2"
+		},
+		{
+		    "id": "sic4",
+		    "context": "report-period",
+		    "config": "metadata.business.sic-codes.3"
+		},
+		{
+		    "id": "industry-sector",
+		    "context": "industry-sector",
+		    "value": ""
+		},
+		{
+		    "id": "is-dormant",
+		    "context": "report-period",
+		    "kind": "bool",
+		    "config": "metadata.business.is-dormant"
+		},
+		{
+		    "id": "trading-status",
+		    "context": "report-period",
+		    "value": ""
+		},
+		{
+		    "id": "accounting-standards",
+		    "context": "accounting-standards",
+		    "value": ""
+		},
+		{
+		    "id": "accounts-type",
+		    "context": "accounts-type",
+		    "value": ""
+		},
+		{
+		    "id": "accounts-status",
+		    "context": "accounts-status",
+		    "value": ""
+		},
+		{
+		    "id": "entity-legal-form",
+		    "context": "entity-legal-form",
+		    "value": ""
+		},
+		{
+		    "id": "entity-legal-country",
+		    "context": "entity-legal-country",
+		    "value": ""
+		},
+		{
+		    "id": "entity-legal-date",
+		    "context": "report-date",
+		    "config": "metadata.business.company-formation.date",
+		    "kind": "date"
+		},
+		{
+		    "id": "average-employees",
+		    "context": "report-period",
+		    "config": "metadata.business.average-employees.0",
+		    "kind": "count"
+		},
+		{
+		    "id": "average-employees",
+		    "context": "previous-period",
+		    "config": "metadata.business.average-employees.1",
+		    "kind": "count"
+		}
+	    ],
 	    "tags": {
 		"turnover": "uk-core:TurnoverRevenue",
 		"cost-of-sales": "uk-core:CostSales",

@@ -33,7 +33,7 @@ class Context:
             dims.append(("period", str(self.period.start),
                          str(self.period.end)))
         if self.instant:
-            dims.append(("instant", self.instant))
+            dims.append(("instant", str(self.instant)))
         return dims
 
     def with_segment(self, k, v):

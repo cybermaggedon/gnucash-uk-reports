@@ -5,6 +5,7 @@ from . computation import get_computations, Result
 from . valueset import ValueSet
 from . multi_period import MultiPeriodWorksheet
 from . element import Element
+from . config import NoneValue
 
 class DataSource:
     def __init__(self, cfg, session):
@@ -19,6 +20,12 @@ class DataSource:
         )
         self.computations = get_computations(cfg, self.business_context)
         self.results = {}
+
+    def get_business_context(self):
+        return self.business_context
+
+    def get_root_context(self):
+        return self.root_context
 
     def get_contact_information(self):
 
@@ -284,9 +291,9 @@ class DataSource:
 
         raise RuntimeError("Could not find element '%s'" % id)
 
-    def get_config(self, key):
-        return self.cfg.get(key)
+    def get_config(self, key, deflt=None):
+        return self.cfg.get(key, deflt)
 
-    def get_config_date(self, key):
-        return self.cfg.get_date(key)
+    def get_config_date(self, key, deflt=None):
+        return self.cfg.get_date(key, deflt)
 

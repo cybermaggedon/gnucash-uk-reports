@@ -507,19 +507,21 @@ h2 {
 
     def create_metadata(self, taxonomy):
 
+        metadata = taxonomy.get_metadata(self.data)
+
+        for fact in metadata:
+            if fact.name:
+                fact.append(self.doc, self.hidden)
+            
+
+        return
+
         ci = self.data.get_company_information()
         ri = self.data.get_report_information()
         ni = self.data.get_contact_information()
 
         period = self.data.get_report_period()
         rpc = self.data.business_context.with_period(period)
-
-        def add(val):
-            fact = taxonomy.create_fact(val)
-
-            # Don't add facts if there's no fact to add
-            if fact.name:
-                fact.append(self.doc, self.hidden)
 
         ri.get("report-title").use(add)
         ri.get("report-date").use(add)

@@ -6,6 +6,11 @@ from . fact import (
     StringFact, DateFact, MoneyFact, BoolFact, CountFact, NumberFact
 )
 
+from . period import Period
+from . config import NoneValue
+
+from datetime import datetime
+
 class Taxonomy:
     def __init__(self, cfg, name):
         self.cfg = cfg
@@ -132,6 +137,92 @@ class Taxonomy:
     def get_schema(self):
         key = "taxonomy.{0}.schema".format(self.name)
         return self.cfg.get(key)
+
+    def get_predefined_contexts(self, data):
+
+        contexts = {}
+
+        for c in self.cfg.get("taxonomy.{0}.contexts".format(self.name)):
+
+            ctxt = None
+
+            if c.get("from"):
+                ctxt = contexts[c.get("from")]
+            else:
+                ctxt = data.get_root_context()
+
+            if c.get("entity"):
+                scheme_def = c.get("scheme")
+                scheme = data.get_config(scheme_def, scheme_def)
+                entity_def = c.get("entity")
+                entity = data.get_config(entity_def, entity_def)
+                ctxt = ctxt.with_entity(scheme, entity)
+
+            if c.get("period"):
+                period_def = c.get("period")
+                period = Period.load(data.get_config(period_def))
+                ctxt = ctxt.with_period(period)
+
+            if c.get("instant"):
+                instant_def = c.get("instant")
+                instant = data.get_config_date(instant_def)
+                ctxt = ctxt.with_instant(instant)
+
+            if c.get("segments"):
+                segments = c.get("segments")
+
+                for k, v in segments.items():
+                    v = data.get_config(v, v)
+                    segments[k] = v
+                    
+                ctxt = ctxt.with_segments(segments)
+
+            contexts[c.get("id")] = ctxt
+
+        return contexts
+
+    def get_metadata(self, data):
+
+        ctxts = self.get_predefined_contexts(data)
+
+        meta = []
+
+        key = "taxonomy.{0}.document-metadata".format(self.name)
+        for c in self.cfg.get(key):
+
+            id = c.get("id")
+            context = ctxts[c.get("context")]
+
+            if c.get("config"):
+                value_def = c.get("config")
+                value = data.get_config(value_def)
+            else:
+                value = c.get("value")
+
+            # Ignore missing values
+            if isinstance(value, NoneValue):
+                continue
+
+            kind = c.get("kind")
+            if kind == "date":
+                value = datetime.fromisoformat(value).date()
+                datum = DateDatum(id, value, context)
+            elif kind == "bool":
+                value = bool(value)
+                datum = BoolDatum(id, value, context)
+            elif kind == "money":
+                datum = MoneyDatum(id, value, context)
+            elif kind == "count":
+                datum = CountDatum(id, value, context)
+            elif kind == "number":
+                datum = NumberDatum(id, value, context)
+            else:
+                datum = StringDatum(id, value, context)
+            fact = self.create_fact(datum)
+
+            meta.append(fact)
+
+        return meta
 
     def get_context(self, id, cfg, instant=None, period=None):
         key = "taxonomy.{0}.contexts.{1}".format(self.name, id)

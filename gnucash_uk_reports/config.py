@@ -50,6 +50,9 @@ class Config(dict):
                 if key in nav:
                     nav = nav[key]
                 elif isinstance(nav, list):
+                    pos = int(key)
+                    if pos >= len(nav):
+                        return Config.makevalue(deflt)
                     nav = nav[int(key)]
                 else:
                     return Config.makevalue(deflt)
