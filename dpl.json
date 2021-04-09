@@ -1,0 +1,241 @@
+{
+
+    "accounts": {
+        "file": "example.gnucash"
+    },
+
+    "taxonomy": {
+	"file": "taxonomy/dpl.json",
+	"id": "dpl"
+    },
+
+    "metadata": {
+    
+	"business": {
+	    "company-name": "Example Biz Ltd.",
+	    "company-number": "012345678",
+	    "vat-registration": "GB012345678",
+	    "activities": "Computer security consultancy and development services",
+	    "industry-sector": "m",
+	    "is-dormant": false,
+	    "company-formation": {
+		"form": "private-limited-company",
+		"country": "england-and-wales",
+		"date": "2019-03-01"
+	    },
+	    "average-employees": [
+		2,
+		1
+	    ],
+	    "sic-codes": [
+		"62020", "62021"
+	    ],
+	    "directors": [
+		"A Bloggs",
+		"B Smith",
+		"C Jones"
+	    ],
+	    "contact": {
+		"name": "Corporate Enquiries",
+		"address": [
+		    "123 Leadbarton Street",
+		    "Dumpston Trading Estate"
+		],
+		"location": "Threapminchington",
+		"county": "Minchingshire",
+		"postcode": "QQ99 9ZZ",
+		"email": "corporate@example.org",
+		"phone": {
+		    "country": "+44",
+		    "area": "7900",
+		    "number": "0123456",
+		    "type": "landline"
+		},
+		"country": "UK"
+	    },
+	    "website": {
+		"url": "https://example.org/corporate",
+		"description": "Corporate website"
+	    }
+	},
+
+	"report": {
+	    "title": "Unaudited Micro-Entity Accounts",
+	    "accounts-status": "audit-exempt-no-accountants-report",
+	    "accounts-type": "abridged-accounts",
+	    "accounting-standards": "micro-entities",
+	    "balance-sheet-date": "2021-08-31",
+	    "date": "2021-08-31",
+	    "authorised-date": "2021-08-31",
+	    "currency": "GBP",
+	    "signed-by": "B Smith",
+ 	    "periods": [
+ 		{
+ 		    "name": "2021",
+ 		    "start": "2020-09-01",
+ 		    "end": "2021-08-31"
+ 		},
+ 		{
+ 		    "name": "2020",
+ 		    "start": "2019-09-01",
+ 		    "end": "2020-08-31"
+ 		}
+ 	    ]
+	},
+
+	"tax": {
+	    "date": "2021-08-31",
+	    "period": {
+		"name": "2021",
+		"start": "2020-09-01",
+ 		"end": "2021-08-31"
+	    },
+	    "utr": "0123456789",
+	    "business-type": "company",
+	    "ni": {
+		"trading": false,
+		"sme": false,
+		"employer": false
+	    },
+	    "partner-in-a-firm": false
+	}
+
+    },
+ 
+    "computations": [
+	{
+	    "id": "turnover",
+	    "kind": "group",
+	    "description": "Turnover / revenue",
+	    "period": "in-year",
+	    "lines": [
+		{
+		    "kind": "line",
+		    "id": "consultancy",
+		    "description": "Consultancy",
+		    "accounts": [
+			"Income"
+		    ],
+		    "segments": {
+			"detailed-analysis": "item1"
+		    },
+		    "period": "in-year"
+		}
+	    ]
+	},
+
+	{
+	    "id": "dpl-management-expenses",
+	    "kind": "group",
+	    "description": "Management Expenses",
+	    "period": "in-year",
+	    "lines": [
+		{
+		    "id": "staffing",
+		    "kind": "line",
+		    "description": "Staffing Costs",
+		    "period": "in-year",
+		    "accounts": [
+			"Expenses:Emoluments"
+		    ]
+		},
+		{
+		    "id": "telecoms",
+		    "kind": "line",
+		    "description": "Telecoms",
+		    "accounts": [
+			"Expenses:VAT Purchases:Telecoms"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "other-charges",
+		    "kind": "line",
+		    "description": "Other",
+		    "accounts": [
+			"Expenses:Other non-VAT expenses"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "dpl-machinery-plant",
+		    "kind": "line",
+		    "description": "Machinery and plant",
+		    "period": "in-year",
+		    "accounts": [
+			"Assets:Capital Equipment:Computer Equipment"
+		    ],
+		    "reverse-sign": true
+		}
+	    ]
+	},
+
+	{
+	    "id": "dpl-profit",
+	    "kind": "computation",
+	    "description": "Profit",
+	    "inputs": [
+		"turnover",
+		"dpl-management-expenses"
+	    ]
+	},
+
+	{
+	    "id": "dpl-tax-owed",
+	    "kind": "group",
+	    "description": "Corporation Tax Owed",
+	    "period": "in-year",
+	    "lines": [
+		{
+		    "id": "dpl-corporation-tax",
+		    "kind": "line",
+		    "description": "Other",
+		    "accounts": [
+			"Equity:Corporation Tax"
+		    ],
+		    "period": "in-year"
+		}
+	    ]
+	}
+
+    ],
+    
+    "worksheets": [
+
+	{
+	    "id": "profit-and-loss",
+	    "kind": "multi-period",
+	    "description": "Detailed Profit and Loss",
+
+	    "computations": [
+		"turnover",
+		"dpl-management-expenses",
+		"dpl-profit",
+		"dpl-tax-owed"
+	    ]
+
+	}
+	
+    ],
+
+    "elements": [
+
+	{
+	    "id": "report",
+	    "kind": "composite",
+	    "elements": [
+		"profit-and-loss"
+	    ]
+	},
+
+	{
+	    "id": "profit-and-loss",
+	    "kind": "worksheet",
+	    "title": "Income Statement",
+	    "worksheet": "profit-and-loss"
+	}
+
+    ]
+
+}
+

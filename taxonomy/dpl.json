@@ -1,0 +1,80 @@
+{
+    "taxonomy": {
+	"dpl": {
+	    "schema": "http://www.hmrc.gov.uk/schemas/ct/dpl/2019-01-01/dpl-2019.xsd",
+	    "namespaces": {
+		"uk-core": "http://xbrl.frc.org.uk/fr/2019-01-01/core",
+		"dpl": "http://www.hmrc.gov.uk/schemas/ct/dpl/2019-01-01"
+	    },
+	    "contexts": [
+		{
+		    "id": "business",
+		    "entity": "metadata.business.company-number",
+		    "scheme": "http://www.companieshouse.gov.uk/"
+		},
+		{
+		    "id": "current-item1",
+		    "from": "business",
+		    "period": "metadata.report.periods.0",
+		    "segments": {
+			"detailed-analysis": "item1"
+		    }
+		},
+		{
+		    "id": "previous-item1",
+		    "from": "business",
+		    "period": "metadata.report.periods.1",
+		    "segments": {
+			"detailed-analysis": "item1"
+		    }
+		}
+	    ],
+	    "document-metadata": [
+		{
+		    "id": "comment",
+		    "context": "current-item1",
+		    "value": "Consultancy services"
+		},
+		{
+		    "id": "comment",
+		    "context": "previous-item1",
+		    "value": "Consultancy services"
+		}
+	    ],
+	    "tags": {
+		"turnover": "uk-core:TurnoverRevenue",
+		"consultancy": "uk-core:TurnoverRevenue",
+		"comment": "dpl:DetailedProfitLossFree-textComment",
+		"telecoms": "dpl:TelecommunicationsCosts",
+		"other-charges": "dpl:PrintingPostageStationeryCosts",
+		"staffing": "core:WagesSalaries"
+	    },
+	    "sign-reversed": {
+	    },
+	    "lookup": {
+		"countries-regions": {
+		    "dimension": "uk-geo:CountriesRegionsDimension",
+		    "map": {
+			"UK": "uk-geo:UnitedKingdom",
+			"england-and-wales": "uk-geo:EnglandWales"
+		    }
+		},
+		"detailed-analysis": {
+		    "dimension": "dpl:DetailedAnalysisDimension",
+		    "map": {
+			"item1": "dpl:Item1",
+			"item2": "dpl:Item2",
+			"item3": "dpl:Item3",
+			"item4": "dpl:Item4",
+			"item5": "dpl:Item5",
+			"item6": "dpl:Item6",
+			"item7": "dpl:Item7",
+			"item8": "dpl:Item8",
+			"item9": "dpl:Item9",
+			"item10": "dpl:Item10"
+		    }
+		}
+	    }
+	}
+    }
+}

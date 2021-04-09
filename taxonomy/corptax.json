@@ -990,8 +990,7 @@
 		"share-loss-relief-consideration": "ct-comp:ShareLossReliefConsideration",
 		"share-loss-relief-allowable-costs": "ct-comp:ShareLossReliefAllowableCosts",
 		"share-loss-relief-allowable-loss": "ct-comp:ShareLossReliefAllowableLoss",
-		"share-loss-relief-claimed": "ct-comp:ShareLossReliefClaimed",
-		"administrative-expenses": "FIXME:FIXME"
+		"share-loss-relief-claimed": "ct-comp:ShareLossReliefClaimed"
 	    },
 	    "sign-reversed": {
 		"administrative-expenses": true,
