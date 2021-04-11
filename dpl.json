@@ -116,18 +116,26 @@
 		    "accounts": [
 			"Income"
 		    ],
+		    "period": "in-year",
 		    "segments": {
 			"detailed-analysis": "item1"
-		    },
-		    "period": "in-year"
+		    }
 		}
 	    ]
 	},
-
 	{
-	    "id": "dpl-management-expenses",
+	    "id": "gross-profit",
+	    "kind": "computation",
+	    "description": "Gross Profit",
+	    "period": "in-year",
+	    "inputs": [
+		"turnover"
+	    ]
+	},
+	{
+	    "id": "total-costs",
 	    "kind": "group",
-	    "description": "Management Expenses",
+	    "description": "Total costs",
 	    "period": "in-year",
 	    "lines": [
 		{
@@ -140,27 +148,19 @@
 		    ]
 		},
 		{
-		    "id": "telecoms",
-		    "kind": "line",
-		    "description": "Telecoms",
-		    "accounts": [
-			"Expenses:VAT Purchases:Telecoms"
-		    ],
-		    "period": "in-year"
-		},
-		{
 		    "id": "other-charges",
 		    "kind": "line",
 		    "description": "Other",
 		    "accounts": [
+			"Expenses:VAT Purchases",
 			"Expenses:Other non-VAT expenses"
 		    ],
 		    "period": "in-year"
 		},
 		{
-		    "id": "dpl-machinery-plant",
+		    "id": "it-and-computing",
 		    "kind": "line",
-		    "description": "Machinery and plant",
+		    "description": "IT and computing",
 		    "period": "in-year",
 		    "accounts": [
 			"Assets:Capital Equipment:Computer Equipment"
@@ -169,32 +169,42 @@
 		}
 	    ]
 	},
-
 	{
-	    "id": "dpl-profit",
+	    "id": "profit-before-tax",
 	    "kind": "computation",
-	    "description": "Profit",
+	    "description": "Profit before tax",
+	    "period": "in-year",
 	    "inputs": [
-		"turnover",
-		"dpl-management-expenses"
+		"gross-profit",
+		"total-costs"
 	    ]
 	},
-
 	{
-	    "id": "dpl-tax-owed",
+	    "id": "tax-due",
 	    "kind": "group",
-	    "description": "Corporation Tax Owed",
+	    "description": "Tax Due",
 	    "period": "in-year",
 	    "lines": [
 		{
 		    "id": "dpl-corporation-tax",
 		    "kind": "line",
-		    "description": "Other",
+		    "description": "Corporation Tax",
 		    "accounts": [
 			"Equity:Corporation Tax"
 		    ],
 		    "period": "in-year"
 		}
+	    ]
+	},
+	{
+	    "id": "profit",
+	    "kind": "computation",
+	    "description": "Profit (Loss)",
+	    "period": "in-year",
+	    "inputs": [
+		"gross-profit",
+		"total-costs",
+		"tax-due"
 	    ]
 	}
 
@@ -209,9 +219,11 @@
 
 	    "computations": [
 		"turnover",
-		"dpl-management-expenses",
-		"dpl-profit",
-		"dpl-tax-owed"
+		"gross-profit",
+		"total-costs",
+		"profit-before-tax",
+		"tax-due",
+		"profit"
 	    ]
 
 	}
@@ -231,7 +243,7 @@
 	{
 	    "id": "profit-and-loss",
 	    "kind": "worksheet",
-	    "title": "Income Statement",
+	    "title": "Detailed Profit and Loss",
 	    "worksheet": "profit-and-loss"
 	}
 

@@ -46,8 +46,11 @@
 		"consultancy": "uk-core:TurnoverRevenue",
 		"comment": "dpl:DetailedProfitLossFree-textComment",
 		"telecoms": "dpl:TelecommunicationsCosts",
-		"other-charges": "dpl:PrintingPostageStationeryCosts",
-		"staffing": "core:WagesSalaries"
+		"staffing": "core:WagesSalaries",
+		"gross-profit": "uk-core:GrossProfitLoss",
+		"profit-before-tax": "uk-core:ProfitLossBeforeTax",
+		"total-costs": "dpl:TotalCosts",
+		"it-and-computing": "dpl:ItComputingCosts"
 	    },
 	    "sign-reversed": {
 	    },
