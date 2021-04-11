@@ -145,9 +145,9 @@
 		    ]
 		},
 		{
-		    "id": "accountancy",
+		    "id": "legal-and-professional",
 		    "kind": "line",
-		    "description": "Accountancy services",
+		    "description": "Legal and professional services",
 		    "accounts": [
 			"Expenses:VAT Purchases:Accountant"
 		    ],
@@ -172,7 +172,7 @@
 		    "period": "in-year"
 		},
 		{
-		    "id": "software",
+		    "id": "software-expenses",
 		    "kind": "line",
 		    "description": "Software",
 		    "accounts": [
@@ -181,25 +181,17 @@
 		    "period": "in-year"
 		},
 		{
-		    "id": "subscriptions",
-		    "kind": "line",
-		    "description": "Subscriptions",
-		    "accounts": [
-			"Expenses:VAT Purchases:Subscriptions"
-		    ],
-		    "period": "in-year"
-		},
-		{
 		    "id": "sundries",
 		    "kind": "line",
 		    "description": "Sundries",
 		    "accounts": [
+			"Expenses:VAT Purchases:Subscriptions",
 			"Expenses:VAT Purchases:Sundries"
 		    ],
 		    "period": "in-year"
 		},
 		{
-		    "id": "Telecoms",
+		    "id": "telecoms",
 		    "kind": "line",
 		    "description": "Telecoms",
 		    "accounts": [
@@ -244,7 +236,7 @@
 	    "period": "in-year",
 	    "lines": [
 		{
-		    "id": "it-and-computing",
+		    "id": "annual-investment-allowance",
 		    "kind": "line",
 		    "description": "Annual investment allowance",
 		    "period": "in-year",
@@ -450,7 +442,7 @@
 
 		{
 		    "field": "245",
-		    "id": "management-expenses-relief",
+		    "id": "management-expenses",
 		    "description": "Management expenses",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",

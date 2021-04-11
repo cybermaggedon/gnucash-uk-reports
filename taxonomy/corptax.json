@@ -46,9 +46,32 @@
 		    "id": "software-version",
 		    "context": "report-date",
 		    "value": "FIXME"
+		},
+		{
+		    "id": "company-name",
+		    "context": "report-period",
+		    "config": "metadata.business.company-name"
+		},
+		{
+		    "id": "tax-reference",
+		    "context": "report-period",
+		    "config": "metadata.tax.utr"
 		}
 	    ],
 	    "tags": {
+		"annual-investment-allowance": "ct-comp:MainPoolAnnualInvestmentAllowance",
+		"salaries": "ct-comp:ManagementExpensesEmploymentCosts",
+		"gross-profit": "ct-comp:AdjustedTradingProfitOfThisPeriod",
+		"pensions": "ct-comp:ManagementExpensesPensionCosts",
+		"management-expenses": "ct-comp:TotalManagementExpenses",
+		"bank-charges": "ct-comp:ManagementExpensesBankChargesCommission",
+		"legal-and-professional": "ct-comp:ManagementExpensesLegalAndProfessional",
+		"sundries": "ct-comp:ManagementExpensesSundries",
+		"travel": "ct-comp:ManagementExpensesTravelAndSubsistence",
+		"office": "ct-comp:AdjustmentsTelephoneFaxStationeryAndOtherOfficeCosts",
+		"software-expenses": "ct-comp:ComputerCosts",
+		"telecoms": "ct-comp:AdjustmentsTelephoneFaxStationeryAndOtherOfficeCosts",
+
 		"company-name": "ct-comp:CompanyName",
 		"tax-reference": "ct-comp:TaxReference",
 		"return-period-start": "ct-comp:StartOfPeriodCoveredByReturn",
@@ -998,7 +1021,8 @@
 		"total-deductions-and-reliefs": true,
 		"fy1-tax-at-first-rate": true,
 		"corporation-tax-chargeable": true,
-		"corporation-tax-chargeable-payable": true
+		"corporation-tax-chargeable-payable": true,
+		"annual-investment-allowance": true
 	    },
 	    "lookup": {
 		"countries-regions": {
