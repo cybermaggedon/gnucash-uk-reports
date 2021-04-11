@@ -246,7 +246,7 @@
 		{
 		    "id": "it-and-computing",
 		    "kind": "line",
-		    "description": "IT and computing",
+		    "description": "Annual investment allowance",
 		    "period": "in-year",
 		    "accounts": [
 			"Assets:Capital Equipment:Computer Equipment"
@@ -323,7 +323,7 @@
 		"about",
 		"profits",
 		"tax-chargeable",
-		"profit-and-loss"
+		"tax-calculation"
 	    ]
 	},
 
@@ -406,7 +406,7 @@
 		    "description": "Trading profits",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "net-profit",
+		    "computation": "gross-profit",
 		    "context": "report-period"
 		},
 
@@ -425,7 +425,7 @@
 		    "description": "Net trading profits",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "net-profit",
+		    "computation": "gross-profit",
 		    "context": "report-period"
 		},
 
@@ -444,7 +444,7 @@
 		    "description": "Profits before other deductions and reliefs",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "net-profit",
+		    "computation": "gross-profit",
 		    "context": "report-period"
 		},
 

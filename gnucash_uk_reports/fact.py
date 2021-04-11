@@ -28,10 +28,10 @@ class MoneyFact(Fact):
             elt.setAttribute("decimals", "2")
             if value < 0:
                 elt.setAttribute("sign", "-")
-            elt.appendChild(doc.createTextNode(str(value)))
+            elt.appendChild(doc.createTextNode("{0:.2f}".format(value)))
             par.appendChild(elt)
         else:
-            par.appendChild(doc.createTextNode(str(value)))
+            par.appendChild(doc.createTextNode("{0:.2f}".format(value)))
     def copy(self):
         return copy.copy(self)
     def rename(self, id, context, tx):
