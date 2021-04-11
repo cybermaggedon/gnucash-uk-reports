@@ -571,7 +571,7 @@
 		{
 		    "field": "340",
 		    "id": "fy1-first-rate-of-tax",
-		    "description": "FY1 first rate of tax",
+		    "description": "FY1 first rate of tax (%)",
 		    "kind": "number",
 		    "value": 19,
 		    "context": "report-period"
