@@ -125,6 +125,9 @@
 	    "kind": "group",
 	    "description": "Management Expenses",
 	    "period": "in-year",
+	    "segments": {
+		"business-type": "management-expenses"
+	    },
 	    "lines": [
 		{
 		    "id": "salaries",
@@ -133,7 +136,10 @@
 		    "period": "in-year",
 		    "accounts": [
 			"Expenses:Emoluments:Employees"
-		    ]
+		    ],
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		},
 		{
 		    "id": "pensions",
@@ -142,7 +148,10 @@
 		    "period": "in-year",
 		    "accounts": [
 			"Expenses:Emoluments:Employer Pension Contribution"
-		    ]
+		    ],
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		},
 		{
 		    "id": "legal-and-professional",
@@ -151,7 +160,10 @@
 		    "accounts": [
 			"Expenses:VAT Purchases:Accountant"
 		    ],
-		    "period": "in-year"
+		    "period": "in-year",
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		},
 		{
 		    "id": "bank-charges",
@@ -160,16 +172,23 @@
 		    "accounts": [
 			"Expenses:VAT Purchases:Bank Charges"
 		    ],
-		    "period": "in-year"
+		    "period": "in-year",
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		},
 		{
 		    "id": "office",
 		    "kind": "line",
 		    "description": "Office costs",
 		    "accounts": [
-			"Expenses:VAT Purchases:Office"
+			"Expenses:VAT Purchases:Office",
+			"Expenses:VAT Purchases:Telecoms"
 		    ],
-		    "period": "in-year"
+		    "period": "in-year",
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		},
 		{
 		    "id": "software-expenses",
@@ -178,7 +197,10 @@
 		    "accounts": [
 			"Expenses:VAT Purchases:Software"
 		    ],
-		    "period": "in-year"
+		    "period": "in-year",
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		},
 		{
 		    "id": "sundries",
@@ -188,16 +210,10 @@
 			"Expenses:VAT Purchases:Subscriptions",
 			"Expenses:VAT Purchases:Sundries"
 		    ],
-		    "period": "in-year"
-		},
-		{
-		    "id": "telecoms",
-		    "kind": "line",
-		    "description": "Telecoms",
-		    "accounts": [
-			"Expenses:VAT Purchases:Telecoms"
-		    ],
-		    "period": "in-year"
+		    "period": "in-year",
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		},
 		{
 		    "id": "travel",
@@ -206,7 +222,10 @@
 		    "accounts": [
 			"Expenses:VAT Purchases:Travel/Accom"
 		    ],
-		    "period": "in-year"
+		    "period": "in-year",
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		}
 	    ]
 	},
@@ -215,15 +234,20 @@
 	    "id": "gross-profit",
 	    "kind": "computation",
 	    "description": "Gross Profit",
+	    "period": "in-year",
 	    "inputs": [
 		"turnover"
-	    ]
+	    ],
+	    "segments": {
+		"business-type": "company"
+	    }
 	},
 
 	{
 	    "id": "operating-profit",
 	    "kind": "computation",
 	    "description": "Operating Profit",
+	    "period": "in-year",
 	    "inputs": [
 		"gross-profit",
 		"management-expenses"
@@ -243,7 +267,10 @@
 		    "accounts": [
 			"Assets:Capital Equipment:Computer Equipment"
 		    ],
-		    "reverse-sign": true
+		    "reverse-sign": true,
+		    "segments": {
+			"business-type": "management-expenses"
+		    }
 		}
 	    ]
 	},
@@ -251,10 +278,14 @@
 	    "id": "profit-before-tax",
 	    "kind": "computation",
 	    "description": "Profit before tax",
+	    "period": "in-year",
 	    "inputs": [
 		"operating-profit",
 		"allowances"
-	    ]
+	    ],
+	    "segments": {
+		"business-type": "company"
+	    }
 	},
 	{
 	    "id": "tax-owed",
@@ -463,10 +494,10 @@
 		{
 		    "field": "300",
 		    "id": "profits-before-charges-and-group-relief",
-		    "description": "Profits before qualifying donations and group relief",
+		    "description": "Profits before donations and group relief",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "profit",
+		    "computation": "profit-before-tax",
 		    "context": "report-period"
 		},
 
@@ -503,7 +534,7 @@
 		    "description": "Profits chargeable to Corporation Tax",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "profit",
+		    "computation": "profit-before-tax",
 		    "context": "report-period"
 		}
 
@@ -533,7 +564,7 @@
 		    "description": "FY1 amount of profit chargable at first rate",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "profit",
+		    "computation": "profit-before-tax",
 		    "context": "report-period"
 		},
 		    

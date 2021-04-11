@@ -49,12 +49,12 @@
 		},
 		{
 		    "id": "company-name",
-		    "context": "report-period",
+		    "context": "report-date",
 		    "config": "metadata.business.company-name"
 		},
 		{
 		    "id": "tax-reference",
-		    "context": "report-period",
+		    "context": "report-date",
 		    "config": "metadata.tax.utr"
 		}
 	    ],
@@ -69,8 +69,8 @@
 		"sundries": "ct-comp:ManagementExpensesSundries",
 		"travel": "ct-comp:ManagementExpensesTravelAndSubsistence",
 		"office": "ct-comp:AdjustmentsTelephoneFaxStationeryAndOtherOfficeCosts",
-		"software-expenses": "ct-comp:ComputerCosts",
-		"telecoms": "ct-comp:AdjustmentsTelephoneFaxStationeryAndOtherOfficeCosts",
+		"software-expenses": "ct-comp:ManagementExpensesComputerCosts",
+		"profit-before-tax": "ct-comp:TotalProfitsChargeableToCorporationTax",
 
 		"company-name": "ct-comp:CompanyName",
 		"tax-reference": "ct-comp:TaxReference",
@@ -1017,7 +1017,7 @@
 	    },
 	    "sign-reversed": {
 		"administrative-expenses": true,
-		"management-expenses-relief": true,
+		"management-expenses": true,
 		"total-deductions-and-reliefs": true,
 		"fy1-tax-at-first-rate": true,
 		"corporation-tax-chargeable": true,
