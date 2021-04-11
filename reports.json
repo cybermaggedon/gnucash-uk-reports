@@ -21,7 +21,7 @@
 	    "company-formation": {
 		"form": "private-limited-company",
 		"country": "england-and-wales",
-		"date": "2019-03-01"
+		"date": "2017-04-05"
 	    },
 	    "average-employees": [
 		2,
@@ -109,6 +109,7 @@
 	    "kind": "group",
 	    "description": "Turnover / revenue",
 	    "period": "in-year",
+	    "hide-breakdown": true,
 	    "lines": [
 		{
 		    "kind": "line",
@@ -122,31 +123,12 @@
 	    ]
 	},
 	{
-	    "id": "cost-of-sales",
-	    "kind": "group",
-	    "description": "Cost of Sales",
-	    "hide-breakdown": true,
-	    "period": "in-year",
-	    "lines": [
-		{
-		    "id": "staffing",
-		    "kind": "line",
-		    "description": "Staffing Costs",
-		    "period": "in-year",
-		    "accounts": [
-			"Expenses:Emoluments"
-		    ]
-		}
-	    ]
-	},	
-	{
 	    "id": "gross-profit",
 	    "kind": "computation",
 	    "description": "Gross Profit",
 	    "period": "in-year",
 	    "inputs": [
-		"turnover",
-		"cost-of-sales"
+		"turnover"
 	    ]
 	},
 	{
@@ -154,7 +136,26 @@
 	    "kind": "group",
 	    "description": "Administrative Expenses",
 	    "period": "in-year",
+	    "hide-breakdown": true,
 	    "lines": [
+		{
+		    "id": "salaries",
+		    "kind": "line",
+		    "description": "Salaries",
+		    "period": "in-year",
+		    "accounts": [
+			"Expenses:Emoluments:Employees"
+		    ]
+		},
+		{
+		    "id": "pensions",
+		    "kind": "line",
+		    "description": "Pension contributions",
+		    "period": "in-year",
+		    "accounts": [
+			"Expenses:Emoluments:Employer Pension Contribution"
+		    ]
+		},
 		{
 		    "id": "depreciation",
 		    "kind": "line",
@@ -165,12 +166,74 @@
 		    "period": "in-year"
 		},
 		{
-		    "id": "other-charges",
+		    "id": "accountancy",
 		    "kind": "line",
-		    "description": "Other",
+		    "description": "Accountancy services",
 		    "accounts": [
-			"Expenses:VAT Purchases",
-			"Expenses:Other non-VAT expenses"
+			"Expenses:VAT Purchases:Accountant"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "bank-charges",
+		    "kind": "line",
+		    "description": "Bank charges",
+		    "accounts": [
+			"Expenses:VAT Purchases:Bank Charges"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "office",
+		    "kind": "line",
+		    "description": "Office costs",
+		    "accounts": [
+			"Expenses:VAT Purchases:Office"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "software",
+		    "kind": "line",
+		    "description": "Software",
+		    "accounts": [
+			"Expenses:VAT Purchases:Software"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "subscriptions",
+		    "kind": "line",
+		    "description": "Subscriptions",
+		    "accounts": [
+			"Expenses:VAT Purchases:Subscriptions"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "sundries",
+		    "kind": "line",
+		    "description": "Sundries",
+		    "accounts": [
+			"Expenses:VAT Purchases:Sundries"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "Telecoms",
+		    "kind": "line",
+		    "description": "Telecoms",
+		    "accounts": [
+			"Expenses:VAT Purchases:Telecoms"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "travel",
+		    "kind": "line",
+		    "description": "Travel",
+		    "accounts": [
+			"Expenses:VAT Purchases:Travel/Accom"
 		    ],
 		    "period": "in-year"
 		}
@@ -520,7 +583,6 @@
 
 	    "computations": [
 		"turnover",
-		"cost-of-sales",
 		"gross-profit",
 		"administrative-expenses",
 		"profit"

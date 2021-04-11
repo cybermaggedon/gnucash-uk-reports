@@ -139,33 +139,103 @@
 	    "period": "in-year",
 	    "lines": [
 		{
-		    "id": "staffing",
+		    "id": "salaries",
 		    "kind": "line",
-		    "description": "Staffing Costs",
+		    "description": "Salaries",
 		    "period": "in-year",
 		    "accounts": [
-			"Expenses:Emoluments"
+			"Expenses:Emoluments:Employees"
 		    ]
 		},
 		{
-		    "id": "other-charges",
+		    "id": "pensions",
 		    "kind": "line",
-		    "description": "Other",
+		    "description": "Pension contributions",
+		    "period": "in-year",
 		    "accounts": [
-			"Expenses:VAT Purchases",
-			"Expenses:Other non-VAT expenses"
+			"Expenses:Emoluments:Employer Pension Contribution"
+		    ]
+		},
+		{
+		    "id": "depreciation",
+		    "kind": "line",
+		    "description": "Depreciation",
+		    "accounts": [
+			"Expenses:Depreciation"
 		    ],
 		    "period": "in-year"
 		},
 		{
-		    "id": "it-and-computing",
+		    "id": "accountancy",
 		    "kind": "line",
-		    "description": "IT and computing",
-		    "period": "in-year",
+		    "description": "Accountancy services",
 		    "accounts": [
-			"Assets:Capital Equipment:Computer Equipment"
+			"Expenses:VAT Purchases:Accountant"
 		    ],
-		    "reverse-sign": true
+		    "period": "in-year"
+		},
+		{
+		    "id": "bank-charges",
+		    "kind": "line",
+		    "description": "Bank charges",
+		    "accounts": [
+			"Expenses:VAT Purchases:Bank Charges"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "office",
+		    "kind": "line",
+		    "description": "Office costs",
+		    "accounts": [
+			"Expenses:VAT Purchases:Office"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "software",
+		    "kind": "line",
+		    "description": "Software",
+		    "accounts": [
+			"Expenses:VAT Purchases:Software"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "subscriptions",
+		    "kind": "line",
+		    "description": "Subscriptions",
+		    "accounts": [
+			"Expenses:VAT Purchases:Subscriptions"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "sundries",
+		    "kind": "line",
+		    "description": "Sundries",
+		    "accounts": [
+			"Expenses:VAT Purchases:Sundries"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "Telecoms",
+		    "kind": "line",
+		    "description": "Telecoms",
+		    "accounts": [
+			"Expenses:VAT Purchases:Telecoms"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "travel",
+		    "kind": "line",
+		    "description": "Travel",
+		    "accounts": [
+			"Expenses:VAT Purchases:Travel/Accom"
+		    ],
+		    "period": "in-year"
 		}
 	    ]
 	},

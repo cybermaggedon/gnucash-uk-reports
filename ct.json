@@ -121,44 +121,132 @@
 	    ]
 	},
 	{
-	    "id": "cost-of-sales",
-	    "kind": "group",
-	    "description": "Cost of Sales",
-	    "hide-breakdown": true,
-	    "period": "in-year",
-	    "lines": [
-		{
-		    "id": "staffing",
-		    "kind": "line",
-		    "description": "Staffing Costs",
-		    "period": "in-year",
-		    "accounts": [
-			"Expenses:Emoluments"
-		    ]
-		}
-	    ]
-	},	
-
-	{
-	    "id": "dpl-management-expenses",
+	    "id": "management-expenses",
 	    "kind": "group",
 	    "description": "Management Expenses",
 	    "period": "in-year",
 	    "lines": [
 		{
-		    "id": "other-charges",
+		    "id": "salaries",
 		    "kind": "line",
-		    "description": "Other",
+		    "description": "Salaries",
+		    "period": "in-year",
 		    "accounts": [
-			"Expenses:VAT Purchases",
-			"Expenses:Other non-VAT expenses"
+			"Expenses:Emoluments:Employees"
+		    ]
+		},
+		{
+		    "id": "pensions",
+		    "kind": "line",
+		    "description": "Pension contributions",
+		    "period": "in-year",
+		    "accounts": [
+			"Expenses:Emoluments:Employer Pension Contribution"
+		    ]
+		},
+		{
+		    "id": "accountancy",
+		    "kind": "line",
+		    "description": "Accountancy services",
+		    "accounts": [
+			"Expenses:VAT Purchases:Accountant"
 		    ],
 		    "period": "in-year"
 		},
 		{
-		    "id": "dpl-machinery-plant",
+		    "id": "bank-charges",
 		    "kind": "line",
-		    "description": "Machinery and plant",
+		    "description": "Bank charges",
+		    "accounts": [
+			"Expenses:VAT Purchases:Bank Charges"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "office",
+		    "kind": "line",
+		    "description": "Office costs",
+		    "accounts": [
+			"Expenses:VAT Purchases:Office"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "software",
+		    "kind": "line",
+		    "description": "Software",
+		    "accounts": [
+			"Expenses:VAT Purchases:Software"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "subscriptions",
+		    "kind": "line",
+		    "description": "Subscriptions",
+		    "accounts": [
+			"Expenses:VAT Purchases:Subscriptions"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "sundries",
+		    "kind": "line",
+		    "description": "Sundries",
+		    "accounts": [
+			"Expenses:VAT Purchases:Sundries"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "Telecoms",
+		    "kind": "line",
+		    "description": "Telecoms",
+		    "accounts": [
+			"Expenses:VAT Purchases:Telecoms"
+		    ],
+		    "period": "in-year"
+		},
+		{
+		    "id": "travel",
+		    "kind": "line",
+		    "description": "Travel",
+		    "accounts": [
+			"Expenses:VAT Purchases:Travel/Accom"
+		    ],
+		    "period": "in-year"
+		}
+	    ]
+	},
+
+	{
+	    "id": "gross-profit",
+	    "kind": "computation",
+	    "description": "Gross Profit",
+	    "inputs": [
+		"turnover"
+	    ]
+	},
+
+	{
+	    "id": "operating-profit",
+	    "kind": "computation",
+	    "description": "Operating Profit",
+	    "inputs": [
+		"gross-profit",
+		"management-expenses"
+	    ]
+	},
+	{
+	    "id": "allowances",
+	    "kind": "group",
+	    "description": "Allowances",
+	    "period": "in-year",
+	    "lines": [
+		{
+		    "id": "it-and-computing",
+		    "kind": "line",
+		    "description": "IT and computing",
 		    "period": "in-year",
 		    "accounts": [
 			"Assets:Capital Equipment:Computer Equipment"
@@ -167,35 +255,23 @@
 		}
 	    ]
 	},
-
 	{
-	    "id": "dpl-net-profit",
+	    "id": "profit-before-tax",
 	    "kind": "computation",
-	    "description": "Trading Profits",
+	    "description": "Profit before tax",
 	    "inputs": [
-		"turnover",
-		"cost-of-sales"		
+		"operating-profit",
+		"allowances"
 	    ]
 	},
-
 	{
-	    "id": "dpl-profit",
-	    "kind": "computation",
-	    "description": "Profit",
-	    "inputs": [
-		"dpl-management-expenses",
-		"dpl-net-profit"
-	    ]
-	},
-
-	{
-	    "id": "dpl-tax-owed",
+	    "id": "tax-owed",
 	    "kind": "group",
 	    "description": "Corporation Tax Owed",
 	    "period": "in-year",
 	    "lines": [
 		{
-		    "id": "dpl-corporation-tax",
+		    "id": "corporation-tax",
 		    "kind": "line",
 		    "description": "Other",
 		    "accounts": [
@@ -204,6 +280,15 @@
 		    "period": "in-year"
 		}
 	    ]
+	},
+	{
+	    "id": "profit",
+	    "kind": "computation",
+	    "description": "Profit",
+	    "inputs": [
+		"profit-before-tax",
+		"tax-owed"
+	    ]
 	}
 
     ],
@@ -211,17 +296,18 @@
     "worksheets": [
 
 	{
-	    "id": "corptax-profit-and-loss",
+	    "id": "tax-calculation",
 	    "kind": "multi-period",
-	    "description": "Detailed Profit and Loss",
-
+	    "description": "Tax Calculation",
 	    "computations": [
 		"turnover",
-		"cost-of-sales",
-		"dpl-net-profit",
-		"dpl-management-expenses",
-		"dpl-profit",
-		"dpl-tax-owed"
+		"gross-profit",
+		"management-expenses",
+		"operating-profit",
+		"allowances",
+		"profit-before-tax",
+		"tax-owed",
+		"profit"
 	    ]
 
 	}
@@ -320,7 +406,7 @@
 		    "description": "Trading profits",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-net-profit",
+		    "computation": "net-profit",
 		    "context": "report-period"
 		},
 
@@ -339,7 +425,7 @@
 		    "description": "Net trading profits",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-net-profit",
+		    "computation": "net-profit",
 		    "context": "report-period"
 		},
 
@@ -358,7 +444,7 @@
 		    "description": "Profits before other deductions and reliefs",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-net-profit",
+		    "computation": "net-profit",
 		    "context": "report-period"
 		},
 
@@ -368,7 +454,7 @@
 		    "description": "Management expenses",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-management-expenses",
+		    "computation": "management-expenses",
 		    "context": "management-expenses-period"
 		},
 
@@ -378,7 +464,7 @@
 		    "description": "Total deductions and reliefs",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-management-expenses",
+		    "computation": "management-expenses",
 		    "context": "report-period"
 		},
 
@@ -388,7 +474,7 @@
 		    "description": "Profits before qualifying donations and group relief",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-profit",
+		    "computation": "profit",
 		    "context": "report-period"
 		},
 
@@ -425,7 +511,7 @@
 		    "description": "Profits chargeable to Corporation Tax",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-profit",
+		    "computation": "profit",
 		    "context": "report-period"
 		}
 
@@ -455,7 +541,7 @@
 		    "description": "FY1 amount of profit chargable at first rate",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-profit",
+		    "computation": "profit",
 		    "context": "report-period"
 		},
 		    
@@ -474,7 +560,7 @@
 		    "description": "FY1 tax at first rate",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-tax-owed",
+		    "computation": "tax-owed",
 		    "context": "report-period"
 		},
 		  
@@ -484,7 +570,7 @@
 		    "description": "Corporation tax",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-tax-owed",
+		    "computation": "tax-owed",
 		    "context": "report-period"
 		},
 		  
@@ -503,7 +589,7 @@
 		    "description": "Corporation tax chargeable",
 		    "kind": "computation",
 		    "period-config": "metadata.tax.period",
-		    "computation": "dpl-tax-owed",
+		    "computation": "tax-owed",
 		    "context": "report-period"
 		}
 		     
@@ -511,10 +597,10 @@
 	},
 
 	{
-	    "id": "profit-and-loss",
+	    "id": "tax-calculation",
 	    "kind": "worksheet",
 	    "title": "Income Statement",
-	    "worksheet": "corptax-profit-and-loss"
+	    "worksheet": "tax-calculation"
 	}
 
     ]
