@@ -1,7 +1,7 @@
 
 # `gnucash-uk-reports`
 
-This has been superceded: [https://github.com/cybermaggedon/gnucash-ixbrl](gnucash-ixbrl).
+This has been superceded: [gnucash-ixbrl](https://github.com/cybermaggedon/gnucash-ixbrl]).
 The project has removed the UK-hard-coded stuff from the code base, the iXBRL taxonomies
 can be configured for other reporting regimes.
 
