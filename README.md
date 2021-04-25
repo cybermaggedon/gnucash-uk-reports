@@ -1,6 +1,10 @@
 
 # `gnucash-uk-reports`
 
+This has been superceded: [https://github.com/cybermaggedon/gnucash-ixbrl](gnucash-ixbrl).
+The project has removed the UK-hard-coded stuff from the code base, the iXBRL taxonomies
+can be configured for other reporting regimes.
+
 ## Introduction
 
 This is a utility which allows gnucash accounts to be presented as UK-format
